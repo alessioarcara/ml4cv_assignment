@@ -1,0 +1,14 @@
+seed: 42
+wandb:
+  project: "ML4CV_ASS"
+training:
+  num_epochs: 100
+  batch_size: 256
+  lr: 0.001
+  wd: 0.01
+  ls: 0.1
+paths:
+  train_path: "ml4cv_assignment/data/datasets/train"
+  test_path: "ml4cv-assignment/data/datasets/test"
+  save_path: "ml4cv-assignment/saved/models"
+  logs_path: "ml4cv-assignment/saved/logs"
