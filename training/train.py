@@ -8,6 +8,8 @@ from torch.utils.data import DataLoader
 import wandb
 from tqdm.notebook import tqdm
 from .metrics import Metric
+from utils.visualize import color, COLORS
+import numpy as np
 
 
 class Trainer:
@@ -56,33 +58,21 @@ class Trainer:
 
     def log_segmentation_results(
         self,
-        imgs: torch.Tensor,
         true: torch.Tensor,
         pred: torch.Tensor
     ) -> None:
-        table = wandb.Table(columns=["ID", "Image", "Ground Truth", "Prediction"])
-
-        for i in range(imgs.size(0)):
-            img_np = imgs[i].cpu().detach().numpy().transpose(1, 2, 0)  # From [C, H, W] to [H, W, C]
-            true_mask = true[i].cpu().detach().numpy()
-            pred_mask = pred[i].cpu().detach().numpy() 
-
-            seg_img = wandb.Image(
-                img_np,
-                masks={
-                    "prediction": {
-                        "mask_data": pred_mask,
-                        "class_labels": self.class_dict
-                    },
-                    "ground_truth": {
-                        "mask_data": true_mask,
-                        "class_labels": self.class_dict
-                    },
-                },
-            )
-
-            table.add_data(f"Image_{i}", seg_img, true_mask, pred_mask)
-
+        table = wandb.Table(columns=["Comparison"])
+        
+        for true_mask, pred_mask in zip(true, pred):
+            true_np = true_mask.cpu().numpy()
+            pred_np = pred_mask.cpu().numpy()
+            
+            true_colored = color(true_np, COLORS)
+            pred_colored = color(pred_np, COLORS)
+            
+            comparison = np.concatenate((true_colored, pred_colored), axis=1)
+            table.add_data(wandb.Image(comparison))
+            
         wandb.log({"Segmentation Results": table})
 
     def train(self, run_name) -> None:
@@ -168,8 +158,8 @@ class Trainer:
             for metric in self.metrics:
                 metric.update(pred, masks)
 
-            if not first_batch_logged:
-                self.log_segmentation_masks(imgs, masks, pred)
+            if split == "val" and not first_batch_logged:
+                self.log_segmentation_results(masks, pred)
                 first_batch_logged = True
     
         mean_epoch_loss = cumulative_loss / len(loader)

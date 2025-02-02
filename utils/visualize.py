@@ -1,6 +1,7 @@
 """
 Source: https://github.com/hendrycks/anomaly-seg/issues/15#issuecomment-890300278
 """
+from typing import Union
 import numpy as np
 from PIL import Image
 
@@ -23,15 +24,21 @@ COLORS = np.array([
 ])
 
 
-def color(annot_path: str, colors: np.ndarray) -> Image.Image:
-    img_pil = Image.open(annot_path)
-    img_np = np.array(img_pil)
-    img_new = np.zeros((720, 1280, 3))
+def color(
+    annot_or_mask: Union[str, np.ndarray],
+    colors: np.ndarray,
+) -> Image.Image:
+    if isinstance(annot_or_mask, str):
+        mask = np.array(Image.open(annot_or_mask))
+    else:
+        mask = annot_or_mask
+
+    img_new = np.zeros((mask.shape[0], mask.shape[1], 3), dtype=np.uint8)
 
     for index, color in enumerate(colors):
-        img_new[img_np == index + 1] = color
-    
-    return Image.fromarray(img_new.astype("uint8"), "RGB")
+        img_new[mask == index + 1] = color
+
+    return Image.fromarray(img_new, "RGB")
 
 
 if __name__ == "__main__":
