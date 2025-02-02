@@ -2,8 +2,9 @@ seed: 42
 wandb:
   project: "ML4CV_ASS"
 training:
-  num_epochs: 100
-  batch_size: 256
+  num_epochs: 20
+  evaluation_rate: 2
+  batch_size: 32 
   lr: 0.001
   wd: 0.01
   ls: 0.1

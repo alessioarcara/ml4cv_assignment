@@ -20,7 +20,7 @@ COLORS = np.array([
     [102, 102, 156],  # wall         =  11, 
     [220, 220,   0],  # traffic sign =  12,
     [ 60, 250, 240],  # anomaly      =  13,
-]) 
+])
 
 
 def color(annot_path: str, colors: np.ndarray) -> Image.Image:

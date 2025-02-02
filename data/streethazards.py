@@ -1,60 +1,101 @@
+import pickle
 from pathlib import Path
+
+import numpy as np
+import torch
+from PIL import Image
 from torch.utils.data import Dataset
-import torchvision.transforms.functional as F
-import cv2 as cv
+
+
+STREET_HAZARDS_CLASSES = [
+    "unlabeled", "building", "fence", "other", "pedestrian",
+    "pole", "road line", "road", "sidewalk", "vegetation",
+    "car", "wall", "traffic sign", "anomaly"
+]
+
+
+def get_classes_as_dict():
+        return dict(enumerate(STREET_HAZARDS_CLASSES))
+
+
+# Implementazione basata su Detectron2:
+# https://github.com/facebookresearch/detectron2/blob/main/detectron2/data/common.py
+class TorchSerializedList:
+    """
+    A list-like object whose items are serialized and stored in a torch tensor. When
+    launching a process that uses TorchSerializedList with "fork" start method,
+    the subprocess can read the same buffer without triggering copy-on-access. When
+    launching a process that uses TorchSerializedList with "spawn/forkserver" start
+    method, the list will be pickled by a special ForkingPickler registered by PyTorch
+    that moves data to shared memory. In both cases, this allows parent and child
+    processes to share RAM for the list data, hence avoids the issue in
+    https://github.com/pytorch/pytorch/issues/13246.
+
+    See also https://ppwwyyxx.com/blog/2022/Demystify-RAM-Usage-in-Multiprocess-DataLoader/
+    on how it works.
+    """
+
+    def __init__(self, lst: list):
+        self._lst = lst
+
+        def _serialize(data):
+            buffer = pickle.dumps(data, protocol=-1)
+            return np.frombuffer(buffer, dtype=np.uint8)
+
+        self._lst = [_serialize(x) for x in self._lst]
+        self._addr = np.asarray([len(x) for x in self._lst], dtype=np.int64)
+        self._addr = torch.from_numpy(np.cumsum(self._addr))
+        self._lst = torch.from_numpy(np.concatenate(self._lst))
+
+    def __len__(self):
+        return len(self._addr)
+
+    def __getitem__(self, idx):
+        start_addr = 0 if idx == 0 else self._addr[idx - 1].item()
+        end_addr = self._addr[idx].item()
+        bytes = memoryview(self._lst[start_addr:end_addr].numpy())
+        return pickle.loads(bytes)
+
 
 class StreetHazards(Dataset):
     def __init__(
             self, 
-            root_dir: Path,
-            subset: str = "training",
+            root_dir: Path, 
+            subset: str = "training", 
             transforms=None
         ) -> None:
-        """
-        Args:
-            root_dir: Path to the directory containing the image and masks.
-            subset: Subfolder name ('training' or 'validation') specifying the dataset split.
-            transforms: Transformations to apply the images and masks.
-        """
-        self.classes = [
-            "unlabeled", 
-            "building", 
-            "fence", 
-            "other", 
-            "pedestrian", 
-            "pole", 
-            "road line", 
-            "road", 
-            "sidewalk", 
-            "vegetation", 
-            "car", 
-            "wall", 
-            "traffic sign", 
-            "anomaly"
-        ]
-
         images_dir = root_dir / "images" / subset
         masks_dir = root_dir / "annotations" / subset
 
-        self.imgs = sorted(images_dir.rglob("*.png"))
-        self.masks = sorted(masks_dir.rglob("*.png"))
-
+        self.imgs = TorchSerializedList(sorted(str(p) for p in images_dir.rglob("*.png")))
+        self.masks = TorchSerializedList(sorted(str(p) for p in masks_dir.rglob("*.png")))
         self.transforms = transforms 
 
         if len(self.imgs) - len(self.masks) != 0:
             raise AssertionError(
-                f"Labels and Images differs in size {len(self.imgs) - len(self.masks)}."
+                f"Labels and Images differ in size {len(self.imgs) - len(self.masks)}."
             )
 
     def __len__(self):
         return len(self.imgs)
+    
+    @staticmethod
+    def _load_image(path: str):
+        with Image.open(path) as img:
+            img = img.convert("RGB")
+            return np.array(img)
+
+    @staticmethod
+    def _load_mask(path: str):
+        with Image.open(path) as mask:
+            mask = mask.convert("L")
+            return np.array(mask)
 
     def __getitem__(self, idx):
         path_img = self.imgs[idx]
         path_mask = self.masks[idx]
-
-        img = cv.cvtColor(cv.imread(path_img, cv.IMREAD_COLOR), cv.COLOR_BGR2RGB)
-        mask = cv.imread(path_mask, cv.IMREAD_GRAYSCALE)
+        img = self._load_image(path_img)
+        mask = self._load_mask(path_mask)
 
         if self.transforms is not None:
             augmented = self.transforms(image=img, mask=mask)
@@ -63,8 +104,23 @@ class StreetHazards(Dataset):
 
         return img, mask
     
-    def get_classes_as_dict(self):
-        return { idx: class_name for idx, class_name in enumerate(self.classes) }
+    def get_class_weights(self) -> torch.Tensor:
+        """
+        Calcola i pesi inversi per classe, utili nelle funzioni di loss.
+        """
+        # Conta i pixel per ciascuna classe
+        num_classes = len(STREET_HAZARDS_CLASSES)
+        class_counts = torch.zeros(num_classes)
+        for path_mask in self.masks:
+            mask = self._load_mask(path_mask)
+            class_counts += torch.bincount(
+                torch.from_numpy(mask.flatten()), 
+                minlength=num_classes
+            )
+        
+        # Calcola i pesi inversi, aggiungendo 1 per evitare divisioni per zero
+        weights = 1.0 / (class_counts + 1.0)
+        return weights / weights.sum() * num_classes
     
 
 if __name__ == "__main__":
