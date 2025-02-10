@@ -1,12 +1,12 @@
 import torch.nn as nn
 
 class ChimeraSeg(nn.Module):
-    def __init__(self, backbone, decoder):
+    def __init__(self, encoder, decoder):
         super(ChimeraSeg, self).__init__()
-        self.backbone = backbone 
-        self.sem_decoder = decoder
+        self.encoder = encoder 
+        self.decoder = decoder
 
     def forward(self, x):
-        features = self.backbone(x)
-        segmentation_map = self.sem_decoder(features)
+        features = self.encoder(x)
+        segmentation_map = self.decoder(features)
         return features, segmentation_map 

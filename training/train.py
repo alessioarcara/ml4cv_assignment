@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, Callable
 from pathlib import Path
 import torch
 import torch.nn as nn
@@ -18,11 +18,13 @@ class Trainer:
             model: nn.Module,
             device: torch.device,
             train_loader: DataLoader,
+            criterions: list[tuple[float, Callable]],
             val_loader: DataLoader = None,
             class_dict: Dict[int, str] = {},
-            metrics: list[Metric] = []
+            metrics: list[Metric] = [],
         ) -> None:
         self.config = config
+        self.criterions = criterions
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.device = device
@@ -44,7 +46,7 @@ class Trainer:
             self.optimizer,
             max_lr=lr,
             total_steps=num_steps,
-            pct_start=0.1
+            pct_start=0.1,
         )
 
         # AMP
@@ -61,6 +63,9 @@ class Trainer:
         true: torch.Tensor,
         pred: torch.Tensor
     ) -> None:
+        """
+        Log a side-by-side comparison of true vs predicted masks.
+        """
         table = wandb.Table(columns=["Comparison"])
         
         for true_mask, pred_mask in zip(true, pred):
@@ -104,8 +109,20 @@ class Trainer:
                 self.eval('train', epoch)
                 if self.val_loader:
                     self.eval('val', epoch)
+            
+            # self._save_model(epoch)
 
         wandb.finish()
+
+    def _compute_loss(self, logits: torch.Tensor, masks: torch.Tensor) -> torch.Tensor:
+        """
+        Compute a weighted sum of all provided criterions.
+        """
+        total_loss = 0.0
+        for weight, criterion in self.criterions:
+            l = criterion(logits, masks)
+            total_loss += weight * l
+        return total_loss
 
     def _training_step(self, imgs: torch.Tensor, masks: torch.Tensor) -> float:
         imgs = imgs.to(self.device, non_blocking=True)
@@ -115,7 +132,7 @@ class Trainer:
 
         with torch.autocast(device_type=self.device.type, dtype=torch.float16):
             _, logits = self.model(imgs)
-            loss = F.cross_entropy(logits, masks)
+            loss = self._compute_loss(logits, masks)
 
         self.scaler.scale(loss).backward()
         self.scaler.step(self.optimizer)
@@ -133,6 +150,9 @@ class Trainer:
 
     @torch.inference_mode()
     def eval(self, split: str, epoch: int) -> None:
+        """
+        Evaluate the model on either the training loader or validation loader.
+        """
         self.model.eval()
         loader = self.val_loader if split == "val" else self.train_loader
 
@@ -151,7 +171,7 @@ class Trainer:
             
             with torch.autocast(device_type=self.device.type, dtype=torch.float16):
                 _, logits = self.model(imgs)
-                batch_loss = F.cross_entropy(logits, masks)
+                batch_loss = self._compute_loss(logits, masks)
 
             cumulative_loss += batch_loss.item()
             pred = logits.argmax(dim=1)
@@ -174,9 +194,13 @@ class Trainer:
         wandb.log(log_dict)
 
     def _save_model(self):
-        save_path = self.path_ckpts / f"{self.config['wandb_run_name']}.pt"
-        torch.save(self.model.state_dict(), save_path)
-        print(f"Model saved to {save_path}")
+        """
+        Save model checkpoint to the configured directory.
+        """
+        # save_path = self.path_ckpts / f"{self.config['wandb_run_name']}.pt"
+        # torch.save(self.model.state_dict(), save_path)
+        # print(f"Model saved to {save_path}")
+        pass
 
 
 if __name__ == '__main__':

@@ -30,3 +30,34 @@ class _RepeatSampler(object):
     def __iter__(self):
         while True:
             yield from iter(self.sampler)
+
+
+# Verifying whether the _RepeatSampler affects the shuffle functionality.
+# If shuffle is working correctly, the printed indices should be different across epochs.
+if __name__ == "__main__":
+    class IndexDataset(torch.utils.data.Dataset):
+        def __init__(self, size):
+            self.size = size
+
+        def __len__(self):
+            return self.size
+
+        def __getitem__(self, idx):
+            return idx
+
+    dataset = IndexDataset(100)
+
+    loader = MultiEpochsDataLoader(
+        dataset,
+        batch_size=4,
+        shuffle=True,
+        num_workers=0
+    )
+
+    for epoch in range(3):
+        indices = []
+        for batch in loader:
+            indices.extend(batch.numpy())
+            break
+    
+        print(f"Epoch {epoch + 1}: {indices}")

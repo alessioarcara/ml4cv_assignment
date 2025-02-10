@@ -105,22 +105,13 @@ class StreetHazards(Dataset):
         return img, mask
     
     def get_class_weights(self) -> torch.Tensor:
-        """
-        Calcola i pesi inversi per classe, utili nelle funzioni di loss.
-        """
-        # Conta i pixel per ciascuna classe
         num_classes = len(STREET_HAZARDS_CLASSES)
         class_counts = torch.zeros(num_classes)
         for path_mask in self.masks:
-            mask = self._load_mask(path_mask)
-            class_counts += torch.bincount(
-                torch.from_numpy(mask.flatten()), 
-                minlength=num_classes
-            )
-        
-        # Calcola i pesi inversi, aggiungendo 1 per evitare divisioni per zero
-        weights = 1.0 / (class_counts + 1.0)
-        return weights / weights.sum() * num_classes
+            mask = torch.from_numpy(self._load_mask(path_mask))
+            unique_labels = torch.unique(mask).long() - 1
+            class_counts[unique_labels] += 1
+        return class_counts
     
 
 if __name__ == "__main__":
