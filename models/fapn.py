@@ -9,8 +9,15 @@ from torchvision.ops import DeformConv2d
 class DCNv2(nn.Module):
     def __init__(self, in_channels, out_channels, k, s, p, g=1):
         super().__init__()
-        self.dcn = DeformConv2d(in_channels, out_channels, k, s, p, groups=g)
         self.offset_mask = nn.Conv2d(in_channels, g * 3 * k * k, k, s, p)
+        self.dcn = DeformConv2d(
+            in_channels, 
+            out_channels, 
+            kernel_size=k, 
+            stride=s, 
+            padding=p, 
+            groups=g, 
+        )
         self._init_offset()
 
     def _init_offset(self):

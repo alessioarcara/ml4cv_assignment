@@ -7,6 +7,7 @@ from torch import optim
 from torch.utils.data import DataLoader
 import wandb
 from tqdm.notebook import tqdm
+from .losses import ClassDescriptorLoss 
 from .metrics import Metric
 from utils.visualize import color, COLORS
 import numpy as np
@@ -114,14 +115,17 @@ class Trainer:
 
         wandb.finish()
 
-    def _compute_loss(self, logits: torch.Tensor, masks: torch.Tensor) -> torch.Tensor:
+    def _compute_loss(self, logits: torch.Tensor, masks: torch.Tensor, prelogits: torch.Tensor) -> torch.Tensor:
         """
         Compute a weighted sum of all provided criterions.
         """
         total_loss = 0.0
         for weight, criterion in self.criterions:
-            l = criterion(logits, masks)
-            total_loss += weight * l
+            if isinstance(criterion, ClassDescriptorLoss):
+                l = criterion(logits, masks, prelogits)
+            else:
+                l = criterion(logits, masks)
+            total_loss += weight * l 
         return total_loss
 
     def _training_step(self, imgs: torch.Tensor, masks: torch.Tensor) -> float:
@@ -131,8 +135,8 @@ class Trainer:
         self.optimizer.zero_grad(set_to_none=True)
 
         with torch.autocast(device_type=self.device.type, dtype=torch.float16):
-            _, logits = self.model(imgs)
-            loss = self._compute_loss(logits, masks)
+            prelogits, logits = self.model(imgs)
+            loss = self._compute_loss(logits, masks, prelogits)
 
         self.scaler.scale(loss).backward()
         self.scaler.step(self.optimizer)
@@ -170,8 +174,8 @@ class Trainer:
             masks = masks.long().to(self.device, non_blocking=True)
             
             with torch.autocast(device_type=self.device.type, dtype=torch.float16):
-                _, logits = self.model(imgs)
-                batch_loss = self._compute_loss(logits, masks)
+                prelogits, logits = self.model(imgs)
+                batch_loss = self._compute_loss(logits, masks, prelogits)
 
             cumulative_loss += batch_loss.item()
             pred = logits.argmax(dim=1)

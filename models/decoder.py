@@ -65,9 +65,10 @@ class DecoderWithFAM(nn.Module):
         # from low to high resolution
         for fam_block, feat in zip(self.fam_blocks, fpn_features[:-1][::-1]):
             x = fam_block(feat, x)
-
-        x = self.scoring_layer(x)
-        return F.interpolate(x, size=self.input_size, mode="bilinear", align_corners=False)
+        
+        prelogits = F.interpolate(x, size=self.input_size, mode="bilinear", align_corners=False)
+        logits = self.scoring_layer(prelogits)
+        return prelogits, logits
 
 
 class DepthwiseSeparableConv(nn.Module):

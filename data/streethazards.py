@@ -102,7 +102,7 @@ class StreetHazards(Dataset):
             img = augmented['image']
             mask = augmented['mask']
 
-        return img, mask
+        return img, (mask - 1)
     
     def get_class_weights(self) -> torch.Tensor:
         num_classes = len(STREET_HAZARDS_CLASSES)

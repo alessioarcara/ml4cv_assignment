@@ -8,5 +8,5 @@ class ChimeraSeg(nn.Module):
 
     def forward(self, x):
         features = self.encoder(x)
-        segmentation_map = self.decoder(features)
-        return features, segmentation_map 
+        prelogits, logits = self.decoder(features)
+        return prelogits, logits 
