@@ -1,5 +1,4 @@
 from typing import Dict, Any, Callable
-from pathlib import Path
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -81,51 +80,82 @@ class Trainer:
             
         wandb.log({"Segmentation Results": table})
 
+    def _define_metrics(self) -> None:
+        """
+        Define all metrics to be tracked in Weights & Biases.
+        """
+        # Step-level metrics
+        wandb.define_metric("train/lr", step_metric="step")
+        wandb.define_metric("train/batch_totalloss", step_metric="step")
+        for i in range(len(self.criterions)):
+            wandb.define_metric(f"train/batch_loss{i}", step_metric="step")
+        
+        # Epoch-level metrics
+        wandb.define_metric("train/epoch_totalloss", step_metric="epoch")
+        wandb.define_metric("val/epoch_totalloss", step_metric="epoch")
+        for metric in self.metrics:
+            metric_name = metric.__class__.__name__
+            wandb.define_metric(f"train/{metric_name}", step_metric="epoch")
+            wandb.define_metric(f"val/{metric_name}", step_metric="epoch")
+
     def train(self, run_name) -> None:
         wandb.init(
             project=self.config['wandb']['project'],
             name=run_name,
             config=self.config
         )
-        wandb.define_metric("train/lr", step_metric="step")
-        wandb.define_metric("train/batch_loss", step_metric="step")
-        wandb.define_metric("train/epoch_loss", step_metric="epoch")
-        wandb.define_metric("val/epoch_loss", step_metric="epoch")
-        for metric in self.metrics:
-            wandb.define_metric(f"train/{metric.__class__.__name__}", step_metric="epoch")
-            wandb.define_metric(f"val/{metric.__class__.__name__}", step_metric="epoch")
+        self._define_metrics()
 
-        for epoch in tqdm(range(1, self.config['training']['num_epochs'] + 1), desc="Epoch", colour='green'):
-            self.model.train()
+        try:
+            for epoch in tqdm(range(1, self.config['training']['num_epochs'] + 1), desc="Epoch", colour='green'):
+                self.model.train()
 
-            for imgs, masks in tqdm(self.train_loader, 
-                                    total=len(self.train_loader), 
-                                    desc=f"Epoch {epoch} Batches", 
-                                    leave=False,
-                                    colour='blue'):
+                for imgs, masks in tqdm(self.train_loader, 
+                                        total=len(self.train_loader), 
+                                        desc=f"Epoch {epoch} Batches", 
+                                        leave=False,
+                                        colour='blue'):
 
-                self._training_step(imgs, masks)
+                    self._training_step(imgs, masks)
 
-            if epoch % self.evaluation_rate == 0:
-                self.eval('train', epoch)
-                if self.val_loader:
-                    self.eval('val', epoch)
-            
-            # self._save_model(epoch)
+                if epoch % self.evaluation_rate == 0:
+                    self.eval('train', epoch)
+                    if self.val_loader:
+                        self.eval('val', epoch)
+                
+                # self._save_model(epoch)
+        finally:
+            wandb.finish()
 
-        wandb.finish()
-
-    def _compute_loss(self, logits: torch.Tensor, masks: torch.Tensor, prelogits: torch.Tensor) -> torch.Tensor:
+    def _compute_loss(
+            self, 
+            logits: torch.Tensor, 
+            masks: torch.Tensor, 
+            prelogits: torch.Tensor, 
+            is_train = False, 
+        ) -> torch.Tensor:
         """
         Compute a weighted sum of all provided criterions.
         """
         total_loss = 0.0
-        for weight, criterion in self.criterions:
+        batch_losses = {}
+
+        for i, (weight, criterion) in enumerate(self.criterions):
             if isinstance(criterion, ClassDescriptorLoss):
                 l = criterion(logits, masks, prelogits)
             else:
                 l = criterion(logits, masks)
-            total_loss += weight * l 
+            
+            total_loss += weight * l
+
+            batch_losses[f'train/batch_loss{i}'] = l.item()
+
+        if is_train:
+            wandb.log({
+                **batch_losses,
+                'step': self.step
+            })
+
         return total_loss
 
     def _training_step(self, imgs: torch.Tensor, masks: torch.Tensor) -> float:
@@ -136,7 +166,7 @@ class Trainer:
 
         with torch.autocast(device_type=self.device.type, dtype=torch.float16):
             prelogits, logits = self.model(imgs)
-            loss = self._compute_loss(logits, masks, prelogits)
+            loss = self._compute_loss(logits, masks, prelogits, True)
 
         self.scaler.scale(loss).backward()
         self.scaler.step(self.optimizer)
@@ -147,7 +177,7 @@ class Trainer:
         
         if self.step % 10 == 0:
             wandb.log({
-                'train/batch_loss': loss.item(),
+                'train/batch_totalloss': loss.item(),
                 'train/lr': self.scheduler.get_last_lr()[0],
                 'step': self.step
             })
@@ -160,7 +190,7 @@ class Trainer:
         self.model.eval()
         loader = self.val_loader if split == "val" else self.train_loader
 
-        cumulative_loss = 0.0
+        cumulative_totalloss = 0.0
         for metric in self.metrics:
             metric.reset()
 
@@ -177,7 +207,7 @@ class Trainer:
                 prelogits, logits = self.model(imgs)
                 batch_loss = self._compute_loss(logits, masks, prelogits)
 
-            cumulative_loss += batch_loss.item()
+            cumulative_totalloss += batch_loss.item()
             pred = logits.argmax(dim=1)
             for metric in self.metrics:
                 metric.update(pred, masks)
@@ -186,10 +216,10 @@ class Trainer:
                 self.log_segmentation_results(masks, pred)
                 first_batch_logged = True
     
-        mean_epoch_loss = cumulative_loss / len(loader)
+        mean_epoch_loss = cumulative_totalloss / len(loader)
 
         log_dict = {
-            f'{split}/epoch_loss': mean_epoch_loss,
+            f'{split}/epoch_totalloss': mean_epoch_loss,
             'epoch': epoch
         }
         for metric in self.metrics:

@@ -36,7 +36,7 @@ def color(
     img_new = np.zeros((mask.shape[0], mask.shape[1], 3), dtype=np.uint8)
 
     for index, color in enumerate(colors):
-        img_new[mask == index + 1] = color
+        img_new[mask == index] = color
 
     return Image.fromarray(img_new, "RGB")
 
