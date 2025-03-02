@@ -12,7 +12,7 @@ class Decoder(nn.Module):
         fpn_channels: List[int],
         input_size: Tuple[int, int],
         num_classes: int, 
-        atrous_rates: Sequence[int] = (12, 24, 36), 
+        atrous_rates: Sequence[int] = (6, 12, 18), 
         d: int = 128 
     ):
         super().__init__()
@@ -43,14 +43,13 @@ class DecoderWithFAM(nn.Module):
         fpn_channels: List[int],
         num_classes: int,
         input_size,
-        #atrous_rates: Sequence[int] = (12, 24, 36), 
+        atrous_rates: Sequence[int] = (6, 12, 18), 
         d: int = 128 
     ):
         super().__init__()
         self.input_size = input_size
-        #self.input_size = input_size
-        #self.aspp = ASPP(fpn_channels[-1], atrous_rates, d)
-        self.fsm_block = FSM(fpn_channels[-1], d) 
+        self.aspp = ASPP(fpn_channels[-1], atrous_rates, d)
+        #self.fsm_block = FSM(fpn_channels[-1], d) 
 
         self.fam_blocks = nn.ModuleList([
             FAM(lateral_channels, d) for lateral_channels in reversed(fpn_channels[:-1])
@@ -59,8 +58,8 @@ class DecoderWithFAM(nn.Module):
         self.scoring_layer = nn.Conv2d(d, num_classes, 1)
 
     def forward(self, fpn_features):
-        #x = self.aspp(fpn_features[-1])
-        x = self.fsm_block(fpn_features[-1])
+        x = self.aspp(fpn_features[-1])
+        #x = self.fsm_block(fpn_features[-1])
 
         # from low to high resolution
         for fam_block, feat in zip(self.fam_blocks, fpn_features[:-1][::-1]):

@@ -1,5 +1,6 @@
 import torch.nn as nn
 
+
 class ChimeraSeg(nn.Module):
     def __init__(self, encoder, decoder):
         super(ChimeraSeg, self).__init__()

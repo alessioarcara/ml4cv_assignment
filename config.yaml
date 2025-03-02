@@ -4,15 +4,16 @@ wandb:
 training:
   img_height: 360 
   img_width: 640 
-  num_epochs: 50
+  num_epochs: 50 
   evaluation_rate: 2
-  batch_size: 16
+  batch_size: 16 
   lr: 0.0004
   wd: 0.05
   ls: 0.1
   d: 64
+  anchors_magnitude: 20
 paths:
   train_path: "ml4cv_assignment/data/datasets/train"
-  test_path: "ml4cv-assignment/data/datasets/test"
-  save_path: "ml4cv-assignment/saved/models"
-  logs_path: "ml4cv-assignment/saved/logs"
+  test_path: "ml4cv_assignment/data/datasets/test"
+  save_path: "ml4cv_assignment/saved/models"
+  logs_path: "ml4cv_assignment/saved/logs"
