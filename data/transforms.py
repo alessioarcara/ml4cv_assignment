@@ -1,12 +1,38 @@
 import albumentations as A
+import numpy as np
+import torch
 from albumentations.pytorch import ToTensorV2
+
+IMAGENET_MEAN = [0.485, 0.456, 0.406]
+IMAGENET_STD = [0.229, 0.224, 0.225]
+
+
+class Denormalize(object):
+    def __init__(
+        self, mean: list[float] = IMAGENET_MEAN, std: list[float] = IMAGENET_STD
+    ):
+        self.denormalize = A.Compose(
+            [
+                A.Normalize(
+                    mean=tuple(-m / s for m, s in zip(mean, std)),
+                    std=tuple(1.0 / s for s in std),
+                    max_pixel_value=1.0,
+                ),
+                A.FromFloat(max_value=255, dtype="uint8"),
+            ]
+        )
+
+    def __call__(self, img):
+        if isinstance(img, torch.Tensor):
+            img = np.transpose(img.cpu().detach().numpy().squeeze(), (1, 2, 0))
+        return self.denormalize(image=img)["image"]
 
 
 def get_data_transforms(
     img_height: int,
     img_width: int,
-    mean: list[float] = [0.485, 0.456, 0.406],
-    std: list[float] = [0.229, 0.224, 0.225],
+    mean: list[float] = IMAGENET_MEAN,
+    std: list[float] = IMAGENET_STD,
 ) -> dict[str, A.Compose]:
     train_transforms = A.Compose(
         [

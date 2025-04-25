@@ -12,6 +12,8 @@ training:
   ls: 0.1
   d: 64 
   anchors_magnitude: 10 
+  stride: 8
+  encoder_name: "efficientnet_b2"
 paths:
   train_path: "ml4cv_assignment/data/datasets/train"
   test_path: "ml4cv_assignment/data/datasets/test"
