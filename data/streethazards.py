@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from PIL import Image
 from torch.utils.data import Dataset
+from pytorch_ood.augment import InsertCOCO
 
 
 STREET_HAZARDS_CLASSES = [
@@ -62,14 +63,25 @@ class StreetHazards(Dataset):
             self, 
             root_dir: Path, 
             subset: str = "training", 
-            transforms=None
+            transforms = None,
+            add_anomalies = False
         ) -> None:
         images_dir = root_dir / "images" / subset
         masks_dir = root_dir / "annotations" / subset
 
         self.imgs = TorchSerializedList(sorted(str(p) for p in images_dir.rglob("*.png")))
         self.masks = TorchSerializedList(sorted(str(p) for p in masks_dir.rglob("*.png")))
-        self.transforms = transforms 
+        self.transforms = transforms
+
+        if add_anomalies:
+            self.coco_transform = InsertCOCO(
+                coco_dir='data/datasets/coco/',
+                exclude_classes="Streethazards",
+                p=1,
+                ood_mask_value=14
+            )
+        else:
+            self.coco_transform = None
 
         if len(self.imgs) - len(self.masks) != 0:
             raise AssertionError(
@@ -79,25 +91,20 @@ class StreetHazards(Dataset):
     def __len__(self):
         return len(self.imgs)
     
-    @staticmethod
-    def _load_image(path: str):
-        with Image.open(path) as img:
-            img = img.convert("RGB")
-            return np.array(img)
+    def __getitem__(self, idx, apply_transforms=True):
+        img = Image.open(self.imgs[idx]).convert("RGB")
+        mask = Image.open(self.masks[idx]).convert("L")
 
-    @staticmethod
-    def _load_mask(path: str):
-        with Image.open(path) as mask:
-            mask = mask.convert("L")
-            return np.array(mask)
+        if self.coco_transform is not None:
+            img, mask = self.coco_transform(img, mask)
+            mask = mask.numpy()
 
-    def __getitem__(self, idx):
-        path_img = self.imgs[idx]
-        path_mask = self.masks[idx]
-        img = self._load_image(path_img)
-        mask = self._load_mask(path_mask)
+        if not isinstance(img, np.ndarray):
+            img = np.array(img)
+        if not isinstance(mask, np.ndarray):
+            mask = np.array(mask)
 
-        if self.transforms is not None:
+        if apply_transforms and self.transforms is not None:
             augmented = self.transforms(image=img, mask=mask)
             img = augmented['image']
             mask = augmented['mask']
@@ -108,7 +115,7 @@ class StreetHazards(Dataset):
         num_classes = len(STREET_HAZARDS_CLASSES)
         class_counts = torch.zeros(num_classes)
         for path_mask in self.masks:
-            mask = torch.from_numpy(self._load_mask(path_mask))
+            mask = torch.from_numpy(np.array(Image.open(path_mask).convert("L")))
             unique_labels = torch.unique(mask).long() - 1
             class_counts[unique_labels] += 1
         return class_counts

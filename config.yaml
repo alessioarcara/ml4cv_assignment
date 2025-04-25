@@ -2,18 +2,19 @@ seed: 42
 wandb:
   project: "ML4CV_ASS"
 training:
-  img_height: 360 
-  img_width: 640 
+  img_height: 576 
+  img_width: 1024 
   num_epochs: 50 
   evaluation_rate: 2
-  batch_size: 16 
+  batch_size: 4
   lr: 0.0004
   wd: 0.05
   ls: 0.1
-  d: 64
-  anchors_magnitude: 20
+  d: 64 
+  anchors_magnitude: 10 
 paths:
   train_path: "ml4cv_assignment/data/datasets/train"
   test_path: "ml4cv_assignment/data/datasets/test"
   save_path: "ml4cv_assignment/saved/models"
   logs_path: "ml4cv_assignment/saved/logs"
+  coco_path: "ml3cv_assignment/data/datasets/coco"
