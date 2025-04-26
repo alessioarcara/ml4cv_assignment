@@ -1,19 +1,31 @@
 seed: 42
+
 wandb:
   project: "ML4CV_ASS"
+
+model:
+  encoder_name: "efficientnet_b2"
+  d: 64
+  stride: 8
+
 training:
   img_height: 576 
   img_width: 1024 
-  num_epochs: 50 
+  num_epochs: 30 
   evaluation_rate: 2
-  batch_size: 4
+  batch_size: 6
   lr: 0.0004
-  wd: 0.05
-  ls: 0.1
-  d: 64 
-  anchors_magnitude: 10 
-  stride: 8
-  encoder_name: "efficientnet_b2"
+  wd: 0.0001
+
+losses:
+  prototypical_triplet:
+    anchors_magnitude: 10
+    global: 1.5
+    local: 0.5
+  focal:
+    alpha: 1
+    gamma: 2
+
 paths:
   train_path: "ml4cv_assignment/data/datasets/train"
   test_path: "ml4cv_assignment/data/datasets/test"

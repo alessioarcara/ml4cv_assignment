@@ -6,14 +6,14 @@ import numpy as np
 import torch
 import torch.nn as nn
 import yaml
-from models.model import ModelInfo
 from torchinfo import summary
+
+from models.model import ModelInfo
 
 
 def load_config(config_path: str) -> Dict[str, Any]:
     with open(config_path, "r") as file:
         cfg = yaml.safe_load(file)
-
     return cfg
 
 
@@ -50,12 +50,14 @@ def generate_run_name(
     model_info: ModelInfo,
     criterions: List[Tuple[float, nn.Module]],
 ) -> str:
-    encoder_name = config["training"]["encoder_name"]
-    d = config["training"]["d"]
+    encoder_name = config["model"]["encoder_name"]
+    d = config["model"]["d"]
     imgH = config["training"]["img_height"]
     imgW = config["training"]["img_width"]
+
     loss_str = ",".join([l.__class__.__name__ for _, l in criterions])
     atrous_str = "-".join(map(str, model_info.atrous_rates))
+
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     run_name = (
         f"ENC_{encoder_name}"

@@ -7,10 +7,18 @@ import torch.nn.functional as F
 # Implementazione dell'ASPP basata su torchvision:
 # https://github.com/pytorch/vision/blob/main/torchvision/models/segmentation/deeplabv3.py
 
+
 class ASPPConv(nn.Sequential):
     def __init__(self, in_channels: int, out_channels: int, dilation: int) -> None:
         modules = [
-            nn.Conv2d(in_channels, out_channels, 3, padding=dilation, dilation=dilation, bias=False),
+            nn.Conv2d(
+                in_channels,
+                out_channels,
+                3,
+                padding=dilation,
+                dilation=dilation,
+                bias=False,
+            ),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(),
         ]
@@ -34,11 +42,17 @@ class ASPPPooling(nn.Sequential):
 
 
 class ASPP(nn.Module):
-    def __init__(self, in_channels: int, atrous_rates: Sequence[int], out_channels: int = 256) -> None:
+    def __init__(
+        self, in_channels: int, atrous_rates: Sequence[int], out_channels: int = 256
+    ) -> None:
         super().__init__()
         modules = []
         modules.append(
-            nn.Sequential(nn.Conv2d(in_channels, out_channels, 1, bias=False), nn.BatchNorm2d(out_channels), nn.ReLU())
+            nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, 1, bias=False),
+                nn.BatchNorm2d(out_channels),
+                nn.ReLU(),
+            )
         )
 
         rates = tuple(atrous_rates)

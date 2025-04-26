@@ -1,10 +1,10 @@
+from dataclasses import dataclass
 from typing import Any, Dict, List
 
 import timm
-from models.decoder import DecoderWithFAM
 import torch.nn as nn
-from loguru import logger
-from dataclasses import dataclass
+
+from models.decoder import DecoderWithFAM
 
 
 class EncoderDecoder(nn.Module):
@@ -34,13 +34,15 @@ def build_model(
     config: Dict[str, Any],
     num_classes: int,
     atrous_rates: List[int] | None = None,
-) -> tuple[nn.Module, ModelInfo]:
-    stride = config["training"]["stride"]
+) -> tuple[EncoderDecoder, ModelInfo]:
+    encoder_name = config["model"]["encoder_name"]
+    d = config["model"]["d"]
+    stride = config["model"]["stride"]
     imgH = config["training"]["img_height"]
     imgW = config["training"]["img_width"]
 
     encoder = timm.create_model(
-        model_name=config["training"]["encoder_name"],
+        model_name=encoder_name,
         features_only=True,
         pretrained=True,
         out_indices=(0, 1, 4),
@@ -56,7 +58,7 @@ def build_model(
         fpn_features,
         num_classes,
         input_size=(imgH, imgW),
-        d=config["training"]["d"],
+        d=d,
         atrous_rates=atrous_rates,
     )
 
