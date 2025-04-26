@@ -8,7 +8,7 @@ from torchmetrics.utilities.compute import auc
 
 class Metric(abc.ABC):
     @abc.abstractmethod
-    def update(self, pred: torch.Tensor, true: torch.Tensor):
+    def update(self, logits: torch.Tensor, pred: torch.Tensor, true: torch.Tensor):
         pass
 
     @abc.abstractmethod
@@ -27,7 +27,7 @@ class MeanIoU(Metric):
         self.reset()
 
     @torch.no_grad()
-    def update(self, pred: torch.Tensor, true: torch.Tensor):
+    def update(self, _: torch.Tensor, pred: torch.Tensor, true: torch.Tensor):
         for cls in range(self.num_classes):
             pred_mask = pred == cls
             true_mask = true == cls
@@ -56,7 +56,7 @@ class AUPR(Metric):
         self.reset()
 
     @torch.no_grad()
-    def update(self, logits: torch.Tensor, true: torch.Tensor):
+    def update(self, logits: torch.Tensor, _: torch.Tensor, true: torch.Tensor):
         true = (true == self.unknown_label).long()
 
         # Sanity checks
@@ -70,7 +70,6 @@ class AUPR(Metric):
             true_flat = true[i].view(-1)
 
             p, r, _ = binary_precision_recall_curve(logits_flat, true_flat)
-
             self.aupr_out += auc(r, p)
             self.count += 1
 
@@ -90,10 +89,10 @@ if __name__ == "__main__":
 
     pred = torch.randint(0, 10, (4, 128, 128))
     true = torch.randint(0, 10, (4, 128, 128))
-    mean_iou.update(pred, true)
+    mean_iou.update(None, pred, true)
     logger.debug(f"Mean IoU: {mean_iou.compute()}")
 
     logits = torch.randn(4, 128, 128)
     true[true == 4] = 255  # Set some pixels to unknown
-    aupr.update(logits, true)
+    aupr.update(logits, None, true)
     logger.debug(f"AUPR: {aupr.compute()}")

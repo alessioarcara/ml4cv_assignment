@@ -194,7 +194,7 @@ class Trainer:
             pred = logits.argmax(dim=1)
 
             for metric in self.metrics:
-                metric.update(pred, masks)
+                metric.update(logits, pred, masks)
 
             if split == "val" and not first_batch_logged:
                 self.monitor.log_segmentation_results(imgs, masks, pred)
