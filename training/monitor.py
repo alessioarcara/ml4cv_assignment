@@ -114,7 +114,10 @@ class WandbMonitor:
                     np.random.choice(cls_indices, size=n_samples, replace=False)
                 )
 
-        anchors = np.eye(C) * self.config["training"]["anchors_magnitude"]
+        anchors = (
+            np.eye(C)
+            * self.config["losses"]["prototypical_triplet"]["anchors_magnitude"]
+        )
 
         selected_embeddings = embeddings[indices]
         selected_classes = labels[indices]

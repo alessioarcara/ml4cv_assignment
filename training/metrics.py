@@ -21,16 +21,22 @@ class Metric(abc.ABC):
 
 
 class MeanIoU(Metric):
-    def __init__(self, num_classes: int, device=None):
+    def __init__(self, num_classes: int, ignore_index: int = None, device=None):
         self.num_classes = num_classes
+        self.ignore_index = ignore_index
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.reset()
 
     @torch.no_grad()
     def update(self, _: torch.Tensor, pred: torch.Tensor, true: torch.Tensor):
+        if self.ignore_index is not None:
+            valid_mask = true != self.ignore_index
+        else:
+            valid_mask = torch.ones_like(true, dtype=torch.bool)
+
         for cls in range(self.num_classes):
-            pred_mask = pred == cls
-            true_mask = true == cls
+            pred_mask = (pred == cls) & valid_mask
+            true_mask = (true == cls) & valid_mask
 
             self.intersection[cls] += torch.sum(pred_mask & true_mask).float()
             self.union[cls] += torch.sum(pred_mask | true_mask).float()

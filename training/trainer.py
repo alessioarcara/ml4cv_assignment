@@ -229,7 +229,3 @@ class Trainer:
         path = self.ckpt_dir / filename
         torch.save(self.model.state_dict(), path)
         logger.info(f"Saved checkpoint to {path}")
-
-
-if __name__ == "__main__":
-    pass

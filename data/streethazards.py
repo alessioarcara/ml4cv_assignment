@@ -9,14 +9,25 @@ from pytorch_ood.augment import InsertCOCO
 
 
 STREET_HAZARDS_CLASSES = [
-    "unlabeled", "building", "fence", "other", "pedestrian",
-    "pole", "road line", "road", "sidewalk", "vegetation",
-    "car", "wall", "traffic sign", "anomaly"
+    "unlabeled",
+    "building",
+    "fence",
+    "other",
+    "pedestrian",
+    "pole",
+    "road line",
+    "road",
+    "sidewalk",
+    "vegetation",
+    "car",
+    "wall",
+    "traffic sign",
+    "anomaly",
 ]
 
 
 def get_classes_as_dict():
-        return dict(enumerate(STREET_HAZARDS_CLASSES))
+    return dict(enumerate(STREET_HAZARDS_CLASSES))
 
 
 # Implementazione basata su Detectron2:
@@ -60,25 +71,29 @@ class TorchSerializedList:
 
 class StreetHazards(Dataset):
     def __init__(
-            self, 
-            root_dir: Path, 
-            subset: str = "training", 
-            transforms = None,
-            add_anomalies = False
-        ) -> None:
+        self,
+        root_dir: Path,
+        subset: str = "training",
+        transforms=None,
+        add_anomalies=False,
+    ) -> None:
         images_dir = root_dir / "images" / subset
         masks_dir = root_dir / "annotations" / subset
 
-        self.imgs = TorchSerializedList(sorted(str(p) for p in images_dir.rglob("*.png")))
-        self.masks = TorchSerializedList(sorted(str(p) for p in masks_dir.rglob("*.png")))
+        self.imgs = TorchSerializedList(
+            sorted(str(p) for p in images_dir.rglob("*.png"))
+        )
+        self.masks = TorchSerializedList(
+            sorted(str(p) for p in masks_dir.rglob("*.png"))
+        )
         self.transforms = transforms
 
         if add_anomalies:
             self.coco_transform = InsertCOCO(
-                coco_dir='data/datasets/coco/',
+                coco_dir="data/datasets/coco/",
                 exclude_classes="Streethazards",
                 p=1,
-                ood_mask_value=14
+                ood_mask_value=14,
             )
         else:
             self.coco_transform = None
@@ -90,7 +105,7 @@ class StreetHazards(Dataset):
 
     def __len__(self):
         return len(self.imgs)
-    
+
     def __getitem__(self, idx, apply_transforms=True):
         img = Image.open(self.imgs[idx]).convert("RGB")
         mask = Image.open(self.masks[idx]).convert("L")
@@ -106,11 +121,11 @@ class StreetHazards(Dataset):
 
         if apply_transforms and self.transforms is not None:
             augmented = self.transforms(image=img, mask=mask)
-            img = augmented['image']
-            mask = augmented['mask']
+            img = augmented["image"]
+            mask = augmented["mask"]
 
         return img, (mask - 1)
-    
+
     def get_class_weights(self) -> torch.Tensor:
         num_classes = len(STREET_HAZARDS_CLASSES)
         class_counts = torch.zeros(num_classes)
@@ -119,16 +134,13 @@ class StreetHazards(Dataset):
             unique_labels = torch.unique(mask).long() - 1
             class_counts[unique_labels] += 1
         return class_counts
-    
+
 
 if __name__ == "__main__":
     current_dir = Path(__file__).parent  # Directory dello script
     dataset_path = current_dir / "datasets/train"
 
-    dataset = StreetHazards(
-        root_dir=dataset_path,
-        subset="training/t1-3/"
-    )
+    dataset = StreetHazards(root_dir=dataset_path, subset="training/t1-3/")
 
     img, mask = dataset[0]
     print("Image shape:", img.shape)
