@@ -79,11 +79,10 @@ def get_data_transforms(
                     A.RandomSunFlare(flare_roi=(0.1, 0.1, 0.3, 0.3), p=1.0),
                     A.RandomShadow(p=1.0),
                 ],
-                p=0.1,
+                p=0.2,
             ),
             # Normalization
             A.Normalize(mean=mean, std=std, max_pixel_value=255.0),
-            # A.Normalize(normalization="image_per_channel", p=1.0),
             ToTensorV2(),
         ]
     )

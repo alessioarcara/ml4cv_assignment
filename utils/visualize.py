@@ -7,7 +7,9 @@ from typing import Union
 
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
 from PIL import Image
+from sklearn.manifold import TSNE
 
 COLORS = np.array(
     [
@@ -55,7 +57,7 @@ def visualize_augmentations(dataset, data_transforms, denorm, num_samples=6, col
         imgs.append(denorm(augmented))
 
     rows = math.ceil(num_samples / cols)
-    fig, axes = plt.subplots(rows, cols, figsize=(cols * 5, rows * 5))
+    fig, axes = plt.subplots(rows, cols, figsize=(cols * 3, rows * 3))
 
     axes = axes.flatten() if rows > 1 else [axes]
 
@@ -66,7 +68,7 @@ def visualize_augmentations(dataset, data_transforms, denorm, num_samples=6, col
         else:
             ax.set_visible(False)  # Hide unused subplots
 
-    plt.suptitle("Original and Augmented Images", fontsize=18)
+    plt.suptitle("Original and Augmented Images", fontsize=14)
     plt.tight_layout()
     plt.show()
 
@@ -84,6 +86,43 @@ def visualize_added_outlier(sample, denorm, figsize=(12, 8)):
     axs[1].set_title("Labels")
     axs[1].axis("off")
 
+    plt.tight_layout()
+    plt.show()
+
+
+def visualize_centers(centers):
+    if isinstance(centers, torch.Tensor):
+        centers = centers.detach().cpu().numpy()
+    if not isinstance(centers, np.ndarray):
+        raise TypeError(
+            f"`centers` must be torch.Tensor or np.ndarray, got {type(centers)!r}"
+        )
+    tsne = TSNE(n_components=2, random_state=42, perplexity=centers.shape[0] - 1)
+    centers_2d = tsne.fit_transform(centers)
+
+    plt.figure(figsize=(8, 6))
+    scatter = plt.scatter(
+        centers_2d[:, 0],
+        centers_2d[:, 1],
+        s=200,
+        c=range(centers.shape[0]),
+        cmap="tab20",
+    )
+
+    for i in range(centers.shape[0]):
+        plt.annotate(
+            f"{i}",
+            (centers_2d[i, 0], centers_2d[i, 1]),
+            xytext=(5, 5),
+            textcoords="offset points",
+            fontsize=12,
+            fontweight="bold",
+        )
+
+    plt.title(f"{centers.shape[0]} Class Centers (t-SNE visualization)")
+    plt.axis("off")
+    plt.grid(True, alpha=0.3)
+    plt.colorbar(scatter, label="Class")
     plt.tight_layout()
     plt.show()
 
