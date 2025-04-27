@@ -5,6 +5,7 @@ Source: https://github.com/hendrycks/anomaly-seg/issues/15#issuecomment-89030027
 import math
 from typing import Union
 
+import ipywidgets as widgets
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -95,7 +96,7 @@ def visualize_centers(centers):
         centers = centers.detach().cpu().numpy()
     if not isinstance(centers, np.ndarray):
         raise TypeError(
-            f"`centers` must be torch.Tensor or np.ndarray, got {type(centers)!r}"
+            f"centers must be torch.Tensor or np.ndarray, got {type(centers)!r}"
         )
     tsne = TSNE(n_components=2, random_state=42, perplexity=centers.shape[0] - 1)
     centers_2d = tsne.fit_transform(centers)
@@ -120,11 +121,54 @@ def visualize_centers(centers):
         )
 
     plt.title(f"{centers.shape[0]} Class Centers (t-SNE visualization)")
-    plt.axis("off")
     plt.grid(True, alpha=0.3)
     plt.colorbar(scatter, label="Class")
     plt.tight_layout()
     plt.show()
+
+
+def visualize_predictions(segmenter, denorm, dataset, device, threshold: float = 0.5):
+    def show_prediction(idx, threshold_value):
+        img, mask = dataset[idx]
+        img = img.unsqueeze(0).to(device)
+
+        closed_set_preds, open_set_probs = segmenter(img)
+        open_set_preds = open_set_probs > threshold_value
+
+        plt.figure(figsize=(15, 10))
+
+        plt.subplot(231)
+        plt.imshow(denorm(img))
+        plt.title("Image")
+        plt.axis("off")
+
+        plt.subplot(232)
+        plt.imshow(color(mask.squeeze(), COLORS))
+        plt.title("Ground Truth")
+        plt.axis("off")
+
+        plt.subplot(233)
+        plt.imshow(color(closed_set_preds.cpu().squeeze(), COLORS))
+        plt.title("Closed Set Mask")
+        plt.axis("off")
+
+        plt.subplot(234)
+        plt.imshow(open_set_preds.cpu().squeeze(), cmap="hot")
+        plt.title("Anomaly Mask")
+        plt.axis("off")
+
+        plt.tight_layout()
+        plt.show()
+
+    idx_slider = widgets.IntSlider(
+        value=0, min=0, max=len(dataset) - 1, step=1, description="Indice:"
+    )
+
+    threshold_slider = widgets.FloatSlider(
+        value=threshold, min=0.0, max=1.0, step=0.01, description="Threshold:"
+    )
+
+    widgets.interact(show_prediction, idx=idx_slider, threshold_value=threshold_slider)
 
 
 if __name__ == "__main__":

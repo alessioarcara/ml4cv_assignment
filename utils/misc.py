@@ -7,8 +7,11 @@ import torch
 import torch.nn as nn
 import yaml
 from torchinfo import summary
+from tqdm.notebook import tqdm
 
+from models.detector import OpenSetSegmenter
 from models.model import ModelInfo
+from training.metrics import Metric
 
 
 def load_config(config_path: str) -> Dict[str, Any]:
@@ -55,7 +58,7 @@ def generate_run_name(
     imgH = config["training"]["img_height"]
     imgW = config["training"]["img_width"]
 
-    loss_str = ",".join([l.__class__.__name__ for _, l in criterions])
+    loss_str = ",".join([criterion.__class__.__name__ for _, criterion in criterions])
     atrous_str = "-".join(map(str, model_info.atrous_rates))
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -77,3 +80,29 @@ def print_summary(net, input_size, verbose=True):
     if verbose:
         print(net_info)
     print("\nNetwork's n°params: %.3fk \tMAC: %.3fM\n" % (params / 1e3, macs / 1e6))
+
+
+def compute_metrics(
+    data_loader: torch.utils.data.DataLoader,
+    segmenter: OpenSetSegmenter,
+    metrics: List[Metric],
+    device="cuda" if torch.cuda.is_available() else "cpu",
+):
+    for metric in metrics:
+        metric.reset()
+
+    for imgs, masks in tqdm(data_loader, desc="Computing metrics"):
+        imgs = imgs.to(device)
+        masks = masks.to(device)
+
+        closed_set_preds, open_set_probs = segmenter(imgs)
+
+        for metric in metrics:
+            metric.update(open_set_probs, closed_set_preds, masks)
+
+    results = {}
+    for metric in metrics:
+        results[metric.__class__.__name__] = metric.compute()
+        print(f"{metric.__class__.__name__}: {results[metric.__class__.__name__]}")
+
+    return results

@@ -25,6 +25,8 @@ losses:
   focal:
     alpha: 1
     gamma: 2
+  objectosphere:
+    xi: 5.0
 
 paths:
   train_path: "ml4cv_assignment/data/datasets/train"
