@@ -133,9 +133,12 @@ def visualize_predictions(segmenter, denorm, dataset, device, threshold: float =
         img = img.unsqueeze(0).to(device)
 
         closed_set_preds, open_set_probs = segmenter(img)
-        open_set_preds = open_set_probs > threshold_value
+        open_set_mask = open_set_probs > threshold_value
 
-        plt.figure(figsize=(15, 10))
+        open_set_preds = closed_set_preds.clone()
+        open_set_preds[open_set_mask.squeeze(1)] = 13
+
+        plt.figure(figsize=(18, 10))
 
         plt.subplot(231)
         plt.imshow(denorm(img))
@@ -143,18 +146,23 @@ def visualize_predictions(segmenter, denorm, dataset, device, threshold: float =
         plt.axis("off")
 
         plt.subplot(232)
-        plt.imshow(color(mask.squeeze(), COLORS))
-        plt.title("Ground Truth")
+        plt.imshow(color(mask.cpu().squeeze(), COLORS))
+        plt.title("Ground-truth mask")
         plt.axis("off")
 
         plt.subplot(233)
         plt.imshow(color(closed_set_preds.cpu().squeeze(), COLORS))
-        plt.title("Closed Set Mask")
+        plt.title("Closed-set mask")
         plt.axis("off")
 
         plt.subplot(234)
-        plt.imshow(open_set_preds.cpu().squeeze(), cmap="hot")
-        plt.title("Anomaly Mask")
+        plt.imshow(open_set_probs.cpu().squeeze(), cmap="viridis")
+        plt.title("Anomaly score")
+        plt.axis("off")
+
+        plt.subplot(235)
+        plt.imshow(color(open_set_preds.cpu().squeeze(), COLORS))
+        plt.title("Open-set mask")
         plt.axis("off")
 
         plt.tight_layout()
