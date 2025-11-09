@@ -3,13 +3,14 @@ from typing import Optional
 
 import torch
 from loguru import logger
+from torch import Tensor
 from torchmetrics.functional.classification import binary_precision_recall_curve
 from torchmetrics.utilities.compute import auc
 
 
 class Metric(abc.ABC):
     @abc.abstractmethod
-    def update(self, logits: torch.Tensor, pred: torch.Tensor, true: torch.Tensor):
+    def update(self, logits: Tensor, pred: Tensor, true: Tensor):
         pass
 
     @abc.abstractmethod
@@ -31,7 +32,7 @@ class MeanIoU(Metric):
         self.reset()
 
     @torch.no_grad()
-    def update(self, _: torch.Tensor, pred: torch.Tensor, true: torch.Tensor):
+    def update(self, _: Tensor, pred: Tensor, true: Tensor):
         if self.ignore_index is not None:
             valid_mask = true != self.ignore_index
         else:
@@ -65,7 +66,7 @@ class AUPR(Metric):
         self.reset()
 
     @torch.no_grad()
-    def update(self, logits: torch.Tensor, _: torch.Tensor, true: torch.Tensor):
+    def update(self, logits: Tensor, _: Tensor, true: Tensor):
         true = (true == self.unknown_label).long()
 
         # Sanity checks

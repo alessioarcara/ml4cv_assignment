@@ -21,25 +21,9 @@ def get_id_to_label_map() -> Dict[int, str]:
     return {i: name for i, name in enumerate(STREET_HAZARDS_CLASSES)}
 
 
-def get_device():
-    if torch.cuda.is_available():
-        device = torch.device("cuda")
-        print("🚀 CUDA device is available!")
-    elif torch.backends.mps.is_available():
-        device = torch.device("mps")
-        print("🍎 MPS device is available!")
-    else:
-        device = torch.device("cpu")
-        print("🐢 No GPU available. Falling back to the CPU.")
-    return device
-
-
 def fix_random(seed: int) -> None:
     """
     Fix all the possible sources of randomness.
-
-    Args:
-        seed: the seed to use.
     """
     np.random.seed(seed)
     random.seed(seed)

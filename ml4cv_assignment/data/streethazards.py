@@ -8,7 +8,7 @@ from pytorch_ood.augment import InsertCOCO
 from torch import Tensor
 from torch.utils.data import Dataset
 
-from ml4cv_assignment.data.torch_serialized_list import TorchSerializedList
+from ml4cv_assignment.data.data_utils import TorchSerializedList
 from ml4cv_assignment.utils.typings import PathOrStr
 
 

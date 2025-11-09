@@ -3,6 +3,16 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+class WeightedLoss(nn.Module):
+    def __init__(self, loss: nn.Module, weight: float = 1.0):
+        super().__init__()
+        self.loss = loss
+        self.weight = weight
+
+    def forward(self, *args, **kwargs):
+        return self.loss(*args, **kwargs) * self.weight
+
+
 # https://github.com/PRBonn/ContMAV/blob/master/src/utils.py
 class OWLoss(nn.Module):
     def __init__(self, n_classes, hinged=False, delta=0.1):
