@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Optional
 
 import torch
 import torch.nn as nn
@@ -7,7 +7,7 @@ from loguru import logger
 from torch import optim
 from torch.profiler import ProfilerActivity, profile, record_function, schedule
 from torch.utils.data import DataLoader
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 
 import wandb
 
@@ -24,7 +24,7 @@ class Trainer:
         train_loader: DataLoader,
         criterions: list[tuple[float, Callable]],
         denorm: Callable,
-        val_loader: DataLoader = None,
+        val_loader: Optional[DataLoader] = None,
         class_dict: Dict[int, str] = {},
         metrics: list[Metric] = [],
         use_amp: bool = True,
@@ -105,7 +105,7 @@ class Trainer:
 
     def _training_step(
         self, imgs: torch.Tensor, masks: torch.Tensor, profiler=None
-    ) -> float:
+    ) -> None:
         imgs = imgs.to(self.device, non_blocking=True)
         masks = masks.long().to(self.device, non_blocking=True)
 

@@ -4,30 +4,9 @@ from pathlib import Path
 import numpy as np
 import torch
 from PIL import Image
-from torch.utils.data import Dataset
 from pytorch_ood.augment import InsertCOCO
-
-
-STREET_HAZARDS_CLASSES = [
-    "unlabeled",
-    "building",
-    "fence",
-    "other",
-    "pedestrian",
-    "pole",
-    "road line",
-    "road",
-    "sidewalk",
-    "vegetation",
-    "car",
-    "wall",
-    "traffic sign",
-    "anomaly",
-]
-
-
-def get_classes_as_dict():
-    return dict(enumerate(STREET_HAZARDS_CLASSES))
+from torch.utils.data import Dataset
+from ml4cv_assignment.utils.typings import PathOrStr
 
 
 # Implementazione basata su Detectron2:
@@ -72,11 +51,12 @@ class TorchSerializedList:
 class StreetHazards(Dataset):
     def __init__(
         self,
-        root_dir: Path,
+        root_dir: PathOrStr,
         subset: str = "training",
         transforms=None,
         add_anomalies=False,
     ) -> None:
+        root_dir = Path(root_dir)
         images_dir = root_dir / "images" / subset
         masks_dir = root_dir / "annotations" / subset
 

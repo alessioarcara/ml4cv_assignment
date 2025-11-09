@@ -4,8 +4,8 @@ import numpy as np
 import torch
 from loguru import logger
 
-from models.model import build_model
-from utils.misc import get_device, load_config
+from ml4cv_assignment.models.model import build_model
+from ml4cv_assignment.utils.misc import get_device, load_config
 
 
 class Timer:

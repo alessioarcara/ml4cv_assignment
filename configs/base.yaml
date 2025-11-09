@@ -11,9 +11,9 @@ model:
 training:
   img_height: 576 
   img_width: 1024 
-  num_epochs: 30 
+  num_epochs: 50 
   evaluation_rate: 2
-  batch_size: 6
+  batch_size: 4
   lr: 0.0004
   wd: 0.0001
 
@@ -29,8 +29,7 @@ losses:
     xi: 5.0
 
 paths:
-  train_path: "ml4cv_assignment/data/datasets/train"
-  test_path: "ml4cv_assignment/data/datasets/test"
-  save_path: "ml4cv_assignment/saved/models"
-  logs_path: "ml4cv_assignment/saved/logs"
-  coco_path: "ml3cv_assignment/data/datasets/coco"
+  street_hazards_train_dir: "../datasets/train"
+  street_hazards_test_dir: "../datasets/test"
+  checkpoints_dir: "../saved/logs"
+  coco_data_dir: "../datasets/coco"

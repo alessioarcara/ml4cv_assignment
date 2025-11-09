@@ -1,3 +1,4 @@
+import argparse
 import os
 from pathlib import Path
 
@@ -5,21 +6,23 @@ import cv2
 import torch
 from kornia.losses import FocalLoss
 from loguru import logger
-import argparse
 
 # ── Project modules ───────────────────────────────────────────────────────────
-from data.multi_epochs_dataloader import MultiEpochsDataLoader
-from data.streethazards import (
+from ml4cv_assignment.data.multi_epochs_dataloader import MultiEpochsDataLoader
+from ml4cv_assignment.data.streethazards import (
     STREET_HAZARDS_CLASSES,
     StreetHazards,
     get_classes_as_dict,
 )
-from data.transforms import Denormalize, get_data_transforms
-from models.model import build_model
-from training.losses import ObjectosphereLoss, PrototypicalGlobalLocalTripletLoss
-from training.metrics import MeanIoU
-from training.trainer import Trainer
-from utils.misc import (
+from ml4cv_assignment.data.transforms import Denormalize, get_data_transforms
+from ml4cv_assignment.models.model import build_model
+from ml4cv_assignment.training.losses import (
+    ObjectosphereLoss,
+    PrototypicalGlobalLocalTripletLoss,
+)
+from ml4cv_assignment.training.metrics import MeanIoU
+from ml4cv_assignment.training.trainer import Trainer
+from ml4cv_assignment.utils.misc import (
     fix_random,
     generate_run_name,
     get_device,
@@ -58,7 +61,7 @@ cv2.setNumThreads(0)
 NUM_WORKERS: int = max(os.cpu_count() - 1, 1)
 
 CONFIG_PATH = Path("./config.yaml")
-config = load_config(CONFIG_PATH)
+config = load_config(str(CONFIG_PATH))
 device = get_device()
 fix_random(config["seed"])
 
@@ -95,7 +98,7 @@ if __name__ == "__main__":
         root_dir=TRAIN_ROOT,
         subset="validation",
         transforms=data_transforms["val"],
-        add_anomalies=args.with_anoamalies,
+        add_anomalies=args.with_anomalies,
     )
 
     train_loader = MultiEpochsDataLoader(

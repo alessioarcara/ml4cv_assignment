@@ -5,19 +5,20 @@ from typing import Any, Dict, List, Tuple
 import numpy as np
 import torch
 import torch.nn as nn
-import yaml
 from torchinfo import summary
 from tqdm.notebook import tqdm
 
-from models.detector import OpenSetSegmenter
-from models.model import ModelInfo
-from training.metrics import Metric
+from ml4cv_assignment.models.detector import OpenSetSegmenter
+from ml4cv_assignment.models.model import ModelInfo
+from ml4cv_assignment.training.metrics import Metric
+from ml4cv_assignment.utils.constants import STREET_HAZARDS_CLASSES
 
 
-def load_config(config_path: str) -> Dict[str, Any]:
-    with open(config_path, "r") as file:
-        cfg = yaml.safe_load(file)
-    return cfg
+def get_id_to_label_map() -> Dict[int, str]:
+    """
+    Return a mapping from class ID to class name for the StreetHazard dataset
+    """
+    return {i: name for i, name in enumerate(STREET_HAZARDS_CLASSES)}
 
 
 def get_device():
@@ -34,7 +35,8 @@ def get_device():
 
 
 def fix_random(seed: int) -> None:
-    """Fix all the possible sources of randomness.
+    """
+    Fix all the possible sources of randomness.
 
     Args:
         seed: the seed to use.

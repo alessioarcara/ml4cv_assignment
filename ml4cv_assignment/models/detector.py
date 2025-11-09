@@ -5,7 +5,7 @@ import torch.nn as nn
 from loguru import logger
 from tqdm.notebook import tqdm
 
-from .model import EncoderDecoder
+from ml4cv_assignment.models.model import EncoderDecoder
 
 
 class RunningCenters(nn.Module):

@@ -64,7 +64,7 @@ class OWLoss(nn.Module):
             # update mav only at training time
             sem_gt = sem_gt.type(torch.uint8)
             self.cumulate(logits, sem_gt)
-        if self.previous_features == None:
+        if self.previous_features is None:
             return torch.tensor(0.0).cuda()
         gt_labels = torch.unique(sem_gt).tolist()
 

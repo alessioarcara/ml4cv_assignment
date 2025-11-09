@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 import timm
 import torch.nn as nn
 
-from models.decoder import DecoderWithFAM
+from ml4cv_assignment.models.decoder import DecoderWithFAM
 
 
 class EncoderDecoder(nn.Module):

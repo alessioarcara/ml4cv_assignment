@@ -4,8 +4,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from models.aspp import ASPP
-from models.fapn import FAM
+from ml4cv_assignment.models.aspp import ASPP
+from ml4cv_assignment.models.fapn import FAM
 
 
 class Decoder(nn.Module):

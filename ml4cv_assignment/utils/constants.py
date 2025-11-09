@@ -1,0 +1,16 @@
+STREET_HAZARDS_CLASSES = [
+    "unlabeled",
+    "building",
+    "fence",
+    "other",
+    "pedestrian",
+    "pole",
+    "road line",
+    "road",
+    "sidewalk",
+    "vegetation",
+    "car",
+    "wall",
+    "traffic sign",
+    "anomaly",
+]

@@ -1,4 +1,5 @@
 import abc
+from typing import Optional
 
 import torch
 from loguru import logger
@@ -21,7 +22,9 @@ class Metric(abc.ABC):
 
 
 class MeanIoU(Metric):
-    def __init__(self, num_classes: int, ignore_index: int = None, device=None):
+    def __init__(
+        self, num_classes: int, ignore_index: Optional[int] = None, device=None
+    ):
         self.num_classes = num_classes
         self.ignore_index = ignore_index
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")

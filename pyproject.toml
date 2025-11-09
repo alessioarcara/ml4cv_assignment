@@ -1,0 +1,39 @@
+[build-system]
+requires = ["flit_core >=3.11,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+authors = [
+    { name = "Alessio Arcara", email = "alessio.arcara@studio.unibo.it" },
+]
+name = "ml4cv-assignment"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "jupyter>=1.1.1",
+    "kornia>=0.8.1",
+    "loguru>=0.7.3",
+    "matplotlib>=3.10.7",
+    "opencv-python>=4.12.0.88",
+    "pillow>=12.0.0",
+    "polars>=1.35.1",
+    "pydantic>=2.12.4",
+    "pytorch-ood>=0.2.2",
+    "scikit-learn>=1.7.2",
+    "seaborn>=0.13.2",
+    "timm>=1.0.22",
+    "torch>=2.9.0",
+    "torchinfo>=1.8.0",
+    "tqdm>=4.67.1",
+]
+
+[project.optional-dependencies]
+dev = ["pre-commit", "ruff", "mypy", "types-PyYAML"]
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.flit.module]
+name = "ml4cv_assignment"

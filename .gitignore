@@ -1,3 +1,4 @@
+
 ### macOS ###
 # General
 .DS_Store
@@ -222,6 +223,6 @@ pyrightconfig.json
 .history
 .ionide
 
-/data/datasets/*
+datasets
 wandb
 saved

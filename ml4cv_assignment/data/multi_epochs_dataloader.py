@@ -18,7 +18,8 @@ class MultiEpochsDataLoader(torch.utils.data.DataLoader):
 
 
 class _RepeatSampler(object):
-    """ Sampler that repeats forever.
+    """
+    Sampler that repeats forever.
 
     Args:
         sampler (Sampler)
@@ -35,6 +36,7 @@ class _RepeatSampler(object):
 # Verifying whether the _RepeatSampler affects the shuffle functionality.
 # If shuffle is working correctly, the printed indices should be different across epochs.
 if __name__ == "__main__":
+
     class IndexDataset(torch.utils.data.Dataset):
         def __init__(self, size):
             self.size = size
@@ -47,17 +49,12 @@ if __name__ == "__main__":
 
     dataset = IndexDataset(100)
 
-    loader = MultiEpochsDataLoader(
-        dataset,
-        batch_size=4,
-        shuffle=True,
-        num_workers=0
-    )
+    loader = MultiEpochsDataLoader(dataset, batch_size=4, shuffle=True, num_workers=0)
 
     for epoch in range(3):
         indices = []
         for batch in loader:
             indices.extend(batch.numpy())
             break
-    
+
         print(f"Epoch {epoch + 1}: {indices}")
