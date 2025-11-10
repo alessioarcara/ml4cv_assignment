@@ -17,6 +17,7 @@ from ml4cv_assignment.training.losses import (
     PrototypicalGlobalLocalTripletLoss,
     WeightedLoss,
 )
+from ml4cv_assignment.training.metrics import AUPR, MeanIoU, Metric, MetricCollection
 from ml4cv_assignment.utils.io import read_yaml
 from ml4cv_assignment.utils.typings import PathOrStr
 
@@ -55,6 +56,13 @@ transforms_registry.register("ToTensorV2", A.ToTensorV2)
 transforms_registry.register("OneOf", A.OneOf)
 transforms_registry.register("Compose", A.Compose)
 
+# ------------------------
+# Registry metrics
+# ------------------------
+metric_registry = Registry[Metric]()
+metric_registry.register("MeanIoU", MeanIoU)
+metric_registry.register("AUPR", AUPR)
+
 
 class PathsConfig(BaseModel):
     street_hazards_train_dir: DirectoryPath = Field(
@@ -86,6 +94,13 @@ class TrainerConfig(BaseModel, arbitrary_types_allowed=True):
         A.Compose,
         make_field_before_validator(transforms_registry),
     ] = Field(default_factory=lambda: A.Compose([]))
+    metrics: Annotated[List[Metric], make_field_before_validator(metric_registry)] = (
+        Field(default_factory=list)
+    )
+
+    @property
+    def metric_collection(self) -> MetricCollection:
+        return MetricCollection(self.metrics)
 
 
 class Config(BaseModel):
@@ -122,6 +137,7 @@ class Config(BaseModel):
 
     @classmethod
     def load(cls, path: PathOrStr) -> "Config":
+        # TODO: from a list of files
         """Load configuration from a YAML file"""
         data = read_yaml(path)
         return cls(**data)

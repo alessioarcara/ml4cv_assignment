@@ -4,6 +4,7 @@ from kornia.losses import FocalLoss
 
 from ml4cv_assignment.config.config import TrainerConfig
 from ml4cv_assignment.training.losses import WeightedLoss
+from ml4cv_assignment.training.metrics import AUPR, MeanIoU, MetricCollection
 
 losses_cfg = [
     {
@@ -45,7 +46,10 @@ transforms_cfg = {
         ]
     },
 }
-# {"metrics": [{"type": "IoU"}]}
+metrics_cfg = [
+    {"type": "MeanIoU", "params": {"num_classes": 13}},
+    {"type": "AUPR", "params": {"unknown_label": 255}},
+]
 
 
 def test_losses_config():
@@ -74,4 +78,10 @@ def test_transforms_config():
 
 
 def test_metrics_config():
-    assert False
+    cfg = TrainerConfig(metrics=metrics_cfg)
+
+    metric_collection = cfg.metric_collection
+
+    assert isinstance(metric_collection, MetricCollection)
+    assert isinstance(metric_collection.metrics[0], MeanIoU)
+    assert isinstance(metric_collection.metrics[1], AUPR)
