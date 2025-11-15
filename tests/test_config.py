@@ -3,6 +3,10 @@ import torch.nn as nn
 from kornia.losses import FocalLoss
 
 from ml4cv_assignment.config.config import TrainerConfig
+from ml4cv_assignment.training.callbacks import (
+    EarlyStoppingCallback,
+    ModelSavingCallback,
+)
 from ml4cv_assignment.training.losses import WeightedLoss
 from ml4cv_assignment.training.metrics import AUPR, MeanIoU, MetricCollection
 
@@ -50,6 +54,10 @@ metrics_cfg = [
     {"type": "MeanIoU", "params": {"num_classes": 13}},
     {"type": "AUPR", "params": {"unknown_label": 255}},
 ]
+callbacks_cfg = [
+    {"type": "EarlyStoppingCallback", "params": {"patience": 5, "min_delta": 0.001}},
+    {"type": "ModelSavingCallback", "params": {"out_dir": "./checkpoints"}},
+]
 
 
 def test_losses_config():
@@ -85,3 +93,11 @@ def test_metrics_config():
     assert isinstance(metric_collection, MetricCollection)
     assert isinstance(metric_collection.metrics[0], MeanIoU)
     assert isinstance(metric_collection.metrics[1], AUPR)
+
+
+def test_callbacks_config():
+    cfg = TrainerConfig(callbacks=callbacks_cfg)
+
+    assert len(cfg.callbacks) == 2
+    assert isinstance(cfg.callbacks[0], EarlyStoppingCallback)
+    assert isinstance(cfg.callbacks[1], ModelSavingCallback)

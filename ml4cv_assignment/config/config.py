@@ -1,143 +1,91 @@
-from typing import Annotated, List
+from functools import partial
+from typing import Annotated, Callable, Union
 
-import albumentations as A
-import torch.nn as nn
-from kornia.losses import FocalLoss
-from pydantic import BaseModel, ConfigDict, DirectoryPath, Field
-from torch.nn import CrossEntropyLoss
+import torch
+from pydantic import BaseModel, Field
 from torch.utils.data import DataLoader
+from transformers import Mask2FormerImageProcessor
 
-from ml4cv_assignment.config.registry import Registry
-from ml4cv_assignment.config.validator import make_field_before_validator
+from ml4cv_assignment.config.dataset_config import StreetHazardsDatasetConfig
+from ml4cv_assignment.config.paths_config import PathsConfig
+
+# from ml4cv_assignment.config.registries import model_registry
+from ml4cv_assignment.config.trainer_config import TrainerConfig
+
+# from ml4cv_assignment.config.validator import registry_instantiation_validator
 from ml4cv_assignment.data.data_utils import MultiEpochsDataLoader
 from ml4cv_assignment.data.streethazards import StreetHazards
-from ml4cv_assignment.training.losses import (
-    ObjectosphereLoss,
-    OWLoss,
-    PrototypicalGlobalLocalTripletLoss,
-    WeightedLoss,
-)
-from ml4cv_assignment.training.metrics import AUPR, MeanIoU, Metric, MetricCollection
 from ml4cv_assignment.utils.io import read_yaml
 from ml4cv_assignment.utils.typings import PathOrStr
 
-# ------------------------
-# Registry losses
-# ------------------------
-loss_registry = Registry[nn.Module]()
-loss_registry.register("FocalLoss", FocalLoss)
-loss_registry.register("WeightedLoss", WeightedLoss)
-loss_registry.register("CrossEntropyLoss", CrossEntropyLoss)
-loss_registry.register("OWLoss", OWLoss)
-loss_registry.register(
-    "PrototypicalGlobalLocalTripletLoss", PrototypicalGlobalLocalTripletLoss
-)
-loss_registry.register("ObjectosphereLoss", ObjectosphereLoss)
 
-# ------------------------
-# Registry transformations
-# ------------------------
-transforms_registry = Registry[A.BasicTransform]()
-# --- Resize & geometric
-transforms_registry.register("Resize", A.Resize)
-transforms_registry.register("HorizontalFlip", A.HorizontalFlip)
-# --- Color & brightness ---
-transforms_registry.register("ColorJitter", A.ColorJitter)
-transforms_registry.register("RGBShift", A.RGBShift)
-# --- Erasing ---
-transforms_registry.register("CoarseDropout", A.CoarseDropout)
-# --- Environmental artefacts ---
-transforms_registry.register("RandomSunFlare", A.RandomSunFlare)
-transforms_registry.register("RandomShadow", A.RandomShadow)
-transforms_registry.register("RandomFog", A.RandomFog)
-transforms_registry.register("RandomRain", A.RandomRain)
-transforms_registry.register("Normalize", A.Normalize)
-transforms_registry.register("ToTensorV2", A.ToTensorV2)
-transforms_registry.register("OneOf", A.OneOf)
-transforms_registry.register("Compose", A.Compose)
-
-# ------------------------
-# Registry metrics
-# ------------------------
-metric_registry = Registry[Metric]()
-metric_registry.register("MeanIoU", MeanIoU)
-metric_registry.register("AUPR", AUPR)
-
-
-class PathsConfig(BaseModel):
-    street_hazards_train_dir: DirectoryPath = Field(
-        ...,
-        description="Directory containing the StreetHazards training dataset",
+def collate_fn(batch, processor):
+    images, masks = zip(*batch)
+    inputs = processor(
+        images=list(images), segmentation_maps=list(masks), return_tensors="pt"
     )
-    street_hazards_test_dir: DirectoryPath = Field(
-        ...,
-        description="Directory containing the StreetHazards test dataset",
-    )
-    checkpoints_dir: DirectoryPath = Field(
-        ...,
-        description="Directory where model checkpoints are stored",
-    )
-    coco_data_dir: DirectoryPath = Field(
-        ..., description="Directory containing the COCO dataset"
-    )
-
-
-class TrainerConfig(BaseModel, arbitrary_types_allowed=True):
-    losses: Annotated[List[nn.Module], make_field_before_validator(loss_registry)] = (
-        Field(default_factory=list)
-    )
-    train_transforms: Annotated[
-        A.Compose,
-        make_field_before_validator(transforms_registry),
-    ] = Field(default_factory=lambda: A.Compose([]))
-    val_transforms: Annotated[
-        A.Compose,
-        make_field_before_validator(transforms_registry),
-    ] = Field(default_factory=lambda: A.Compose([]))
-    metrics: Annotated[List[Metric], make_field_before_validator(metric_registry)] = (
-        Field(default_factory=list)
-    )
-
-    @property
-    def metric_collection(self) -> MetricCollection:
-        return MetricCollection(self.metrics)
+    inputs["orig_masks"] = torch.stack(masks)
+    return inputs
 
 
 class Config(BaseModel):
-    model_config = ConfigDict(extra="ignore")
+    seed: int = Field(..., description="Random seed")
     training: TrainerConfig
     paths: PathsConfig
+    dataset_config: Annotated[
+        Union[StreetHazardsDatasetConfig], Field(discriminator="type")
+    ]
 
     @property
-    def train_dataset(self) -> StreetHazards:
+    def train_dataset(self) -> "StreetHazards":
         return StreetHazards(
-            root_dir=self.paths.street_hazards_train_dir, subset="training"
+            config=self.dataset_config,
+            root_dir=self.paths.street_hazards_train_dir,
+            coco_dir=self.paths.coco_data_dir,
+            transforms=self.training.train_transforms,
+            subset="training",
         )
 
     @property
-    def val_dataset(self) -> StreetHazards:
+    def val_dataset(self) -> "StreetHazards":
         return StreetHazards(
+            config=self.dataset_config,
             root_dir=self.paths.street_hazards_train_dir,
+            coco_dir=self.paths.coco_data_dir,
+            transforms=self.training.val_transforms,
             subset="validation",
         )
 
     @property
-    def train_dataloader(self) -> DataLoader:
-        return MultiEpochsDataLoader(
-            self.train_dataset,
-            shuffle=True,
+    def dataloader(self) -> Callable[..., DataLoader]:
+        processor = Mask2FormerImageProcessor(
+            do_resize=False,
+            do_normalize=False,
+            num_labels=13,
+            ignore_index=255,
+        )
+        collate_with_processor = partial(collate_fn, processor=processor)
+
+        return partial(
+            MultiEpochsDataLoader,
+            batch_size=self.training.batch_size,
+            num_workers=self.training.num_workers,
+            drop_last=True,
+            pin_memory=True,
+            persistent_workers=True,
+            collate_fn=collate_with_processor,
         )
 
     @property
+    def train_dataloader(self) -> DataLoader:
+        return self.dataloader(self.train_dataset, shuffle=True)
+
+    @property
     def val_dataloader(self) -> DataLoader:
-        return MultiEpochsDataLoader(
-            self.val_dataset,
-            shuffle=False,
-        )
+        return self.dataloader(self.val_dataset, shuffle=False)
 
     @classmethod
     def load(cls, path: PathOrStr) -> "Config":
-        # TODO: from a list of files
         """Load configuration from a YAML file"""
         data = read_yaml(path)
-        return cls(**data)
+        return cls.model_validate(data)

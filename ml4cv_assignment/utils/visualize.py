@@ -35,7 +35,8 @@ COLORS = np.array(
 def color(
     annot_or_mask: Union[str, np.ndarray],
     colors: np.ndarray,
-) -> Image.Image:
+) -> np.ndarray:
+    # Load mask if path is provided
     if isinstance(annot_or_mask, str):
         mask = np.array(Image.open(annot_or_mask))
     else:
@@ -46,7 +47,7 @@ def color(
     for index, color in enumerate(colors):
         img_new[mask == index] = color
 
-    return Image.fromarray(img_new, "RGB")
+    return img_new
 
 
 def visualize_augmentations(dataset, data_transforms, denorm, num_samples=6, cols=3):
@@ -177,9 +178,3 @@ def visualize_predictions(segmenter, denorm, dataset, device, threshold: float =
     )
 
     widgets.interact(show_prediction, idx=idx_slider, threshold_value=threshold_slider)
-
-
-if __name__ == "__main__":
-    annot_path = "/path/to/input/annotation"
-    segm_map = color(annot_path, COLORS)
-    segm_map.save("/path/to/output/map")

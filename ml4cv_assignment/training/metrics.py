@@ -1,10 +1,13 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Union
+from typing import List, Optional, Union
 
 import torch
 from torch import Tensor
 from torchmetrics.functional.classification import binary_precision_recall_curve
 from torchmetrics.utilities.compute import auc
+
+from ml4cv_assignment.utils.misc import resolve_device
+from ml4cv_assignment.utils.typings import MetricResults
 
 
 class Metric(ABC):
@@ -14,7 +17,7 @@ class Metric(ABC):
     @abstractmethod
     def compute(
         self,
-    ) -> Union[float, List[float], Dict[str, Union[float, List[float]]]]: ...
+    ) -> MetricResults: ...
 
     @abstractmethod
     def reset(self) -> None: ...
@@ -31,9 +34,7 @@ class MeanIoU(Metric):
         self.num_classes = num_classes
         self.ignore_index = ignore_index
         self.per_class = per_class
-        self.device = device or torch.device(
-            "cuda" if torch.cuda.is_available() else "cpu"
-        )
+        self.device = resolve_device(device)
         self.reset()
 
     @torch.no_grad()
@@ -50,16 +51,20 @@ class MeanIoU(Metric):
             self.intersection[cls] += torch.sum(pred_mask & true_mask).float()
             self.union[cls] += torch.sum(pred_mask | true_mask).float()
 
-    def compute(self) -> Union[float, List[float]]:
+    def compute(self) -> MetricResults:
         iou = self.intersection / (self.union + 1e-6)  # Avoid division by zero
-        valid_iou = iou[self.union > 0]  # Ignore classes with no samples
+        valid_mask = self.union > 0  # Ignore classes with no samples
+
+        miou = float(torch.mean(iou[valid_mask])) if torch.any(valid_mask) else 0.0
+
+        result = {"mIoU": miou}
 
         if self.per_class:
-            # Return IoU for each class, with 0 for classes with no samples
-            return iou.tolist()
-        else:
-            # Return mean IoU over classes with at least one sample
-            return float(torch.mean(valid_iou)) if len(valid_iou) > 0 else 0.0
+            for cls in range(self.num_classes):
+                if valid_mask[cls]:
+                    result[f"IoU_class_{cls}"] = float(iou[cls])
+
+        return result
 
     def reset(self) -> None:
         self.intersection = torch.zeros(self.num_classes, device=self.device)
@@ -73,9 +78,7 @@ class AUPR(Metric):
         device: Optional[Union[str, torch.device]] = None,
     ) -> None:
         self.unknown_label = unknown_label
-        self.device = device or torch.device(
-            "cuda" if torch.cuda.is_available() else "cpu"
-        )
+        self.device = resolve_device(device)
         self.reset()
 
     @torch.no_grad()
@@ -97,10 +100,10 @@ class AUPR(Metric):
             self.aupr_out += auc(r, p)
             self.count += 1
 
-    def compute(self) -> float:
+    def compute(self) -> MetricResults:
         if self.count == 0:
-            return 0.0
-        return float(self.aupr_out / self.count)
+            return {"AUPR": 0.0}
+        return {"AUPR": float(self.aupr_out / self.count)}
 
     def reset(self) -> None:
         self.aupr_out = torch.tensor(0.0, dtype=torch.float32, device=self.device)
@@ -116,8 +119,15 @@ class MetricCollection(Metric):
         for metric in self.metrics:
             metric.update(logits, pred, true)
 
-    def compute(self) -> Dict[str, Union[float, List[float]]]:
-        return {metric.__class__.__name__: metric.compute() for metric in self.metrics}  # type: ignore
+    def compute(self) -> MetricResults:
+        combined = {}
+
+        for metric in self.metrics:
+            metric_dict = metric.compute()
+            for k, v in metric_dict.items():
+                combined[k] = v
+
+        return combined
 
     def reset(self) -> None:
         for metric in self.metrics:

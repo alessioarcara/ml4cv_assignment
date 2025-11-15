@@ -3,8 +3,23 @@ from typing import Any, Dict, List
 
 import timm
 import torch.nn as nn
+from torch import Tensor
 
 from ml4cv_assignment.models.decoder import DecoderWithFAM
+
+
+class Segmenter(nn.Module):
+    def __init__(self, backbone: nn.Module, neck: nn.Module, head: nn.Module) -> None:
+        super().__init__()
+        self.backbone = backbone
+        self.neck = neck
+        self.head = head
+
+    def forward(self, x: Tensor) -> Tensor:
+        x = self.backbone(x)
+        x = self.neck(x)
+        _, logits = self.head(x)
+        return logits
 
 
 class EncoderDecoder(nn.Module):

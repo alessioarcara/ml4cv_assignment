@@ -1,231 +1,254 @@
-from pathlib import Path
-from typing import Any, Callable, Dict, Optional
+from collections import defaultdict
+from typing import Any, Dict, Mapping, Optional, Tuple, Union
 
 import torch
 import torch.nn as nn
 from loguru import logger
-from torch import optim
-from torch.profiler import ProfilerActivity, profile, record_function, schedule
+from torch import Tensor, optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 import wandb
-
-from .metrics import Metric
-from .monitor import WandbMonitor
+from ml4cv_assignment.config.trainer_config import TrainerConfig
+from ml4cv_assignment.training.metrics import MetricCollection
+from ml4cv_assignment.utils.misc import resolve_device
+from ml4cv_assignment.utils.typings import Stage, StepOutput
 
 
 class Trainer:
     def __init__(
         self,
-        config: Dict[str, Any],
+        config: TrainerConfig,
         model: nn.Module,
-        device: torch.device,
         train_loader: DataLoader,
-        criterions: list[tuple[float, Callable]],
-        denorm: Callable,
+        run_name: str,
         val_loader: Optional[DataLoader] = None,
-        class_dict: Dict[int, str] = {},
-        metrics: list[Metric] = [],
-        use_amp: bool = True,
+        device: Optional[Union[str, torch.device]] = None,
     ) -> None:
         self.config = config
-        self.criterions = criterions
         self.train_loader = train_loader
         self.val_loader = val_loader
-        self.device = device
-        self.model = model.to(device)
-        self.class_dict = class_dict
-        self.metrics = metrics
-        self.use_amp = use_amp
+        self.callbacks = config.callbacks
+        self.losses = config.losses
+        self.metric_collection = MetricCollection(config.metrics)
+        self.denormalize = config.denormalize
+        self.run_name = run_name
+        self.history: Dict[str, float] = {}
+        self._stop_training = False
 
-        # Monitor
-        self.monitor = WandbMonitor(
-            config=config, metrics=metrics, denorm=denorm, class_dict=class_dict
-        )
+        # Model
+        self.device = resolve_device(device)
+        self.model = model.to(self.device)
+        if self.config.use_torch_compile:
+            self.model.compile()
 
-        # Optimzier
-        lr = self.config["training"]["lr"]
+        # Optimizer
+        lr = self.config.lr
         self.optimizer = optim.AdamW(
-            self.model.parameters(), lr=lr, weight_decay=self.config["training"]["wd"]
+            self.model.parameters(), lr=lr, weight_decay=config.weight_decay
         )
 
         # Scheduler
-        num_steps = self.config["training"]["num_epochs"] * len(self.train_loader)
+        total_steps = self.config.num_epochs * len(self.train_loader)
         self.scheduler = optim.lr_scheduler.OneCycleLR(
             self.optimizer,
-            max_lr=lr,
-            total_steps=num_steps,
+            max_lr=lr * 3,
+            total_steps=total_steps,
             pct_start=0.1,
+            anneal_strategy="linear",
         )
 
         # AMP
-        self.scaler = torch.amp.GradScaler() if use_amp else None
+        self.scaler = torch.amp.GradScaler(enabled=self.config.use_mixed_precision)
 
-        # Training state
-        self.step = 0
-        self.epoch = 0
-        self.best_miou = 0.0
+    @property
+    def stop_training(self) -> bool:
+        return self._stop_training
 
-        # Save dir
-        save_dir = Path.home() / config["paths"]["save_path"]
-        save_dir.mkdir(parents=True, exist_ok=True)
-        self.ckpt_dir = save_dir
-        self.evaluation_rate = config["training"].get("evaluation_rate", 1)
+    @stop_training.setter
+    def stop_training(self, value: bool) -> None:
+        self._stop_training = value
 
-    def train(self, run_name: str) -> None:
-        with self.monitor.run_context(run_name, len(self.criterions)):
-            with profile(
-                activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
-                schedule=schedule(wait=1, warmup=1, active=1, repeat=1),
-                on_trace_ready=torch.profiler.tensorboard_trace_handler("saved/logs"),
-                record_shapes=True,
-                profile_memory=True,
-                with_stack=True,
-            ) as p:
-                for epoch in tqdm(
-                    range(1, self.config["training"]["num_epochs"] + 1),
-                    desc="Epoch",
-                    colour="green",
-                ):
-                    self.model.train()
-                    for batch in tqdm(
-                        self.train_loader,
-                        total=len(self.train_loader),
-                        desc=f"Epoch {epoch} Batches",
-                        leave=False,
-                        colour="blue",
-                    ):
-                        self._training_step(*batch, profiler=p)
+    def _on_training_end(self) -> None:
+        for callback in self.callbacks:
+            callback.on_train_end(self)
 
-                    if epoch % self.evaluation_rate == 0:
-                        self.eval("train", epoch)
-                        if self.val_loader:
-                            self.eval("val", epoch)
+    def _on_eval_end(self) -> None:
+        for callback in self.callbacks:
+            callback.on_eval_end(self)
 
-    def _training_step(
-        self, imgs: torch.Tensor, masks: torch.Tensor, profiler=None
-    ) -> None:
+    def get_loader(self, stage: Stage) -> Optional[DataLoader]:
+        return self.train_loader if stage == Stage.TRAIN else self.val_loader
+
+    def prepare_batch(self, batch: Tuple[Tensor, Tensor]) -> Tuple[Tensor, Tensor]:
+        imgs, masks = batch
         imgs = imgs.to(self.device, non_blocking=True)
         masks = masks.long().to(self.device, non_blocking=True)
+        return imgs, masks
+
+    def _compute_loss(
+        self, logits: Tensor, gt_masks: Tensor, stage: str
+    ) -> Tuple[Tensor, Dict[str, float]]:
+        losses = []
+        loss_dict = {}
+
+        for i, loss_fn in enumerate(self.losses):
+            loss_i: Tensor = loss_fn(logits, gt_masks)
+            losses.append(loss_i)
+            loss_dict[f"{stage}/batch_loss_{i}"] = loss_i.item()
+
+        total_loss = torch.mean(torch.stack(losses))
+        loss_dict[f"{stage}/loss"] = total_loss.item()
+
+        return total_loss, loss_dict
+
+    def _prepare_input(
+        self, data: Union[torch.Tensor, Any]
+    ) -> Union[torch.Tensor, Any]:
+        """
+        Prepares one `data` before feeding it to the model, be it a tensor or a nested list/dictionary of tensors.
+        """
+        if isinstance(data, Mapping):
+            return type(data)({k: self._prepare_input(v) for k, v in data.items()})  # type: ignore
+        elif isinstance(data, (tuple, list)):
+            return type(data)(self._prepare_input(v) for v in data)
+        elif isinstance(data, torch.Tensor):
+            return data.to(self.device, non_blocking=True)
+        return data
+
+    def _train_step(self, batch: Tuple[Tensor, Tensor]) -> StepOutput:
+        # imgs, masks = self.prepare_batch(batch)
+        inputs = self._prepare_input(batch)
+        # inputs = batch
 
         self.optimizer.zero_grad(set_to_none=True)
 
-        if self.use_amp:
-            with torch.autocast(device_type=self.device.type, dtype=torch.float16):
-                logits = self.model(imgs)
-                batch_loss = self._compute_loss(logits, masks, True)
+        with torch.autocast(
+            device_type=self.device.type,
+            dtype=torch.bfloat16,
+            enabled=self.config.use_mixed_precision,
+        ):
+            outputs = self.model(inputs, return_preds=False)
 
-            self.scaler.scale(batch_loss).backward()
-            self.scaler.step(self.optimizer)
-            self.scaler.update()
-        else:
-            logits = self.model(imgs)
-            batch_loss = self._compute_loss(logits, masks, True)
-            batch_loss.backward()
-            self.optimizer.step()
+            # logits = self.model(imgs)
+            # total_loss, loss_dict = self._compute_loss(logits, masks, Stage.TRAIN)
+        loss = outputs["loss"]
 
+        self.scaler.scale(loss).backward()
+        self.scaler.step(self.optimizer)
+        self.scaler.update()
         self.scheduler.step()
-        self.step += 1
 
-        if self.step % 10 == 0:
-            self.monitor.log_training_step(
-                batch_loss.item(), self.scheduler.get_last_lr()[0], self.step
-            )
+        # return loss_dict
+        return {"train/batch_loss": loss.item()}
 
-        if profiler is not None:
-            profiler.step()
+    def _eval_step(self, batch: Tuple[Tensor, Tensor], stage: Stage) -> StepOutput:
+        inputs = self._prepare_input(batch)
+        # imgs, masks = self.prepare_batch(batch)
 
-    def _compute_loss(
-        self,
-        logits: torch.Tensor,
-        masks: torch.Tensor,
-        is_train=False,
-    ) -> torch.Tensor:
-        """
-        Compute a weighted sum of all provided criterions.
-        """
-        with record_function("loss"):
-            total_loss = 0.0
-            batch_losses = {}
+        with torch.autocast(
+            device_type=self.device.type,
+            dtype=torch.bfloat16,
+            enabled=self.config.use_mixed_precision,
+        ):
+            # logits: Tensor = self.model(imgs)
+            # _, loss_dict = self._compute_loss(logits, masks, stage)
+            outputs = self.model(inputs)
 
-            for i, (weight, loss_fn) in enumerate(self.criterions):
-                loss = loss_fn(logits, masks)
-                total_loss += weight * loss
-                batch_losses[f"train/batch_loss{i}"] = loss.item()
+        pred_masks = outputs["preds"]
+        gt_masks = inputs["orig_masks"]
+        # pred = logits.argmax(dim=1)
+        self.metric_collection.update(None, pred_masks, gt_masks)
 
-            if is_train:
-                self.monitor.log_batch_losses(batch_losses, self.step)
+        # return loss_dict
+        return {f"{stage}/loss": outputs["loss"].item()}
 
-            return total_loss
+    def run(self) -> None:
+        wandb.init(
+            project=self.config.wandb_project_name,
+            entity=self.config.wandb_entity,
+            name=self.run_name,
+            config=self.config.model_dump(),
+        )
+        wandb.watch(self.model, log="all", log_freq=100)
+
+        try:
+            for epoch in tqdm(
+                range(1, self.config.num_epochs + 1), desc="Epoch", colour="green"
+            ):
+                self.model.train()
+                train_loader = self.get_loader(Stage.TRAIN)
+                assert train_loader is not None
+
+                for batch in tqdm(
+                    train_loader,
+                    total=len(train_loader),
+                    desc=f"Epoch {epoch} Batches",
+                    leave=False,
+                    colour="blue",
+                ):
+                    batch_log = self._train_step(batch)
+                    batch_log["train/lr"] = self.scheduler.get_last_lr()[0]
+                    wandb.log(batch_log)
+
+                if epoch % self.config.evaluation_rate == 0:
+                    train_results = self.eval(Stage.TRAIN)
+                    val_results = self.eval(Stage.VAL)
+
+                    epoch_log = {}
+                    epoch_log.update(train_results)
+                    epoch_log.update(val_results)
+
+                    self.history.update(epoch_log)
+
+                    wandb.log(epoch_log)
+
+                    self._on_eval_end()
+
+                    if self.stop_training:
+                        logger.info("Early stopping triggered! No improvement.")
+                        break
+
+            self._on_training_end()
+
+        finally:
+            wandb.finish()
 
     @torch.inference_mode()
-    def eval(self, split: str, epoch: int) -> None:
-        """
-        Evaluate the model on either the training loader or validation loader.
-        """
+    def eval(self, stage: Stage) -> Dict[str, float]:
         self.model.eval()
-        loader = self.val_loader if split == "val" else self.train_loader
+        loader = self.get_loader(stage)
 
-        total_loss = 0.0
-        for metric in self.metrics:
-            metric.reset()
+        if loader is None:
+            logger.warning(
+                "No data to evaluate for the '{}' stage. Skipping evaluation.", stage
+            )
+            return {}
 
-        first_batch_logged = False
-        for imgs, masks in tqdm(
+        self.metric_collection.reset()
+        loss_acc: defaultdict[str, float] = defaultdict(float)
+        num_batches = len(loader)
+
+        for batch in tqdm(
             loader,
-            total=len(loader),
-            desc=f"Evaluating {split}",
+            total=num_batches,
+            desc=f"Evaluating {stage}",
             leave=False,
             colour="red",
         ):
-            imgs = imgs.to(self.device, non_blocking=True)
-            masks = masks.long().to(self.device, non_blocking=True)
+            loss_dict = self._eval_step(batch, stage)
+            for k, v in loss_dict.items():
+                loss_acc[f"{k}_epoch"] += v
 
-            if self.use_amp:
-                with torch.autocast(device_type=self.device.type, dtype=torch.float16):
-                    logits = self.model(imgs)
-                    batch_loss = self._compute_loss(logits, masks)
-            else:
-                logits = self.model(imgs)
-                batch_loss = self._compute_loss(logits, masks)
+        losses_avg: Dict[str, float] = {}
+        for k, v in loss_acc.items():
+            losses_avg[k] = v / num_batches
 
-            total_loss += batch_loss.item()
-            pred = logits.argmax(dim=1)
+        metrics_dict = self.metric_collection.compute()
 
-            for metric in self.metrics:
-                metric.update(logits, pred, masks)
+        eval_results = {
+            **losses_avg,
+            **{f"{stage}/{k}_epoch": v for k, v in metrics_dict.items()},
+        }
 
-            if split == "val" and not first_batch_logged:
-                self.monitor.log_segmentation_results(imgs, masks, pred)
-                self.monitor.log_pixel_embeddings(logits, pred, masks)
-                first_batch_logged = True
-
-        mean_loss = total_loss / len(loader)
-
-        log_dict = {f"{split}/epoch_totalloss": mean_loss, "epoch": epoch}
-
-        for metric in self.metrics:
-            metric_name = metric.__class__.__name__
-            log_dict[f"{split}/{metric_name}"] = metric.compute()
-
-        self.monitor.log_metrics(log_dict)
-
-        if split == "val":
-            curr_miou = None
-            for key, value in log_dict.items():
-                if "meaniou" in key.lower():
-                    curr_miou = value
-                    break
-            if curr_miou is not None and curr_miou > self.best_miou:
-                self.best_miou = curr_miou
-                self._save_model(epoch, curr_miou)
-
-    def _save_model(self, epoch: int, miou: float) -> None:
-        """
-        Save model checkpoint to the configured directory.
-        """
-        filename = f"{wandb.run.name}_epoch{epoch}_miou{miou:.4f}.pt"
-        path = self.ckpt_dir / filename
-        torch.save(self.model.state_dict(), path)
-        logger.info(f"Saved checkpoint to {path}")
+        return eval_results

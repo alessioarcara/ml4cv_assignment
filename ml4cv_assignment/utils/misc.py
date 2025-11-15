@@ -1,24 +1,25 @@
 import random
 from datetime import datetime
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
 import torch.nn as nn
 from torchinfo import summary
-from tqdm.notebook import tqdm
 
-from ml4cv_assignment.models.detector import OpenSetSegmenter
+# from tqdm.notebook import tqdm
+# from ml4cv_assignment.models.detector import OpenSetSegmenter
 from ml4cv_assignment.models.model import ModelInfo
-from ml4cv_assignment.training.metrics import Metric
-from ml4cv_assignment.utils.constants import STREET_HAZARDS_CLASSES
+
+# from ml4cv_assignment.training.metrics import Metric
 
 
-def get_id_to_label_map() -> Dict[int, str]:
-    """
-    Return a mapping from class ID to class name for the StreetHazard dataset
-    """
-    return {i: name for i, name in enumerate(STREET_HAZARDS_CLASSES)}
+def resolve_device(device: Optional[Union[str, torch.device]] = None) -> torch.device:
+    if isinstance(device, str):
+        return torch.device(device)
+    if isinstance(device, torch.device):
+        return device
+    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def fix_random(seed: int) -> None:
@@ -68,27 +69,28 @@ def print_summary(net, input_size, verbose=True):
     print("\nNetwork's n°params: %.3fk \tMAC: %.3fM\n" % (params / 1e3, macs / 1e6))
 
 
-def compute_metrics(
-    data_loader: torch.utils.data.DataLoader,
-    segmenter: OpenSetSegmenter,
-    metrics: List[Metric],
-    device="cuda" if torch.cuda.is_available() else "cpu",
-):
-    for metric in metrics:
-        metric.reset()
-
-    for imgs, masks in tqdm(data_loader, desc="Computing metrics"):
-        imgs = imgs.to(device)
-        masks = masks.to(device)
-
-        closed_set_preds, open_set_probs = segmenter(imgs)
-
-        for metric in metrics:
-            metric.update(open_set_probs, closed_set_preds, masks)
-
-    results = {}
-    for metric in metrics:
-        results[metric.__class__.__name__] = metric.compute()
-        print(f"{metric.__class__.__name__}: {results[metric.__class__.__name__]}")
-
-    return results
+# def compute_metrics(
+#    data_loader: torch.utils.data.DataLoader,
+#    segmenter: OpenSetSegmenter,
+#    metrics: List[Metric],
+#    device="cuda" if torch.cuda.is_available() else "cpu",
+# ):
+#    for metric in metrics:
+#        metric.reset()
+#
+#    for imgs, masks in tqdm(data_loader, desc="Computing metrics"):
+#        imgs = imgs.to(device)
+#        masks = masks.to(device)
+#
+#        closed_set_preds, open_set_probs = segmenter(imgs)
+#
+#        for metric in metrics:
+#            metric.update(open_set_probs, closed_set_preds, masks)
+#
+#    results = {}
+#    for metric in metrics:
+#        results[metric.__class__.__name__] = metric.compute()
+#        print(f"{metric.__class__.__name__}: {results[metric.__class__.__name__]}")
+#
+#    return results
+#
