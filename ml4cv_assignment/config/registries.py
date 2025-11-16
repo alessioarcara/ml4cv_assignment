@@ -1,13 +1,16 @@
 import albumentations as A
+import timm
 import torch.nn as nn
 from kornia.losses import DiceLoss, FocalLoss
 from torch.nn import CrossEntropyLoss
 
 from ml4cv_assignment.config.registry import Registry
+from ml4cv_assignment.models import DeepLabFPN, FaPNDecoder, Mask2Former
 from ml4cv_assignment.training.callbacks import (
     Callback,
     EarlyStoppingCallback,
     ModelSavingCallback,
+    ModelSummaryCallback,
     VisualizeSegmentationResultsCallback,
 )
 from ml4cv_assignment.training.losses import (
@@ -80,8 +83,13 @@ callback_registry.register("ModelSavingCallback", ModelSavingCallback)
 callback_registry.register(
     "VisualizeSegmentationResultsCallback", VisualizeSegmentationResultsCallback
 )
+callback_registry.register("ModelSummaryCallback", ModelSummaryCallback)
 
 # ------------------------
 # Registry models
 # ------------------------
 model_registry = Registry[nn.Module]()
+model_registry.register("Mask2Former", Mask2Former)
+model_registry.register("DeepLabFPN", DeepLabFPN)
+model_registry.register("FaPNDecoder", FaPNDecoder)
+model_registry.register("timm", timm.create_model)  # type: ignore

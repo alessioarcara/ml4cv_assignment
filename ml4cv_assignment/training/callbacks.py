@@ -8,6 +8,7 @@ import numpy as np
 import torch
 from loguru import logger
 from torch import Tensor
+from torchinfo import summary
 
 import wandb
 from ml4cv_assignment.utils.typings import Stage
@@ -18,6 +19,7 @@ if TYPE_CHECKING:
 
 
 class Callback(ABC):
+    def on_train_start(self, trainer: "Trainer"): ...
     def on_train_end(self, trainer: "Trainer"): ...
     def on_eval_end(self, trainer: "Trainer"): ...
 
@@ -60,11 +62,13 @@ class EarlyStoppingCallback(ModelMonitorCallback):
 
         if improved:
             self.counter = 0
+            logger.info("Improved. Counter reset.")
         else:
             self.counter += 1
+            logger.info(f"No improvement for {self.counter}/{self.patience}.")
 
             if self.counter >= self.patience:
-                self.trainer = True
+                trainer.stop_training = True
 
         return improved
 
@@ -102,6 +106,22 @@ class ModelSavingCallback(ModelMonitorCallback):
         logger.info(f"Uploaded model artifact to wandb: {base_name}")
 
 
+class ModelSummaryCallback(Callback):
+    def __init__(self):
+        pass
+
+    def on_train_start(self, trainer: "Trainer") -> None:
+        model = trainer.model
+        train_loader = trainer.get_loader(Stage.TRAIN)
+        assert train_loader is not None
+
+        dummy_batch = next(iter(train_loader))
+        dummy_input = dummy_batch["pixel_values"]
+        input_shape = dummy_input.shape
+
+        summary(model, input_size=input_shape, verbose=1)
+
+
 class VisualizeSegmentationResultsCallback(Callback):
     """
     Log a side-by-side comparison of true vs predicted segmentation masks.
@@ -133,32 +153,22 @@ class VisualizeSegmentationResultsCallback(Callback):
             logger.warning("Validation loader not available; skipping visualization.")
             return
 
-        # imgs, masks = trainer.prepare_batch(batch)
-        inputs = trainer._prepare_input(batch)
+        inputs: Dict[str, Tensor] = trainer._prepare_input(batch)  # type: ignore
         table = wandb.Table(columns=["Segmentation Comparison"])
 
         with torch.inference_mode():
-            # logits: Tensor = trainer.model(imgs)
             outputs = trainer.model(inputs)
 
-        preds = outputs["preds"]
-        # preds = logits.argmax(dim=1)
+        imgs = inputs["pixel_values"]
+        gt_masks = inputs["orig_masks"]
+        pred_preds = outputs["preds"]
 
-        for img, gt_mask, pred_mask in zip(
-            inputs["pixel_values"], inputs["orig_masks"], preds
-        ):
+        for img, gt_mask, pred_mask in zip(imgs, gt_masks, pred_preds):
             img_np = trainer.denormalize(img)
             true_colored = color(gt_mask.cpu().numpy(), COLORS)
             pred_colored = color(pred_mask.cpu().numpy(), COLORS)
             comparison = np.concatenate((img_np, true_colored, pred_colored), axis=1)
             table.add_data(wandb.Image(comparison))
-
-        #        for img, gt_mask, pred_mask in zip(imgs, masks, preds):
-        #            img_np = trainer.denormalize(img)
-        #            true_colored = color(gt_mask.cpu().numpy(), COLORS)
-        #            pred_colored = color(pred_mask.cpu().numpy(), COLORS)
-        #            comparison = np.concatenate((img_np, true_colored, pred_colored), axis=1)
-        #            table.add_data(wandb.Image(comparison))
 
         wandb.log({"Segmentation Results": table})
 

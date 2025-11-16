@@ -5,7 +5,7 @@ import torch.nn as nn
 from loguru import logger
 from tqdm.notebook import tqdm
 
-from ml4cv_assignment.models.model import EncoderDecoder
+from ml4cv_assignment.models.deeplab_fpn import DeepLabFPN
 
 
 class RunningCenters(nn.Module):
@@ -59,7 +59,7 @@ class OpenSetSegmenter(nn.Module):
     def __init__(
         self,
         config: Dict[str, Any],
-        model: EncoderDecoder,
+        model: DeepLabFPN,
         n_classes: int,
         alpha: float = 0.5,
         T: float = 1.0,

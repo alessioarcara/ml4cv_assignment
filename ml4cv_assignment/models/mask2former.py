@@ -27,7 +27,7 @@ class Mask2Former(nn.Module):
         )
 
     def forward(
-        self, inputs: dict[str, torch.Tensor], return_preds: bool = True
+        self, inputs: dict[str, torch.Tensor], return_preds: bool
     ) -> dict[str, torch.Tensor]:
         pixel_values = inputs["pixel_values"]
         mask_labels = inputs.get("mask_labels", None)

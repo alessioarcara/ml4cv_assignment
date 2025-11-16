@@ -1,21 +1,11 @@
 seed: 42
 
 dataset_config:
-  type: "streethazards"
+  type: streethazards
   add_anomalies: false
   mask_shift: true
 
-training:
-  wandb_project_name: "ml4cv_assignment"
-  wandb_entity: "aarcara"
-  batch_size: 8
-  lr: 1e-4
-  weight_decay: 0.05
-  num_epochs: 100
-  evaluation_rate: 1
-  use_mixed_precision: true 
-  use_torch_compile: false 
-
+model_cfg:
   losses:
     - type: WeightedLoss
       params:
@@ -23,12 +13,45 @@ training:
           type: FocalLoss
           params:
             alpha: 1.0
-            gamma: 2.0
+            gamma: 3.0
             reduction: "mean"
         weight: 20.0
     - type: DiceLoss
       params:
         average: "macro"
+  model:
+    #type: Mask2Former
+    #params: {}
+    type: DeepLabFPN
+    params:
+      encoder:
+        type: timm
+        params:
+          model_name: "efficientnet_b2"
+          features_only: true
+          pretrained: true 
+          out_indices: [0, 1, 4]
+          output_stride: 8
+      decoder:
+        type: FaPNDecoder
+        params:
+          fpn_channels: [16, 24, 352]
+          decoder_channels: 64
+          num_classes: 13
+          input_size: [360, 640]
+          output_stride: 8
+
+training:
+  wandb_project_name: ml4cv_assignment
+  wandb_entity: aarcara
+  wandb_base_run_name: "test_deeplab_fpn"
+  batch_size: 8
+  lr: 1e-4
+  weight_decay: 0.05
+  num_epochs: 100
+  evaluation_rate: 1
+  use_mixed_precision: true 
+  use_torch_compile: false 
 
   train_transforms:
     type: Compose
@@ -105,8 +128,8 @@ training:
         # Normalization & tensor conversion
         - type: Normalize
           params:
-            mean: [0.485, 0.456, 0.406]
-            std: [0.229, 0.224, 0.225]
+            mean: [0.331, 0.346, 0.373]
+            std: [0.162, 0.160, 0.174]
             max_pixel_value: 255.0
             p: 1.0
         - type: ToTensorV2
@@ -122,8 +145,8 @@ training:
             max_size: 640
         - type: Normalize
           params:
-            mean: [0.485, 0.456, 0.406]
-            std: [0.229, 0.224, 0.225]
+            mean: [0.331, 0.346, 0.373]
+            std: [0.162, 0.160, 0.174]
             max_pixel_value: 255.0
             p: 1.0
         - type: ToTensorV2
@@ -139,18 +162,18 @@ training:
   callbacks:
     - type: EarlyStoppingCallback
       params:
-        patience: 10
+        patience: 5
         minimize: false
-        history_key: "val/MeanIoU"
+        history_key: val/mIoU_epoch
     - type: ModelSavingCallback
       params:
-        out_dir: "checkpoints"  
+        out_dir: checkpoints  
         minimize: false
-        history_key: "val/MeanIoU"
+        history_key: val/mIoU_epoch
     - type: VisualizeSegmentationResultsCallback
       params: {}
 
 paths:
-  street_hazards_train_dir: "datasets/train"
-  street_hazards_test_dir: "datasets/test"
-  coco_data_dir: "datasets/coco"
+  street_hazards_train_dir: datasets/train
+  street_hazards_test_dir: datasets/test
+  coco_data_dir: datasets/coco

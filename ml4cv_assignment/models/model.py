@@ -1,82 +1,45 @@
-from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
-import timm
+import torch
 import torch.nn as nn
 from torch import Tensor
 
-from ml4cv_assignment.models.decoder import DecoderWithFAM
 
-
-class Segmenter(nn.Module):
-    def __init__(self, backbone: nn.Module, neck: nn.Module, head: nn.Module) -> None:
+class Model(nn.Module):
+    def __init__(self, model: nn.Module, losses: List[nn.Module]) -> None:
         super().__init__()
-        self.backbone = backbone
-        self.neck = neck
-        self.head = head
+        self.model = model
+        self.losses = losses
 
-    def forward(self, x: Tensor) -> Tensor:
-        x = self.backbone(x)
-        x = self.neck(x)
-        _, logits = self.head(x)
-        return logits
+    def _compute_loss(
+        self, logits: Tensor, gt_masks: Tensor
+    ) -> Tuple[Tensor, Dict[str, float]]:
+        losses = []
+        loss_dict = {}
 
+        for i, loss_fn in enumerate(self.losses):
+            loss_i: Tensor = loss_fn(logits, gt_masks)
+            losses.append(loss_i)
+            loss_dict[f"batch_loss_{i}"] = loss_i.item()
 
-class EncoderDecoder(nn.Module):
-    def __init__(self, encoder, decoder):
-        super(EncoderDecoder, self).__init__()
-        self.encoder = encoder
-        self.decoder = decoder
+        total_loss = torch.mean(torch.stack(losses))
 
-    def forward(self, x):
-        features = self.encoder(x)
-        _, logits = self.decoder(features)
-        return logits
+        return total_loss, loss_dict
 
+    def forward(self, inputs: dict, return_preds: bool = True) -> Dict[str, Any]:
+        outputs = self.model(inputs, return_preds=return_preds)
 
-def compute_aspp_atrous_rates(image_height: int, output_stride: int) -> list[int]:
-    base_rate = image_height // (output_stride * 6)
-    return [base_rate * k for k in (1, 2, 3)]
+        # Compute loss only if:
+        # - losses are defined
+        # - loss is not already computed in outputs
+        # - model outputs logits
+        if self.losses and "logits" in outputs and "loss" not in outputs:
+            targets = inputs.get("orig_masks")
+            if targets is not None:
+                total_loss, loss_dict = self._compute_loss(
+                    outputs["logits"], inputs["orig_masks"]
+                )
+                outputs["loss"] = total_loss
+                outputs.update(loss_dict)
 
-
-@dataclass
-class ModelInfo:
-    fpn_features: List[int]
-    atrous_rates: List[int]
-
-
-def build_model(
-    config: Dict[str, Any],
-    num_classes: int,
-    atrous_rates: List[int] | None = None,
-) -> tuple[EncoderDecoder, ModelInfo]:
-    encoder_name = config["model"]["encoder_name"]
-    d = config["model"]["d"]
-    stride = config["model"]["stride"]
-    imgH = config["training"]["img_height"]
-    imgW = config["training"]["img_width"]
-
-    encoder = timm.create_model(
-        model_name=encoder_name,
-        features_only=True,
-        pretrained=True,
-        out_indices=(0, 1, 4),
-        output_stride=stride,
-    )
-
-    fpn_features = encoder.feature_info.channels()
-
-    if atrous_rates is None:
-        atrous_rates = compute_aspp_atrous_rates(imgH, stride)
-
-    decoder = DecoderWithFAM(
-        fpn_features,
-        num_classes,
-        input_size=(imgH, imgW),
-        d=d,
-        atrous_rates=atrous_rates,
-    )
-
-    model = EncoderDecoder(encoder, decoder)
-
-    return model, ModelInfo(fpn_features, atrous_rates)
+        return outputs

@@ -2,12 +2,10 @@ import os
 from typing import Annotated, List, Optional, Type
 
 import albumentations as A
-import torch.nn as nn
 from pydantic import BaseModel, Field
 
 from ml4cv_assignment.config.registries import (
     callback_registry,
-    loss_registry,
     metric_registry,
     transform_registry,
 )
@@ -20,9 +18,6 @@ from ml4cv_assignment.training.metrics import Metric
 
 
 class TrainerConfig(BaseModel, arbitrary_types_allowed=True):
-    losses: Annotated[
-        List[nn.Module], registry_instantiation_validator(loss_registry)
-    ] = Field(default_factory=list)
     train_transforms: Annotated[
         A.Compose,
         registry_instantiation_validator(transform_registry),
@@ -63,10 +58,14 @@ class TrainerConfig(BaseModel, arbitrary_types_allowed=True):
     )
     device: Optional[str] = Field(
         default=None,
-        description="Device to use for training (e.g., 'cpu', 'cuda'). If None, defaults to automatic selection.",
+        description="Device to use for training (e.g., 'cpu', 'cuda'). If None, defaults to automatic selection",
     )
     wandb_project_name: str = Field(..., description="W&B project name for logging")
     wandb_entity: str = Field(..., description="W&B entity (user or team) for logging")
+    wandb_base_run_name: str = Field(
+        ...,
+        description="Base name for the wandb run; a timestamp will be appended",
+    )
 
     def find_transform(
         self, transform_type: Type[A.BasicTransform], in_train: bool

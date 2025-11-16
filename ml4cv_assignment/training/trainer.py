@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Dict, Mapping, Optional, Tuple, Union
+from typing import Any, Dict, Mapping, Optional, Union
 
 import torch
 import torch.nn as nn
@@ -11,8 +11,8 @@ from tqdm import tqdm
 import wandb
 from ml4cv_assignment.config.trainer_config import TrainerConfig
 from ml4cv_assignment.training.metrics import MetricCollection
-from ml4cv_assignment.utils.misc import resolve_device
-from ml4cv_assignment.utils.typings import Stage, StepOutput
+from ml4cv_assignment.utils.misc import generate_run_name, resolve_device
+from ml4cv_assignment.utils.typings import Batch, Stage, StepOutput
 
 
 class Trainer:
@@ -21,7 +21,6 @@ class Trainer:
         config: TrainerConfig,
         model: nn.Module,
         train_loader: DataLoader,
-        run_name: str,
         val_loader: Optional[DataLoader] = None,
         device: Optional[Union[str, torch.device]] = None,
     ) -> None:
@@ -29,10 +28,8 @@ class Trainer:
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.callbacks = config.callbacks
-        self.losses = config.losses
         self.metric_collection = MetricCollection(config.metrics)
         self.denormalize = config.denormalize
-        self.run_name = run_name
         self.history: Dict[str, float] = {}
         self._stop_training = False
 
@@ -69,38 +66,26 @@ class Trainer:
     def stop_training(self, value: bool) -> None:
         self._stop_training = value
 
-    def _on_training_end(self) -> None:
+    def _run_callbacks(self, hook_name: str) -> None:
+        """
+        A helper function to run a specific hook on all callbacks
+        """
         for callback in self.callbacks:
-            callback.on_train_end(self)
+            method_to_call = getattr(callback, hook_name, None)
+            if method_to_call:
+                method_to_call(self)
+
+    def _on_training_start(self) -> None:
+        self._run_callbacks("on_train_start")
+
+    def _on_training_end(self) -> None:
+        self._run_callbacks("on_train_end")
 
     def _on_eval_end(self) -> None:
-        for callback in self.callbacks:
-            callback.on_eval_end(self)
+        self._run_callbacks("on_eval_end")
 
     def get_loader(self, stage: Stage) -> Optional[DataLoader]:
         return self.train_loader if stage == Stage.TRAIN else self.val_loader
-
-    def prepare_batch(self, batch: Tuple[Tensor, Tensor]) -> Tuple[Tensor, Tensor]:
-        imgs, masks = batch
-        imgs = imgs.to(self.device, non_blocking=True)
-        masks = masks.long().to(self.device, non_blocking=True)
-        return imgs, masks
-
-    def _compute_loss(
-        self, logits: Tensor, gt_masks: Tensor, stage: str
-    ) -> Tuple[Tensor, Dict[str, float]]:
-        losses = []
-        loss_dict = {}
-
-        for i, loss_fn in enumerate(self.losses):
-            loss_i: Tensor = loss_fn(logits, gt_masks)
-            losses.append(loss_i)
-            loss_dict[f"{stage}/batch_loss_{i}"] = loss_i.item()
-
-        total_loss = torch.mean(torch.stack(losses))
-        loss_dict[f"{stage}/loss"] = total_loss.item()
-
-        return total_loss, loss_dict
 
     def _prepare_input(
         self, data: Union[torch.Tensor, Any]
@@ -116,10 +101,19 @@ class Trainer:
             return data.to(self.device, non_blocking=True)
         return data
 
-    def _train_step(self, batch: Tuple[Tensor, Tensor]) -> StepOutput:
-        # imgs, masks = self.prepare_batch(batch)
+    def _collect_losses(self, outputs: Dict[str, Any], prefix: str) -> Dict[str, float]:
+        loss_dict: Dict[str, float] = {}
+
+        for k, v in outputs.items():
+            if "loss" in k:
+                loss_dict[f"{prefix}/{k}"] = (
+                    v.item() if isinstance(v, torch.Tensor) else float(v)
+                )
+
+        return loss_dict
+
+    def _train_step(self, batch: Batch) -> StepOutput:
         inputs = self._prepare_input(batch)
-        # inputs = batch
 
         self.optimizer.zero_grad(set_to_none=True)
 
@@ -130,8 +124,6 @@ class Trainer:
         ):
             outputs = self.model(inputs, return_preds=False)
 
-            # logits = self.model(imgs)
-            # total_loss, loss_dict = self._compute_loss(logits, masks, Stage.TRAIN)
         loss = outputs["loss"]
 
         self.scaler.scale(loss).backward()
@@ -139,38 +131,35 @@ class Trainer:
         self.scaler.update()
         self.scheduler.step()
 
-        # return loss_dict
-        return {"train/batch_loss": loss.item()}
+        return self._collect_losses(outputs, Stage.TRAIN)
 
-    def _eval_step(self, batch: Tuple[Tensor, Tensor], stage: Stage) -> StepOutput:
-        inputs = self._prepare_input(batch)
-        # imgs, masks = self.prepare_batch(batch)
+    def _eval_step(self, batch: Batch, stage: Stage) -> StepOutput:
+        inputs: Dict[str, Tensor] = self._prepare_input(batch)  # type: ignore
 
         with torch.autocast(
             device_type=self.device.type,
             dtype=torch.bfloat16,
             enabled=self.config.use_mixed_precision,
         ):
-            # logits: Tensor = self.model(imgs)
-            # _, loss_dict = self._compute_loss(logits, masks, stage)
             outputs = self.model(inputs)
 
         pred_masks = outputs["preds"]
         gt_masks = inputs["orig_masks"]
-        # pred = logits.argmax(dim=1)
-        self.metric_collection.update(None, pred_masks, gt_masks)
 
-        # return loss_dict
-        return {f"{stage}/loss": outputs["loss"].item()}
+        self.metric_collection.update(None, pred_masks, gt_masks)  # type: ignore
+
+        return self._collect_losses(outputs, stage)
 
     def run(self) -> None:
         wandb.init(
             project=self.config.wandb_project_name,
             entity=self.config.wandb_entity,
-            name=self.run_name,
+            name=generate_run_name(self.config.wandb_base_run_name),
             config=self.config.model_dump(),
         )
         wandb.watch(self.model, log="all", log_freq=100)
+
+        self._on_training_start()
 
         try:
             for epoch in tqdm(
