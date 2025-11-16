@@ -176,7 +176,9 @@ class Trainer:
                     colour="blue",
                 ):
                     batch_log = self._train_step(batch)
-                    batch_log["train/lr"] = self.scheduler.get_last_lr()[0]
+                    lrs = self.scheduler.get_last_lr()
+                    for i, lr in enumerate(lrs):
+                        batch_log[f"train/lr_group_{i}"] = lr
                     wandb.log(batch_log)
 
                 if epoch % self.config.evaluation_rate == 0:
