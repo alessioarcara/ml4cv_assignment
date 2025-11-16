@@ -24,18 +24,24 @@ model_cfg:
     #params: {}
     type: DeepLabFPN
     params:
+      encoder_lr: 1e-5
+      decoder_lr: 1e-3
+      encoder_weight_decay: 0.0
+      decoder_weight_decay: 0.05
       encoder:
         type: timm
         params:
-          model_name: "efficientnet_b2"
+          #model_name: "efficientnet_b2"
+          model_name: "convnext_tiny.dinov3_lvd1689m"
           features_only: true
           pretrained: true 
-          out_indices: [0, 1, 4]
+          #out_indices: [0, 1, 4]
+          out_indices: [0, 3]
           output_stride: 8
       decoder:
         type: FaPNDecoder
         params:
-          fpn_channels: [16, 24, 352]
+          fpn_channels: [96, 768]
           decoder_channels: 64
           num_classes: 13
           input_size: [360, 640]
@@ -46,8 +52,6 @@ training:
   wandb_entity: aarcara
   wandb_base_run_name: "test_deeplab_fpn"
   batch_size: 8
-  lr: 1e-4
-  weight_decay: 0.05
   num_epochs: 100
   evaluation_rate: 1
   use_mixed_precision: true 
@@ -171,6 +175,8 @@ training:
         minimize: false
         history_key: val/mIoU_epoch
     - type: VisualizeSegmentationResultsCallback
+      params: {}
+    - type: ModelSummaryCallback
       params: {}
 
 paths:

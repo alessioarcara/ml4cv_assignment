@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Tuple
 
 import torch
@@ -5,8 +6,21 @@ import torch.nn as nn
 from torch import Tensor
 
 
-class Model(nn.Module):
-    def __init__(self, model: nn.Module, losses: List[nn.Module]) -> None:
+class BaseModel(nn.Module, ABC):
+    """
+    Base class for all models.
+
+    Subclasses must implement the `get_param_groups` method to return
+    parameter groups for the optimizer.
+    """
+
+    @abstractmethod
+    def get_param_groups(self) -> List[Dict[str, Any]]:
+        pass
+
+
+class Model(BaseModel):
+    def __init__(self, model: BaseModel, losses: List[nn.Module]) -> None:
         super().__init__()
         self.model = model
         self.losses = losses
@@ -25,6 +39,9 @@ class Model(nn.Module):
         total_loss = torch.mean(torch.stack(losses))
 
         return total_loss, loss_dict
+
+    def get_param_groups(self) -> List[Dict[str, Any]]:
+        return self.model.get_param_groups()
 
     def forward(self, inputs: dict, return_preds: bool = True) -> Dict[str, Any]:
         outputs = self.model(inputs, return_preds=return_preds)

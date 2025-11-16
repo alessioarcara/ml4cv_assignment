@@ -1,8 +1,7 @@
-import random
 from abc import ABC
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, Literal, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, Optional
 
 import numpy as np
 import torch
@@ -115,11 +114,8 @@ class ModelSummaryCallback(Callback):
         train_loader = trainer.get_loader(Stage.TRAIN)
         assert train_loader is not None
 
-        dummy_batch = next(iter(train_loader))
-        dummy_input = dummy_batch["pixel_values"]
-        input_shape = dummy_input.shape
-
-        summary(model, input_size=input_shape, verbose=1)
+        # dummy_batch = next(iter(train_loader))
+        summary(model, verbose=1)
 
 
 class VisualizeSegmentationResultsCallback(Callback):
@@ -127,32 +123,16 @@ class VisualizeSegmentationResultsCallback(Callback):
     Log a side-by-side comparison of true vs predicted segmentation masks.
     """
 
-    def __init__(self, batch_mode: Literal["first", "random"] = "first"):
-        assert batch_mode in ["first", "random"], (
-            "batch_mode must be 'first' or 'random'"
-        )
-        self.batch_mode = batch_mode
-
-    def _get_batch(
-        self, trainer: "Trainer"
-    ) -> Optional[Tuple[torch.Tensor, torch.Tensor]]:
-        val_loader = trainer.get_loader(Stage.VAL)
-        if val_loader is None:
-            return None
-
-        if self.batch_mode == "first":
-            batch = next(iter(val_loader))
-        else:  # random
-            batch = random.choice(list(val_loader))
-
-        return batch
+    def __init__(self):
+        pass
 
     def on_eval_end(self, trainer: "Trainer") -> None:
-        batch = self._get_batch(trainer)
-        if batch is None:
+        val_loader = trainer.get_loader(Stage.VAL)
+        if val_loader is None:
             logger.warning("Validation loader not available; skipping visualization.")
             return
 
+        batch = next(iter(val_loader))
         inputs: Dict[str, Tensor] = trainer._prepare_input(batch)  # type: ignore
         table = wandb.Table(columns=["Segmentation Comparison"])
 

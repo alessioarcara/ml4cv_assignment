@@ -39,10 +39,6 @@ class TrainerConfig(BaseModel, arbitrary_types_allowed=True):
         default_factory=lambda: max((os.cpu_count() or 1) - 1, 0),
         description="Number of DataLoader workers (Defaults to CPU core count minus one, or 0 if unknown)",
     )
-    lr: float = Field(..., description="Learning rate used by the optimizer")
-    weight_decay: float = Field(
-        ..., description="L2 regularization factor applied to the model weights"
-    )
     num_epochs: int = Field(
         ..., description="Total number of training epochs over the dataset"
     )

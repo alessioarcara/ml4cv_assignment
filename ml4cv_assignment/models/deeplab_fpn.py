@@ -1,15 +1,43 @@
-from typing import Dict
+from typing import Any, Dict, List
 
 import torch
 import torch.nn as nn
 from torch import Tensor
 
+from ml4cv_assignment.models.model import BaseModel
 
-class DeepLabFPN(nn.Module):
-    def __init__(self, encoder: nn.Module, decoder: nn.Module) -> None:
+
+class DeepLabFPN(BaseModel):
+    def __init__(
+        self,
+        encoder: nn.Module,
+        decoder: nn.Module,
+        encoder_lr: float,
+        decoder_lr: float,
+        encoder_weight_decay: float,
+        decoder_weight_decay: float,
+    ) -> None:
         super().__init__()
         self.encoder = encoder
         self.decoder = decoder
+        self.encoder_lr = encoder_lr
+        self.decoder_lr = decoder_lr
+        self.encoder_weight_decay = encoder_weight_decay
+        self.decoder_weight_decay = decoder_weight_decay
+
+    def get_param_groups(self) -> List[Dict[str, Any]]:
+        return [
+            {
+                "params": self.encoder.parameters(),
+                "lr": self.encoder_lr,
+                "weight_decay": self.encoder_weight_decay,
+            },
+            {
+                "params": self.decoder.parameters(),
+                "lr": self.decoder_lr,
+                "weight_decay": self.decoder_weight_decay,
+            },
+        ]
 
     def forward(
         self, inputs: Dict[str, Tensor], return_preds: bool

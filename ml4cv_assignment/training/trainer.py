@@ -2,7 +2,6 @@ from collections import defaultdict
 from typing import Any, Dict, Mapping, Optional, Union
 
 import torch
-import torch.nn as nn
 from loguru import logger
 from torch import Tensor, optim
 from torch.utils.data import DataLoader
@@ -10,6 +9,7 @@ from tqdm import tqdm
 
 import wandb
 from ml4cv_assignment.config.trainer_config import TrainerConfig
+from ml4cv_assignment.models.model import BaseModel
 from ml4cv_assignment.training.metrics import MetricCollection
 from ml4cv_assignment.utils.misc import generate_run_name, resolve_device
 from ml4cv_assignment.utils.typings import Batch, Stage, StepOutput
@@ -19,7 +19,7 @@ class Trainer:
     def __init__(
         self,
         config: TrainerConfig,
-        model: nn.Module,
+        model: BaseModel,
         train_loader: DataLoader,
         val_loader: Optional[DataLoader] = None,
         device: Optional[Union[str, torch.device]] = None,
@@ -40,19 +40,18 @@ class Trainer:
             self.model.compile()
 
         # Optimizer
-        lr = self.config.lr
-        self.optimizer = optim.AdamW(
-            self.model.parameters(), lr=lr, weight_decay=config.weight_decay
-        )
+        param_groups = self.model.get_param_groups()
+        self.optimizer = optim.AdamW(param_groups)
 
         # Scheduler
+        max_lrs = [float(group["lr"]) * 3 for group in param_groups]
         total_steps = self.config.num_epochs * len(self.train_loader)
         self.scheduler = optim.lr_scheduler.OneCycleLR(
             self.optimizer,
-            max_lr=lr * 3,
+            max_lr=max_lrs,
             total_steps=total_steps,
-            pct_start=0.1,
-            anneal_strategy="linear",
+            pct_start=0.3,
+            anneal_strategy="cos",
         )
 
         # AMP

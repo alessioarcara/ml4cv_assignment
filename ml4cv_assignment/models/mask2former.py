@@ -1,13 +1,14 @@
 import torch
-import torch.nn as nn
 from transformers import (
     AutoConfig,
     Mask2FormerForUniversalSegmentation,
     Mask2FormerImageProcessor,
 )
 
+from ml4cv_assignment.models.model import BaseModel
 
-class Mask2Former(nn.Module):
+
+class Mask2Former(BaseModel):
     def __init__(self) -> None:
         super().__init__()
         model_id = "facebook/mask2former-swin-tiny-cityscapes-semantic"
@@ -25,6 +26,11 @@ class Mask2Former(nn.Module):
             num_labels=13,
             ignore_index=255,
         )
+
+    def get_param_groups(self):
+        return [
+            {"params": self.model.parameters(), "lr": 1e-4, "weight_decay": 0.0},
+        ]
 
     def forward(
         self, inputs: dict[str, torch.Tensor], return_preds: bool
