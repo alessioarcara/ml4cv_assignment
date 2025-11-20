@@ -1,15 +1,18 @@
 from abc import ABC
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional
 
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from loguru import logger
+from sklearn.decomposition import PCA
 from torch import Tensor
 from torchinfo import summary
 
 import wandb
+from ml4cv_assignment.data.streethazards import StreetHazards
 from ml4cv_assignment.utils.typings import Stage
 from ml4cv_assignment.utils.visualize import COLORS, color
 
@@ -93,7 +96,10 @@ class ModelSavingCallback(ModelMonitorCallback):
             return
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        base_name = f"{wandb.run.name}_{self.history_key}_{self.best:0.4f}_{timestamp}"
+        base_name = f"{trainer.config.wandb_base_run_name}_{timestamp}_{self.history_key}_{self.best:0.4f}"
+
+        base_name = base_name.replace(" ", "_").replace("/", "-")  # sanitize filename
+
         checkpoint_path = self.out_dir / f"{base_name}.pth"
 
         torch.save(self.best_model, checkpoint_path)
@@ -123,8 +129,11 @@ class VisualizeSegmentationResultsCallback(Callback):
     Log a side-by-side comparison of true vs predicted segmentation masks.
     """
 
-    def __init__(self):
-        pass
+    def __init__(self) -> None:
+        self.eval_step = 0
+
+    def on_train_start(self, trainer: "Trainer") -> None:
+        self.table = wandb.Table(columns=["step", "image"], log_mode="INCREMENTAL")
 
     def on_eval_end(self, trainer: "Trainer") -> None:
         val_loader = trainer.get_loader(Stage.VAL)
@@ -134,113 +143,123 @@ class VisualizeSegmentationResultsCallback(Callback):
 
         batch = next(iter(val_loader))
         inputs: Dict[str, Tensor] = trainer._prepare_input(batch)  # type: ignore
-        table = wandb.Table(columns=["Segmentation Comparison"])
 
         with torch.inference_mode():
             outputs = trainer.model(inputs)
 
         imgs = inputs["pixel_values"]
         gt_masks = inputs["orig_masks"]
-        pred_preds = outputs["preds"]
+        pred_masks = outputs["preds"]
 
-        for img, gt_mask, pred_mask in zip(imgs, gt_masks, pred_preds):
+        for img, gt_mask, pred_mask in zip(imgs, gt_masks, pred_masks):
             img_np = trainer.denormalize(img)
             true_colored = color(gt_mask.cpu().numpy(), COLORS)
             pred_colored = color(pred_mask.cpu().numpy(), COLORS)
             comparison = np.concatenate((img_np, true_colored, pred_colored), axis=1)
-            table.add_data(wandb.Image(comparison))
+            self.table.add_data(self.eval_step, wandb.Image(comparison))
 
-        wandb.log({"Segmentation Results": table})
+        wandb.log({"Segmentation Results": self.table})
+
+        self.eval_step += 1
 
 
-class PixelEmbeddings(Callback):
+class PixelEmbeddingsCallback(Callback):
     """
     Log PCA visualization of pixels embeddings for the first image in a batch.
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, anchors_magnitude: float, min_num_pixels: int) -> None:
+        self.anchors_magnitude = anchors_magnitude
+        self.min_num_pixels = min_num_pixels
+        self.id_to_label_map = StreetHazards.id_to_label_map()
 
-    def on_eval_end(self):
-        pass
+    def on_eval_end(self, trainer: "Trainer") -> None:
+        val_loader = trainer.get_loader(Stage.VAL)
+        if val_loader is None:
+            logger.warning("Validation loader not available; skipping visualization.")
+            return
 
+        batch = next(iter(val_loader))
+        inputs: Dict[str, Tensor] = trainer._prepare_input(batch)  # type: ignore
 
-#
-#    def log_pixel_embeddings(
-#        self,
-#        logits: torch.Tensor,
-#        pred: torch.Tensor,
-#        true: torch.Tensor,
-#        min_samples: int = 1000,
-#    ) -> None:
-#        """
-#        Log PCA visualization of pixels embeddings for the first image in a batch.
-#        """
-#        C = logits.shape[1]
-#        embeddings = logits[0].permute(1, 2, 0).reshape(-1, C).cpu().numpy()
-#        labels = true[0].cpu().numpy().flatten()
-#        pred = pred[0].cpu().numpy().flatten()
-#
-#        indices = []
-#        for cls in np.unique(labels):
-#            cls_indices = np.where(labels == cls)[0]
-#            if len(cls_indices) > 0:
-#                n_samples = min(len(cls_indices), min_samples)
-#                indices.extend(
-#                    np.random.choice(cls_indices, size=n_samples, replace=False)
-#                )
-#
-#        anchors = (
-#            np.eye(C)
-#            * self.config["losses"]["prototypical_triplet"]["anchors_magnitude"]
-#        )
-#
-#        selected_embeddings = embeddings[indices]
-#        selected_classes = labels[indices]
-#        combined_embeddings = np.vstack([selected_embeddings, anchors])
-#
-#        pca = PCA(n_components=2, random_state=self.config["seed"])
-#        points_2d = pca.fit_transform(combined_embeddings)
-#        data_points = points_2d[:-C]
-#        anchor_points = points_2d[-C:]
-#
-#        plt.figure(figsize=(12, 8))
-#        for cls in np.unique(selected_classes):
-#            mask = selected_classes == cls
-#            plt.scatter(
-#                data_points[mask, 0],
-#                data_points[mask, 1],
-#                label=self.class_dict[cls],
-#                alpha=0.6,
-#                s=10,
-#            )
-#
-#        plt.scatter(
-#            anchor_points[:, 0],
-#            anchor_points[:, 1],
-#            marker="x",
-#            s=300,
-#            c="red",
-#            label="Anchors",
-#        )
-#
-#        # Annotate anchors
-#        for cls in range(C):
-#            plt.annotate(
-#                f"{self.class_dict.get(cls)}",
-#                (anchor_points[cls, 0], anchor_points[cls, 1]),
-#                xytext=(0, 5),
-#                textcoords="offset points",
-#                ha="center",
-#                fontsize=12,
-#                color="black",
-#                weight="bold",
-#            )
-#
-#        plt.title("PCA visualization of pixel embeddings with anchors", fontsize=16)
-#        plt.axis("off")
-#        plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left", fontsize=12)
-#        plt.tight_layout()
-#
-#        wandb.log({"pixel_embeddings_pca": wandb.Image(plt)})
-#        plt.close()
+        with torch.inference_mode():
+            outputs = trainer.model(inputs, return_preds=False)
+
+        logits = outputs["logits"]
+        true = inputs["orig_masks"]
+
+        # Take first image in batch
+        logits0 = logits[0].detach().cpu()  # [C, H, W]
+        labels0 = true[0].detach().cpu().numpy().flatten()  # [H*W]
+
+        C = logits0.shape[0]
+        embeddings = logits0.permute(1, 2, 0).reshape(-1, C).cpu().numpy()  # [H*W, C]
+
+        # Sample pixels from each class
+        indices: List[int] = []
+        for cls in np.unique(labels0):
+            cls_indices = np.where(labels0 == cls)[0]
+            if cls_indices.size == 0:
+                continue
+            n_samples = min(len(cls_indices), self.min_num_pixels)
+            chosen = np.random.choice(cls_indices, size=n_samples, replace=False)
+            indices.extend(chosen.tolist())
+
+        selected_embeddings = embeddings[indices]
+        selected_classes = labels0[indices].astype(int)
+
+        # Anchors: one anchor vector per class scaled by magnitude
+        anchors = np.eye(C) * self.anchors_magnitude
+        combined_embeddings = np.vstack([selected_embeddings, anchors])  # [N + C, C]
+
+        pca = PCA(n_components=2)
+        points_2d = pca.fit_transform(combined_embeddings)  # [N + C, 2]
+
+        data_points = points_2d[:-C]
+        anchor_points = points_2d[-C:]
+
+        # Plot pixel embeddings
+        plt.figure(figsize=(12, 8))
+        for cls in np.unique(selected_classes):
+            mask = selected_classes == cls
+            class_name = self.id_to_label_map.get(cls, f"Class {cls}")
+            plt.scatter(
+                data_points[mask, 0],
+                data_points[mask, 1],
+                label=class_name,
+                alpha=0.6,
+                s=10,
+            )
+
+        # Plot anchors
+        plt.scatter(
+            anchor_points[:, 0],
+            anchor_points[:, 1],
+            marker="x",
+            s=300,
+            c="red",
+            label="Anchors",
+        )
+
+        # Annotate anchors
+        for cls in range(C):
+            class_name = self.id_to_label_map.get(cls, f"Class {cls}")
+            plt.annotate(
+                class_name,
+                (anchor_points[cls, 0], anchor_points[cls, 1]),
+                xytext=(0, 5),
+                textcoords="offset points",
+                ha="center",
+                fontsize=12,
+                color="black",
+                weight="bold",
+            )
+
+        plt.title("PCA visualization of pixel embeddings with anchors", fontsize=16)
+        plt.axis("off")
+        plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left", fontsize=12)
+        plt.tight_layout()
+
+        wandb.log({"pixel_embeddings_pca": wandb.Image(plt)})
+
+        plt.close()

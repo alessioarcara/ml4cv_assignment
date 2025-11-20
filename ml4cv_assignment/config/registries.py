@@ -11,6 +11,7 @@ from ml4cv_assignment.training.callbacks import (
     EarlyStoppingCallback,
     ModelSavingCallback,
     ModelSummaryCallback,
+    PixelEmbeddingsCallback,
     VisualizeSegmentationResultsCallback,
 )
 from ml4cv_assignment.training.losses import (
@@ -84,6 +85,7 @@ callback_registry.register(
     "VisualizeSegmentationResultsCallback", VisualizeSegmentationResultsCallback
 )
 callback_registry.register("ModelSummaryCallback", ModelSummaryCallback)
+callback_registry.register("PixelEmbeddingsCallback", PixelEmbeddingsCallback)
 
 # ------------------------
 # Registry models

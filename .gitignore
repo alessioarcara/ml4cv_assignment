@@ -226,3 +226,4 @@ pyrightconfig.json
 datasets
 wandb
 saved
+checkpoints

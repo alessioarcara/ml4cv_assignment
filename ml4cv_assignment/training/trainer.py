@@ -41,7 +41,7 @@ class Trainer:
 
         # Optimizer
         param_groups = self.model.get_param_groups()
-        self.optimizer = optim.AdamW(param_groups)
+        self.optimizer = optim.AdamW(param_groups, fused=True)
 
         # Scheduler
         max_lrs = [float(group["lr"]) * 3 for group in param_groups]
@@ -111,6 +111,11 @@ class Trainer:
 
         return loss_dict
 
+    def _log_scheduler_lrs(self, log_dict: Dict[str, float]) -> None:
+        lrs = self.scheduler.get_last_lr()
+        for i, lr in enumerate(lrs):
+            log_dict[f"train/lr_group_{i}"] = lr
+
     def _train_step(self, batch: Batch) -> StepOutput:
         inputs = self._prepare_input(batch)
 
@@ -126,6 +131,8 @@ class Trainer:
         loss = outputs["loss"]
 
         self.scaler.scale(loss).backward()
+        self.scaler.unscale_(self.optimizer)
+        torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
         self.scaler.step(self.optimizer)
         self.scaler.update()
         self.scheduler.step()
@@ -176,9 +183,7 @@ class Trainer:
                     colour="blue",
                 ):
                     batch_log = self._train_step(batch)
-                    lrs = self.scheduler.get_last_lr()
-                    for i, lr in enumerate(lrs):
-                        batch_log[f"train/lr_group_{i}"] = lr
+                    self._log_scheduler_lrs(batch_log)
                     wandb.log(batch_log)
 
                 if epoch % self.config.evaluation_rate == 0:

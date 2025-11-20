@@ -22,6 +22,7 @@ class Mask2Former(BaseModel):
 
         self.processor = Mask2FormerImageProcessor(
             do_resize=False,
+            do_rescale=False,
             do_normalize=False,
             num_labels=13,
             ignore_index=255,
@@ -29,7 +30,7 @@ class Mask2Former(BaseModel):
 
     def get_param_groups(self):
         return [
-            {"params": self.model.parameters(), "lr": 1e-4, "weight_decay": 0.0},
+            {"params": self.model.parameters(), "lr": 5e-5, "weight_decay": 0.05},
         ]
 
     def forward(

@@ -18,6 +18,7 @@ from ml4cv_assignment.utils.typings import PathOrStr
 
 PROCESSOR = Mask2FormerImageProcessor(
     do_resize=False,
+    do_rescale=False,
     do_normalize=False,
     num_labels=13,
     ignore_index=255,

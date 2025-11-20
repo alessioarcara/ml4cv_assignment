@@ -48,7 +48,11 @@ class DeepLabFPN(BaseModel):
         outputs_dict = {"logits": logits}
 
         if return_preds:
+            # Since anchors are fixed orthogonal vectors minimizing Euclidean
+            # distance is mathematically equivalent to maximizing the logit
+            # value.
             preds = torch.argmax(logits, dim=1)
+
             outputs_dict["preds"] = preds
 
         return outputs_dict
