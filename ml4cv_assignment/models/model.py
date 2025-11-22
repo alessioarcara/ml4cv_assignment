@@ -19,8 +19,9 @@ class BaseModel(nn.Module, ABC):
         pass
 
 
+# TODO: remove the wrapper and use inheritance
 class Model(BaseModel):
-    def __init__(self, model: BaseModel, losses: List[nn.Module]) -> None:
+    def __init__(self, model: nn.Module, losses: List[nn.Module]) -> None:
         super().__init__()
         self.model = model
         self.losses = losses
@@ -41,7 +42,7 @@ class Model(BaseModel):
         return total_loss, loss_dict
 
     def get_param_groups(self) -> List[Dict[str, Any]]:
-        return self.model.get_param_groups()
+        return self.model.get_param_groups()  # type: ignore
 
     def forward(self, inputs: dict, return_preds: bool = True) -> Dict[str, Any]:
         outputs = self.model(inputs, return_preds=return_preds)

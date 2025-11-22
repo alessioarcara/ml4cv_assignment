@@ -20,6 +20,7 @@ dependencies = [
     "opencv-python>=4.12.0.88",
     "pillow>=12.0.0",
     "polars>=1.35.1",
+    "prettytable>=3.17.0",
     "pydantic>=2.12.4",
     "pytorch-ood>=0.2.2",
     "scikit-learn>=1.7.2",

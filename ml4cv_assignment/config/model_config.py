@@ -17,3 +17,6 @@ class ModelConfig(BaseModel, arbitrary_types_allowed=True):
     model: Annotated[nn.Module, registry_instantiation_validator(model_registry)] = (
         Field(..., description="The model to train")
     )
+    use_preprocessor: bool = Field(
+        False, description="Whether to use the Mask2Former processor during collation"
+    )

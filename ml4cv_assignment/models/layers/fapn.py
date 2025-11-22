@@ -34,8 +34,9 @@ class DCNv2(nn.Module):
         if self.offset_mask.bias is not None:
             nn.init.constant_(self.offset_mask.bias, 0)
 
-    def forward(self, x: Tensor, offset: Tensor) -> Tensor:
-        out = self.offset_mask(offset)
+    def forward(self, x: Tensor, offset_feat: Tensor) -> Tensor:
+        # offset_feat is the feature map from which we learn the deformation
+        out = self.offset_mask(offset_feat)
         o1, o2, mask = torch.chunk(out, 3, dim=1)
         offset = torch.cat([o1, o2], dim=1)
         mask = mask.sigmoid()

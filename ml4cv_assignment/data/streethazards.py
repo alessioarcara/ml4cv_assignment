@@ -2,13 +2,11 @@ from pathlib import Path
 from typing import Dict, Optional, Tuple, Union
 
 import albumentations as A
-import cv2 as cv
 import numpy as np
-import torch
+from PIL import Image
 from pytorch_ood.augment import InsertCOCO
 from torch import Tensor
 from torch.utils.data import Dataset
-from transformers import Mask2FormerImageProcessor
 
 from ml4cv_assignment.config.dataset_config import StreetHazardsDatasetConfig
 from ml4cv_assignment.data.data_utils import TorchSerializedList
@@ -16,20 +14,20 @@ from ml4cv_assignment.data.data_utils import TorchSerializedList
 
 class StreetHazards(Dataset):
     CLASSES = [
-        "unlabeled",
-        "building",
-        "fence",
-        "other",
-        "pedestrian",
-        "pole",
-        "road line",
-        "road",
-        "sidewalk",
-        "vegetation",
-        "car",
-        "wall",
-        "traffic sign",
-        "anomaly",
+        "unlabeled",  # 0
+        "building",  # 1
+        "fence",  # 2
+        "other",  # 3
+        "pedestrian",  # 4
+        "pole",  # 5
+        "road line",  # 6
+        "road",  # 7
+        "sidewalk",  # 8
+        "vegetation",  # 9
+        "car",  # 10
+        "wall",  # 11
+        "traffic sign",  # 12
+        "anomaly",  # 13
     ]
 
     def __init__(
@@ -62,12 +60,12 @@ class StreetHazards(Dataset):
                 coco_dir=str(coco_dir),
                 exclude_classes="Streethazards",
                 p=1,
+                n=config.num_objects_to_insert,
                 ood_mask_value=14,
             )
             if config.add_anomalies
             else None
         )
-        self.processor = Mask2FormerImageProcessor()
 
     def __len__(self) -> int:
         return len(self.imgs)
@@ -75,25 +73,26 @@ class StreetHazards(Dataset):
     def __getitem__(
         self, idx: int, apply_transforms: bool = True
     ) -> Union[Tuple[np.ndarray, np.ndarray], Tuple[Tensor, Tensor]]:
-        img = cv.imread(self.imgs[idx], cv.IMREAD_COLOR_RGB)
-        mask = cv.imread(self.masks[idx], cv.IMREAD_GRAYSCALE)
+        img = Image.open(self.imgs[idx]).convert("RGB")
+        mask = Image.open(self.masks[idx]).convert("L")
 
         if self.coco_transform is not None:
             img, mask = self.coco_transform(img, mask)
-            assert isinstance(mask, torch.Tensor), "InsertCOCO returns mask as Tensor"
-            mask = mask.cpu().numpy()
+
+        img_np = np.array(img)
+        mask_np = np.array(mask)
 
         if apply_transforms and self.transforms is not None:
-            augmented = self.transforms(image=img, mask=mask)
-            img, mask = augmented["image"], augmented["mask"]
+            augmented = self.transforms(image=img_np, mask=mask_np)
+            img_np, mask_np = augmented["image"], augmented["mask"]
 
-        assert img is not None and mask is not None, (
+        assert img_np is not None and mask_np is not None, (
             "Image or mask is None after transformations"
         )
 
-        mask = mask - int(self.mask_shift)
+        mask_np = mask_np - int(self.mask_shift)
 
-        return img, mask
+        return img_np, mask_np
 
     @property
     def num_classes(self) -> int:

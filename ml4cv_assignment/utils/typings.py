@@ -15,3 +15,4 @@ Batch: TypeAlias = Dict[str, Tensor]
 class Stage(StrEnum):
     TRAIN = "train"
     VAL = "val"
+    TEST = "test"

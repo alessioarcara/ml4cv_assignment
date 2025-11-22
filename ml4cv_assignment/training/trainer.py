@@ -20,13 +20,15 @@ class Trainer:
         self,
         config: TrainerConfig,
         model: BaseModel,
-        train_loader: DataLoader,
+        train_loader: Optional[DataLoader] = None,
         val_loader: Optional[DataLoader] = None,
+        test_loader: Optional[DataLoader] = None,
         device: Optional[Union[str, torch.device]] = None,
     ) -> None:
         self.config = config
         self.train_loader = train_loader
         self.val_loader = val_loader
+        self.test_loader = test_loader
         self.callbacks = config.callbacks
         self.metric_collection = MetricCollection(config.metrics)
         self.denormalize = config.denormalize
@@ -44,15 +46,19 @@ class Trainer:
         self.optimizer = optim.AdamW(param_groups, fused=True)
 
         # Scheduler
-        max_lrs = [float(group["lr"]) * 3 for group in param_groups]
-        total_steps = self.config.num_epochs * len(self.train_loader)
-        self.scheduler = optim.lr_scheduler.OneCycleLR(
-            self.optimizer,
-            max_lr=max_lrs,
-            total_steps=total_steps,
-            pct_start=0.3,
-            anneal_strategy="cos",
-        )
+        self.scheduler = None
+        if self.train_loader is not None:
+            total_steps = self.config.num_epochs * len(self.train_loader)
+
+            max_lrs = [float(group["lr"]) * 3 for group in param_groups]
+
+            self.scheduler = optim.lr_scheduler.OneCycleLR(
+                self.optimizer,
+                max_lr=max_lrs,
+                total_steps=total_steps,
+                pct_start=0.3,
+                anneal_strategy="cos",
+            )
 
         # AMP
         self.scaler = torch.amp.GradScaler(enabled=self.config.use_mixed_precision)
@@ -84,7 +90,15 @@ class Trainer:
         self._run_callbacks("on_eval_end")
 
     def get_loader(self, stage: Stage) -> Optional[DataLoader]:
-        return self.train_loader if stage == Stage.TRAIN else self.val_loader
+        match stage:
+            case Stage.TRAIN:
+                return self.train_loader
+            case Stage.VAL:
+                return self.val_loader
+            case Stage.TEST:
+                return self.test_loader
+            case _:
+                return None
 
     def _prepare_input(
         self, data: Union[torch.Tensor, Any]
@@ -112,6 +126,8 @@ class Trainer:
         return loss_dict
 
     def _log_scheduler_lrs(self, log_dict: Dict[str, float]) -> None:
+        if self.scheduler is None:
+            return
         lrs = self.scheduler.get_last_lr()
         for i, lr in enumerate(lrs):
             log_dict[f"train/lr_group_{i}"] = lr
@@ -135,7 +151,9 @@ class Trainer:
         torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
         self.scaler.step(self.optimizer)
         self.scaler.update()
-        self.scheduler.step()
+
+        if self.scheduler is not None:
+            self.scheduler.step()
 
         return self._collect_losses(outputs, Stage.TRAIN)
 
@@ -156,7 +174,12 @@ class Trainer:
 
         return self._collect_losses(outputs, stage)
 
-    def run(self) -> None:
+    def train(self) -> None:
+        train_loader = self.get_loader(Stage.TRAIN)
+        if train_loader is None:
+            logger.error("No training data is provided. Cannot start training.")
+            return
+
         wandb.init(
             project=self.config.wandb_project_name,
             entity=self.config.wandb_entity,
@@ -172,8 +195,6 @@ class Trainer:
                 range(1, self.config.num_epochs + 1), desc="Epoch", colour="green"
             ):
                 self.model.train()
-                train_loader = self.get_loader(Stage.TRAIN)
-                assert train_loader is not None
 
                 for batch in tqdm(
                     train_loader,
