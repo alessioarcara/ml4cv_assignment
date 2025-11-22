@@ -9,7 +9,7 @@ from ml4cv_assignment.config.registries import (
     metric_registry,
     transform_registry,
 )
-from ml4cv_assignment.config.validator import registry_instantiation_validator
+from ml4cv_assignment.config.validator import registry_validator
 from ml4cv_assignment.data.transforms import Denormalize
 from ml4cv_assignment.training.callbacks import (
     Callback,
@@ -20,18 +20,18 @@ from ml4cv_assignment.training.metrics import Metric
 class TrainerConfig(BaseModel, arbitrary_types_allowed=True):
     train_transforms: Annotated[
         A.Compose,
-        registry_instantiation_validator(transform_registry),
+        registry_validator(transform_registry),
     ] = Field(default_factory=lambda: A.Compose([]))
     val_transforms: Annotated[
         A.Compose,
-        registry_instantiation_validator(transform_registry),
+        registry_validator(transform_registry),
     ] = Field(default_factory=lambda: A.Compose([]))
-    metrics: Annotated[
-        List[Metric], registry_instantiation_validator(metric_registry)
-    ] = Field(default_factory=list)
-    callbacks: Annotated[
-        List[Callback], registry_instantiation_validator(callback_registry)
-    ] = Field(default_factory=list)
+    metrics: Annotated[List[Metric], registry_validator(metric_registry)] = Field(
+        default_factory=list
+    )
+    callbacks: Annotated[List[Callback], registry_validator(callback_registry)] = Field(
+        default_factory=list
+    )
     batch_size: int = Field(
         ..., description="Number of samples processed in each training step"
     )

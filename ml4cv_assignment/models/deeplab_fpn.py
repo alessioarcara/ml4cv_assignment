@@ -1,10 +1,10 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import torch
 import torch.nn as nn
 from torch import Tensor
 
-from ml4cv_assignment.models.model import BaseModel
+from ml4cv_assignment.models.base_model import BaseModel
 
 
 class DeepLabFPN(BaseModel):
@@ -16,8 +16,9 @@ class DeepLabFPN(BaseModel):
         decoder_lr: float,
         encoder_weight_decay: float,
         decoder_weight_decay: float,
+        losses: Optional[List[nn.Module]] = None,
     ) -> None:
-        super().__init__()
+        super().__init__(losses=losses)
         self.encoder = encoder
         self.decoder = decoder
         self.encoder_lr = encoder_lr
@@ -39,7 +40,7 @@ class DeepLabFPN(BaseModel):
             },
         ]
 
-    def forward(
+    def _forward_impl(
         self, inputs: Dict[str, Tensor], return_preds: bool
     ) -> Dict[str, Tensor]:
         feats = self.encoder(inputs["pixel_values"])

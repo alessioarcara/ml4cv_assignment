@@ -1,4 +1,4 @@
-from typing import Dict, Generic, List, Type, TypeVar, Union
+from typing import Any, Dict, Generic, List, Type, TypeVar, Union
 
 T = TypeVar("T")
 
@@ -12,27 +12,52 @@ class Registry(Generic[T]):
             raise KeyError(f"{name} already registered")
         self._registry[name] = cls
 
-    def instantiate(self, name: str, **kwargs) -> T:
-        cls = self._registry.get(name)
-        if cls is None:
-            raise KeyError(f"{name} not registered")
-        try:
-            return cls(**kwargs)
-        except Exception as e:
-            raise ValueError(f"Failed to instantiate {name} with {kwargs}: {e}")
+    def get(self, name: str) -> Union[Type[T], None]:
+        return self._registry.get(name)
 
 
-def _instantiate_from_registry(value: Union[dict, List[dict]], registry: Registry):
+def build_from_config(value: Union[dict, List[dict], Any], *registries: Registry):
+    """
+    Instantiates objects from configuration searching for 'type' in the provided registries.
+    """
+    # List -> recursive call for each item
     if isinstance(value, list):
-        return [_instantiate_from_registry(v, registry) for v in value]
+        return [build_from_config(v, *registries) for v in value]
+
+    # Dict -> can be a class to instantiate or a simple parameter dict
     if isinstance(value, dict):
         if "type" in value:
             cls_name = value["type"]
             params = value.get("params", {})
-            params = {
-                k: _instantiate_from_registry(val, registry)
-                for k, val in params.items()
-            }
-            return registry.instantiate(cls_name, **params)
 
+            # Resolve parameters recursively BEFORE passing to the constructor
+            # This ensures nested objects are built first
+            resolved_params = {
+                k: build_from_config(v, *registries) for k, v in params.items()
+            }
+
+            # Find the class in the provided registries
+            cls_to_init = None
+            for reg in registries:
+                cls_to_init = reg.get(cls_name)
+                if cls_to_init is not None:
+                    break
+
+            if cls_to_init is None:
+                raise KeyError(
+                    f"Class {cls_name} not found in any of the provided registries"
+                )
+
+            try:
+                # Instantiate the class with resolved parameters
+                return cls_to_init(**resolved_params)
+            except Exception as e:
+                raise ValueError(
+                    f"Failed to instantiate {cls_name} with params {params}: {e}"
+                )
+
+        # if doesn't have 'type', it is a standard dict -> recursive call for each value
+        return {k: build_from_config(val, *registries) for k, val in value.items()}
+
+    # Primitives (int, float, str, etc.) -> return value as is
     return value

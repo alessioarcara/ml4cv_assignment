@@ -1,10 +1,10 @@
 from pydantic import BeforeValidator
 
-from ml4cv_assignment.config.registry import _instantiate_from_registry
+from ml4cv_assignment.config.registry import Registry, build_from_config
 
 
-def registry_instantiation_validator(registry) -> BeforeValidator:
+def registry_validator(*registries: Registry) -> BeforeValidator:
     """
-    Returns a Pydantic BeforeValidator that instantiates objects from the given registry
+    Returns a Pydantic validator that instantiates objects from configuration using the provided registries.
     """
-    return BeforeValidator(lambda v: _instantiate_from_registry(v, registry=registry))
+    return BeforeValidator(lambda v: build_from_config(v, *registries))

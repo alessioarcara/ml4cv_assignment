@@ -18,6 +18,7 @@ from ml4cv_assignment.training.losses import (
     ObjectosphereLoss,
     OWLoss,
     PrototypicalGlobalLocalTripletLoss,
+    RejectedByAllLoss,
     WeightedLoss,
 )
 from ml4cv_assignment.training.metrics import AUPR, MeanIoU, Metric
@@ -35,6 +36,7 @@ loss_registry.register(
     "PrototypicalGlobalLocalTripletLoss", PrototypicalGlobalLocalTripletLoss
 )
 loss_registry.register("ObjectosphereLoss", ObjectosphereLoss)
+loss_registry.register("RejectedByAllLoss", RejectedByAllLoss)
 
 # ------------------------
 # Registry transformations

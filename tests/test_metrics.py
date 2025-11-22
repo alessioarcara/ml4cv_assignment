@@ -26,5 +26,5 @@ def test_metrics():
     assert isinstance(metric_results, dict), (
         "MetricCollection.compute() should return a dictionary"
     )
-    assert "MeanIoU" in metric_results
+    assert "mIoU" in metric_results
     assert "AUPR" in metric_results

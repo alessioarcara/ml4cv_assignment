@@ -4,6 +4,7 @@ from typing import Annotated, Callable, Optional, Union
 
 import albumentations as A
 import torch
+import torch.nn as nn
 from loguru import logger
 from pydantic import BaseModel, Field
 from torch.utils.data import DataLoader
@@ -16,7 +17,6 @@ from ml4cv_assignment.config.trainer_config import TrainerConfig
 from ml4cv_assignment.data.collate import collate_fn
 from ml4cv_assignment.data.data_utils import MultiEpochsDataLoader
 from ml4cv_assignment.data.streethazards import StreetHazards
-from ml4cv_assignment.models.model import Model
 from ml4cv_assignment.utils.io import read_yaml
 from ml4cv_assignment.utils.typings import PathOrStr
 
@@ -105,13 +105,13 @@ class Config(BaseModel):
         return self.dataloader(self.test_dataset, shuffle=False)
 
     @property
-    def model(self) -> "Model":
-        model = Model(model=self.model_cfg.model, losses=self.model_cfg.losses)
+    def model(self) -> nn.Module:
+        model = self.model_cfg.model
 
         if self.paths.checkpoint is not None:
             checkpoint = torch.load(self.paths.checkpoint, map_location="cpu")
             model.load_state_dict(checkpoint)
-            logger.info(f"Loaded model weights from {self.paths.checkpoint}")
+            logger.info(f"Loaded weights from {self.paths.checkpoint}")
 
         return model
 

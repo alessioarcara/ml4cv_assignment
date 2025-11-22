@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 import wandb
 from ml4cv_assignment.config.trainer_config import TrainerConfig
-from ml4cv_assignment.models.model import BaseModel
+from ml4cv_assignment.models.base_model import BaseModel
 from ml4cv_assignment.training.metrics import MetricCollection
 from ml4cv_assignment.utils.misc import generate_run_name, resolve_device
 from ml4cv_assignment.utils.typings import Batch, Stage, StepOutput

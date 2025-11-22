@@ -34,7 +34,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pre-commit", "ruff", "mypy", "types-PyYAML"]
+dev = ["pre-commit", "ruff", "mypy", "types-PyYAML", "pytest"]
 
 [tool.mypy]
 ignore_missing_imports = true
