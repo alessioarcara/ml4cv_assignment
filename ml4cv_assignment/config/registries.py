@@ -21,7 +21,7 @@ from ml4cv_assignment.training.losses import (
     RejectedByAllLoss,
     WeightedLoss,
 )
-from ml4cv_assignment.training.metrics import AUPR, MeanIoU, Metric
+from ml4cv_assignment.training.metrics import MeanIoU, Metric, OoDAUPR
 
 # ------------------------
 # Registry losses
@@ -75,7 +75,7 @@ transform_registry.register("Compose", A.Compose)
 # ------------------------
 metric_registry = Registry[Metric]()
 metric_registry.register("MeanIoU", MeanIoU)
-metric_registry.register("AUPR", AUPR)
+metric_registry.register("AUPR", OoDAUPR)
 
 # ------------------------
 # Registry callbacks

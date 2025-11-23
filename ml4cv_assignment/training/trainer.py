@@ -169,8 +169,9 @@ class Trainer:
 
         pred_masks = outputs["preds"]
         gt_masks = inputs["orig_masks"]
+        ood_scores = outputs.get("ood_score")
 
-        self.metric_collection.update(None, pred_masks, gt_masks)  # type: ignore
+        self.metric_collection.update(gt_masks, pred_masks, ood_scores)
 
         return self._collect_losses(outputs, stage)
 

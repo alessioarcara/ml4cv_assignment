@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import torch
 import torch.nn.functional as F
@@ -44,13 +44,14 @@ class Mask2Former(BaseModel):
             for p in self.model.class_queries_logits.parameters():
                 p.requires_grad = True
 
+    # override
     def get_param_groups(self):
         return [
             {"params": self.model.parameters(), "lr": 1e-4, "weight_decay": 0.05},
         ]
 
     def _compute_segmentation_logits(
-        self, outputs: Dict[str, Tensor], pixel_values: Tensor
+        self, outputs: Dict[str, Tensor], target_hw: Tuple[int, int]
     ) -> torch.Tensor:
         # Shape: [Batch, Num_Queries, Num_Classes + 1] (including 'no object' class)
         class_logits = outputs["class_queries_logits"]
@@ -63,10 +64,9 @@ class Mask2Former(BaseModel):
         ]  # [Batch, Num_Queries, Num_Classes]
 
         # Upsample N masks to full image resolution (expensive in terms of memory)
-        target_h, target_w = pixel_values.shape[-2:]
         mask_logits = torch.nn.functional.interpolate(
             mask_logits,
-            size=(target_h, target_w),
+            size=target_hw,
             mode="bilinear",
             align_corners=False,
         )  # [Batch, Num_Queries, H, W]
@@ -77,38 +77,46 @@ class Mask2Former(BaseModel):
         L = torch.einsum("bqc, bqhw -> bchw", P, M)
         return L
 
+    # override
     def _forward_impl(
         self, inputs: Dict[str, torch.Tensor], return_preds: bool
     ) -> Dict[str, torch.Tensor]:
         pixel_values = inputs["pixel_values"]
+        mask_labels = inputs.get("mask_labels")
+        class_labels = inputs.get("class_labels")
 
-        mask_labels = None
-        class_labels = None
-        if self.should_compute_hf_loss:
-            if "mask_labels" not in inputs and "class_labels" not in inputs:
-                raise ValueError(
-                    "To compute HuggingFace loss, 'mask_labels' and 'class_labels' must be provided in inputs."
-                )
-            mask_labels = inputs["mask_labels"]
-            class_labels = inputs["class_labels"]
+        if self.should_compute_hf_loss and (
+            mask_labels is None or class_labels is None
+        ):
+            raise ValueError(
+                "For HF loss, 'mask_labels' and 'class_labels' are required."
+            )
 
         outputs = self.model(
             pixel_values=pixel_values,
-            mask_labels=mask_labels,
-            class_labels=class_labels,
+            mask_labels=mask_labels if self.should_compute_hf_loss else None,
+            class_labels=class_labels if self.should_compute_hf_loss else None,
             return_dict=True,
         )
 
         # Ensure outputs is a dict
         outputs_dict = dict(outputs)
 
-        should_compute_logits = return_preds or (self.losses is not None)
+        should_compute_logits = return_preds or (len(self.losses) > 0)
 
         if should_compute_logits:
-            L = self._compute_segmentation_logits(outputs, pixel_values)
+            target_hw = (pixel_values.shape[-2], pixel_values.shape[-1])
+            # Shape: [Batch, Num_Classes, H, W]
+            L = self._compute_segmentation_logits(outputs_dict, target_hw)
             outputs_dict["logits"] = L
 
             if return_preds:
+                # ID prediction: argmax over known classes
                 outputs_dict["preds"] = L.argmax(dim=1)
+
+                # OOD prediction (RBA): 1- total activation
+                # High score means the pixel is "rejected" (low activation) by all known classes
+                ood_score = 1 - L.tanh().sum(dim=1)
+                outputs_dict["ood_score"] = ood_score
 
         return outputs_dict

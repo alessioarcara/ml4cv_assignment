@@ -14,7 +14,7 @@ from torchinfo import summary
 import wandb
 from ml4cv_assignment.data.streethazards import StreetHazards
 from ml4cv_assignment.utils.typings import Stage
-from ml4cv_assignment.utils.visualize import COLORS, color
+from ml4cv_assignment.utils.visualize import COLORS, apply_colormap, color
 
 if TYPE_CHECKING:
     from ml4cv_assignment.training.trainer import Trainer
@@ -129,7 +129,8 @@ class VisualizeSegmentationResultsCallback(Callback):
     Log a side-by-side comparison of true vs predicted segmentation masks.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, num_samples: int) -> None:
+        self.num_samples = num_samples
         self.eval_step = 0
 
     def on_train_start(self, trainer: "Trainer") -> None:
@@ -147,15 +148,33 @@ class VisualizeSegmentationResultsCallback(Callback):
         with torch.inference_mode():
             outputs = trainer.model(inputs)
 
-        imgs = inputs["pixel_values"]
-        gt_masks = inputs["orig_masks"]
-        pred_masks = outputs["preds"]
+        imgs = inputs["pixel_values"][: self.num_samples]
+        gt_masks = inputs["orig_masks"][: self.num_samples]
+        pred_masks = outputs["preds"][: self.num_samples]
+        ood_scores = outputs.get("ood_score")
 
-        for img, gt_mask, pred_mask in zip(imgs, gt_masks, pred_masks):
+        if ood_scores is not None:
+            ood_scores = ood_scores[: self.num_samples]
+        else:
+            ood_scores = [None] * len(imgs)
+
+        for img, gt_mask, pred_mask, ood_score in zip(
+            imgs,
+            gt_masks,
+            pred_masks,
+            ood_scores,
+        ):
             img_np = trainer.denormalize(img)
             true_colored = color(gt_mask.cpu().numpy(), COLORS)
             pred_colored = color(pred_mask.cpu().numpy(), COLORS)
-            comparison = np.concatenate((img_np, true_colored, pred_colored), axis=1)
+
+            images_to_concat = [img_np, true_colored, pred_colored]
+
+            if ood_score is not None:
+                heatmap = apply_colormap(ood_score.cpu().numpy(), cmap_name="jet")
+                images_to_concat.append(heatmap)
+
+            comparison = np.concatenate(images_to_concat, axis=1)
             self.table.add_data(self.eval_step, wandb.Image(comparison))
 
         wandb.log({"Segmentation Results": self.table})

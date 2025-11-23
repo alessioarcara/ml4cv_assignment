@@ -5,9 +5,10 @@ from torch import Tensor
 
 
 class RejectedByAllLoss(nn.Module):
-    def __init__(self, alpha: float = 5.0) -> None:
+    def __init__(self, alpha: float = 5.0, unknown_label: int = -1) -> None:
         super().__init__()
         self.alpha = alpha
+        self.unknown_label = unknown_label
 
     def forward(
         self,
@@ -15,7 +16,7 @@ class RejectedByAllLoss(nn.Module):
         targets: Tensor,
     ) -> Tensor:
         # Identify OOD pixels that belong to the outlier class
-        ood_mask = targets == 13
+        ood_mask = targets == self.unknown_label
 
         if not ood_mask.any():
             return torch.tensor(0.0, device=logits.device, requires_grad=True)
@@ -28,7 +29,7 @@ class RejectedByAllLoss(nn.Module):
         probs = logits.tanh()
 
         # Negative Sum: lower accumulated probability = higher OOD likelihood
-        sum_probs = -probs.sum(dim=1)
+        sum_probs = probs.sum(dim=1)
 
         # Select sum_probs only for the ood pixels
         ood_sum_probs = sum_probs[ood_mask]

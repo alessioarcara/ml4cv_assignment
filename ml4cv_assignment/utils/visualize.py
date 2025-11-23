@@ -50,6 +50,15 @@ def color(
     return img_new
 
 
+def apply_colormap(mask: np.ndarray, cmap_name: str = "jet") -> np.ndarray:
+    mask_norm = (mask - mask.min()) / (mask.max() - mask.min() + 1e-8)
+    cmap = plt.get_cmap(cmap_name)
+    colored_rgba = cmap(mask_norm)
+    colored_rgb = colored_rgba[..., :3]  # Discard alpha channel
+    colored_rgb_uint8 = (colored_rgb * 255).astype(np.uint8)
+    return colored_rgb_uint8
+
+
 def visualize_augmentations(dataset, data_transforms, denorm, num_samples=6, cols=3):
     img, _ = dataset.__getitem__(0, apply_transforms=False)  # original image
 
