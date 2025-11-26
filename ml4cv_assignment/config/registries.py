@@ -5,7 +5,7 @@ from kornia.losses import DiceLoss, FocalLoss
 from torch.nn import CrossEntropyLoss
 
 from ml4cv_assignment.config.registry import Registry
-from ml4cv_assignment.models import DeepLabFPN, FaPNDecoder, Mask2Former
+from ml4cv_assignment.models import FaPNDecoder, Mask2Former, ProtoSegNet
 from ml4cv_assignment.training.callbacks import (
     Callback,
     EarlyStoppingCallback,
@@ -94,6 +94,6 @@ callback_registry.register("PixelEmbeddingsCallback", PixelEmbeddingsCallback)
 # ------------------------
 model_registry = Registry[nn.Module]()
 model_registry.register("Mask2Former", Mask2Former)
-model_registry.register("DeepLabFPN", DeepLabFPN)
 model_registry.register("FaPNDecoder", FaPNDecoder)
+model_registry.register("ProtoSegNet", ProtoSegNet)
 model_registry.register("timm", timm.create_model)  # type: ignore

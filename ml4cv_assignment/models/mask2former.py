@@ -16,39 +16,80 @@ class Mask2Former(BaseModel):
         self,
         model_id: str,
         num_classes: int,
+        lr: float,
+        weight_decay: float,
         losses: Optional[List[torch.nn.Module]] = None,
         freeze_all_except_heads: bool = False,
         should_compute_hf_loss: bool = True,
     ) -> None:
         super().__init__(losses=losses)
+        self.lr = float(lr)
+        self.weight_decay = weight_decay
         self.should_compute_hf_loss = should_compute_hf_loss
 
         config = AutoConfig.from_pretrained(model_id)
         config.num_labels = num_classes
+        config.pre_norm = True
+        config.decoder_layers = 2
 
         self.model = Mask2FormerForUniversalSegmentation.from_pretrained(
             model_id, config=config, ignore_mismatched_sizes=True
         )
 
-        # We finetune only the mask-prediction MLP and the post-decoder classification layer
-        # to preserve the model closed-set performance.
         if freeze_all_except_heads:
-            for p in self.model.parameters():
-                p.requires_grad = False
+            self._freeze_parameters()
 
-            for p in (
-                self.model.model.transformer_module.decoder.mask_predictor.parameters()
-            ):
-                p.requires_grad = True
+    def _freeze_parameters(self):
+        """
+        We finetune only the mask-prediction MLP and the post-decoder classification layer
+        to preserve the model closed-set performance.
+        """
+        for p in self.model.parameters():
+            p.requires_grad = False
 
-            for p in self.model.class_queries_logits.parameters():
-                p.requires_grad = True
+        for (
+            p
+        ) in self.model.model.transformer_module.decoder.mask_predictor.parameters():
+            p.requires_grad = True
+
+        for p in self.model.class_predictor.parameters():
+            p.requires_grad = True
 
     # override
     def get_param_groups(self):
-        return [
-            {"params": self.model.parameters(), "lr": 1e-4, "weight_decay": 0.05},
+        backbone = self.model.model.pixel_level_module.encoder
+        backbone_params = list(backbone.parameters())
+        backbone_ids = {id(p) for p in backbone_params}
+
+        trainable_backbone_params = [
+            p for p in backbone.parameters() if p.requires_grad
         ]
+
+        trainable_other_params = [
+            p
+            for p in self.model.parameters()
+            if id(p) not in backbone_ids and p.requires_grad
+        ]
+
+        param_groups = []
+        if trainable_backbone_params:
+            param_groups.append(
+                {
+                    "params": trainable_backbone_params,
+                    "lr": self.lr * 0.1,
+                    "weight_decay": self.weight_decay,
+                }
+            )
+
+        if trainable_other_params:
+            param_groups.append(
+                {
+                    "params": trainable_other_params,
+                    "lr": self.lr,
+                    "weight_decay": self.weight_decay,
+                }
+            )
+        return param_groups
 
     def _compute_segmentation_logits(
         self, outputs: Dict[str, Tensor], target_hw: Tuple[int, int]
@@ -116,7 +157,7 @@ class Mask2Former(BaseModel):
 
                 # OOD prediction (RBA): 1- total activation
                 # High score means the pixel is "rejected" (low activation) by all known classes
-                ood_score = 1 - L.tanh().sum(dim=1)
+                ood_score = -L.tanh().sum(dim=1)
                 outputs_dict["ood_score"] = ood_score
 
         return outputs_dict

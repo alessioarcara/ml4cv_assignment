@@ -13,6 +13,10 @@ class BaseModel(nn.Module, ABC):
     Subclasses must implement:
     1. `get_param_groups`: To return parameter groups for the optimizer.
     2. `_forward_impl`: To define the specific inference logic.
+
+    Subclasses may optionally override:
+    - `on_epoch_start`
+    - `on_train_epoch_end`
     """
 
     def __init__(self, losses: Optional[List[nn.Module]] = None) -> None:
@@ -26,6 +30,20 @@ class BaseModel(nn.Module, ABC):
     def _forward_impl(
         self, inputs: Dict[str, Tensor], return_preds: bool
     ) -> Dict[str, Any]: ...
+
+    def on_train_epoch_start(self) -> None:
+        """
+        Hook to be called at the beginning of a training epoch.
+        Override this method in subclasses to perform specific actions
+        """
+        pass
+
+    def on_eval_start(self) -> None:
+        """
+        Hook to be called at the end of a training epoch.
+        Override this method in subclasses to perform specific actions
+        """
+        pass
 
     def _compute_loss(
         self, logits: Tensor, gt_masks: Tensor

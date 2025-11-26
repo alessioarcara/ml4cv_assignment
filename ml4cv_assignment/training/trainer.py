@@ -89,6 +89,14 @@ class Trainer:
     def _on_eval_end(self) -> None:
         self._run_callbacks("on_eval_end")
 
+    def _on_train_epoch_start(self) -> None:
+        self.model.train()
+        self.model.on_train_epoch_start()
+
+    def _on_eval_start(self) -> None:
+        self.model.eval()
+        self.model.on_eval_start()
+
     def get_loader(self, stage: Stage) -> Optional[DataLoader]:
         match stage:
             case Stage.TRAIN:
@@ -195,7 +203,7 @@ class Trainer:
             for epoch in tqdm(
                 range(1, self.config.num_epochs + 1), desc="Epoch", colour="green"
             ):
-                self.model.train()
+                self._on_train_epoch_start()
 
                 for batch in tqdm(
                     train_loader,
@@ -209,6 +217,7 @@ class Trainer:
                     wandb.log(batch_log)
 
                 if epoch % self.config.evaluation_rate == 0:
+                    self._on_eval_start()
                     train_results = self.eval(Stage.TRAIN)
                     val_results = self.eval(Stage.VAL)
 
@@ -233,7 +242,6 @@ class Trainer:
 
     @torch.inference_mode()
     def eval(self, stage: Stage) -> Dict[str, float]:
-        self.model.eval()
         loader = self.get_loader(stage)
 
         if loader is None:
