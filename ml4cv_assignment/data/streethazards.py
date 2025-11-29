@@ -59,7 +59,7 @@ class StreetHazards(Dataset):
             InsertCOCO(
                 coco_dir=str(coco_dir),
                 exclude_classes="Streethazards",
-                p=0.1,
+                p=config.prob_insert,
                 n=config.num_objects_to_insert,
                 ood_mask_value=14,
             )

@@ -21,7 +21,7 @@ class BaseModel(nn.Module, ABC):
 
     def __init__(self, losses: Optional[List[nn.Module]] = None) -> None:
         super().__init__()
-        self.losses = losses or []
+        self.losses = nn.ModuleList(losses) if losses else nn.ModuleList()
 
     @abstractmethod
     def get_param_groups(self) -> List[Dict[str, Any]]: ...
@@ -82,9 +82,7 @@ class BaseModel(nn.Module, ABC):
             targets = inputs.get("orig_masks")
 
             if targets is not None:
-                total_loss, loss_dict = self._compute_loss(
-                    outputs["logits"], inputs["orig_masks"]
-                )
+                total_loss, loss_dict = self._compute_loss(outputs["logits"], targets)
 
                 outputs.update(loss_dict)
 
