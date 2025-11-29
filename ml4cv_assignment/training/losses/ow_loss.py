@@ -1,12 +1,14 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch import Tensor
 
 
 # https://github.com/PRBonn/ContMAV/blob/master/src/utils.py
 class OWLoss(nn.Module):
-    def __init__(self, n_classes, hinged=False, delta=0.1):
+    def __init__(self, n_classes: int, hinged: bool = False, delta: float = 0.1):
         super().__init__()
+
         self.n_classes = n_classes
         self.hinged = hinged
         self.delta = delta
@@ -30,7 +32,7 @@ class OWLoss(nn.Module):
         self.previous_count = None
 
     @torch.no_grad()
-    def cumulate(self, logits: torch.Tensor, sem_gt: torch.Tensor):
+    def cumulate(self, logits: Tensor, sem_gt: Tensor) -> None:
         sem_pred = torch.argmax(torch.softmax(logits, dim=1), dim=1)
         gt_labels = torch.unique(sem_gt).tolist()
         logits_permuted = logits.permute(0, 2, 3, 1)
@@ -57,9 +59,7 @@ class OWLoss(nn.Module):
             self.count[label] += n_tps
             self.features[label] /= self.count[label] + 1e-8
 
-    def forward(
-        self, logits: torch.Tensor, sem_gt: torch.Tensor, is_train: bool = False
-    ) -> torch.Tensor:
+    def forward(self, logits: Tensor, sem_gt: Tensor, is_train: bool = False) -> Tensor:
         if is_train:
             # update mav only at training time
             sem_gt = sem_gt.type(torch.uint8)

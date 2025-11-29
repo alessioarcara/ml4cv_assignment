@@ -1,0 +1,23 @@
+training:
+  wandb_base_run_name: "proto_segnet_efficientnet_b2"
+
+model_cfg:
+  model:
+    params:
+      encoder:
+        type: timm
+        params:
+          model_name: "efficientnet_b2"
+          features_only: true
+          pretrained: true 
+          out_indices: [0, 1, 4]
+          output_stride: 8
+          drop_path_rate: 0.1
+      decoder:
+        type: FaPNDecoder
+        params:
+          fpn_channels: [16, 24, 352]
+          decoder_channels: 64
+          num_classes: 13
+          input_size: [360, 640]
+          output_stride: 8

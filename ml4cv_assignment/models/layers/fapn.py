@@ -19,6 +19,8 @@ class DCNv2(nn.Module):
         super().__init__()
         chs = g * 3 * k * k
         self.offset_mask = nn.Conv2d(in_channels, chs, k, s, p)
+        # Standard convs use a fixed grid (like a 3x3 kernel),
+        # while deformable convs use the offsets to move the grid points around
         self.dcn = DeformConv2d(
             in_channels,
             out_channels,
@@ -70,7 +72,10 @@ class FAM(nn.Module):
         xavier_fill(self.offset)
 
     def forward(self, feat_l: Tensor, feat_s: Tensor) -> Tensor:
-        # Upsample feat_s to the spatial size of feat_l
+        # feat_l: high-res / low sem feature
+        # feat_s: low-res / high sem feature
+
+        # Upsample the low-res feature to the size of high-res feature
         if feat_l.shape[2:] != feat_s.shape[2:]:
             feat_up = F.interpolate(
                 feat_s, size=feat_l.shape[2:], mode="bilinear", align_corners=False
@@ -78,24 +83,11 @@ class FAM(nn.Module):
         else:
             feat_up = feat_s
 
+        # Apply Feature Selection Module to the high-res feature
         feat_arm = self.lateral_conv(feat_l)
-        offset = self.offset(torch.cat([feat_arm, feat_up * 2], dim=1))
-        feat_align = F.relu(self.dcpack_l2(feat_up, offset), inplace=True)
+        # Get learned offsets for deformable conv
+        offset_feat = self.offset(torch.cat([feat_arm, feat_up * 2], dim=1))
+        # Apply deformable conv using the learned offsets
+        # to the upsampled feature to ALIGN it with the high-res feature
+        feat_align = F.relu(self.dcpack_l2(feat_up, offset_feat), inplace=True)
         return feat_align + feat_arm
-
-
-if __name__ == "__main__":
-    batch_size = 2
-    c1, c2 = 1024, 128
-    h1, w1 = 32, 32
-    h2, w2 = 16, 16
-
-    feat_l = torch.rand(batch_size, c1, h1, w1)
-    feat_s = torch.rand(batch_size, c2, h2, w2)
-
-    fam = FAM(c1, c2)
-
-    out = fam(feat_l, feat_s)
-    print("Input feat_l shape:", feat_l.shape)
-    print("Input feat_s shape:", feat_s.shape)
-    print("Output shape:", out.shape)

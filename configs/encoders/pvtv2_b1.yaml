@@ -1,0 +1,97 @@
+training:
+  wandb_base_run_name: "proto_segnet_pvtv2_b1"
+  # pvtv2 requires input size to be multiple of 32
+  # height is adjusted from 360 to 352 (nearest multiple of 32) to satisfy this,
+  # while maintaining a resolution comparable to other experiments
+  train_transforms:
+    type: Compose
+    params:
+      transforms:
+        - type: OneOf
+          params:
+            p: 1.0
+            transforms:
+              - type: Resize
+                params:
+                  height: 352
+                  width: 640
+                  p: 1.0
+              - type: RandomResizedCrop
+                params:
+                  size: [352, 640]
+                  scale: [0.2, 1.0] 
+                  ratio: [1.5, 2.0] 
+                  p: 1.0
+        - type: HorizontalFlip
+          params:
+            p: 0.5
+        - type: GridDropout
+          params:
+            p: 0.5
+            fill_mask: 255
+        - type: ColorJitter
+          params:
+            brightness: 0.2
+            contrast: 0.2
+            saturation: 0.2
+            hue: 0.1
+            p: 0.5
+        - type: OneOf
+          params:
+            transforms:
+              - type: RandomShadow 
+                params:
+                  p: 1.0
+              - type: RandomSunFlare
+                params:
+                  p: 1.0
+              - type: RandomRain
+                params:
+                  p: 1.0
+            p: 0.2
+        - type: Normalize
+          params:
+            mean: [0.331, 0.346, 0.373]
+            std: [0.162, 0.160, 0.174]
+            max_pixel_value: 255.0
+            p: 1.0
+        - type: ToTensorV2
+          params: 
+            p: 1.0
+  val_transforms:
+    type: Compose
+    params:
+      transforms:
+        - type: Resize 
+          params:
+            height: 352
+            width: 640
+        - type: Normalize
+          params:
+            mean: [0.331, 0.346, 0.373]
+            std: [0.162, 0.160, 0.174]
+            max_pixel_value: 255.0
+            p: 1.0
+        - type: ToTensorV2
+          params: 
+            p: 1.0
+
+model_cfg:
+  model:
+    params:
+      encoder:
+        type: timm
+        params:
+          model_name: "pvt_v2_b1"
+          features_only: true
+          pretrained: true 
+          out_indices: [0, 1, 2, 3]
+          drop_path_rate: 0.1
+      decoder:
+        type: FaPNDecoder
+        params:
+          fpn_channels: [64, 128, 320, 512]
+          decoder_channels: 64
+          num_classes: 13
+          input_size: [352, 640]
+          output_stride: 32

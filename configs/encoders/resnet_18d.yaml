@@ -1,0 +1,23 @@
+training:
+  wandb_base_run_name: "proto_segnet_resnet18d"
+
+model_cfg:
+  model:
+    params:
+      encoder:
+        type: timm
+        params:
+          model_name: "resnet18d"
+          features_only: true
+          pretrained: true
+          out_indices: [0, 1, 4]
+          output_stride: 8 
+          drop_path_rate: 0.1
+      decoder:
+        type: FaPNDecoder
+        params:
+          fpn_channels: [64, 64, 512]
+          decoder_channels: 64
+          num_classes: 13
+          input_size: [360, 640]
+          output_stride: 8

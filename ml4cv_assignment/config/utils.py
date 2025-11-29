@@ -1,7 +1,13 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
+
+from loguru import logger
+from pydantic import FilePath, validate_call
+
+from ml4cv_assignment.utils.io import read_yaml
 
 
-# Taken from repository: https://github.com/alessioarcara/SoccerAI/blob/main/soccerai/training/trainer_config.py
+# Taken from repository:
+# https://github.com/alessioarcara/SoccerAI/blob/main/soccerai/training/trainer_config.py
 def _deep_merge(a: Dict[str, Any], b: Dict[str, Any]) -> Dict[str, Any]:
     """
     Recursively merge dict `b` into dict `a`
@@ -13,3 +19,22 @@ def _deep_merge(a: Dict[str, Any], b: Dict[str, Any]) -> Dict[str, Any]:
         else:
             result[k] = v
     return result
+
+
+@validate_call
+def get_experiment_config(config_paths: List[FilePath]) -> Dict[str, Any]:
+    """
+    Loads and merges multiple YAML configuration files into a single configuration dictionary.
+    Later files in the list override keys from earlier ones.
+    """
+
+    merged_config: Dict[str, Any] = {}
+
+    logger.info(f"📄 Building config from {len(config_paths)} files:")
+
+    for path in config_paths:
+        logger.info(f"    -> Loading: {path.name}")
+        config = read_yaml(path)
+        merged_config = _deep_merge(merged_config, config)
+
+    return merged_config

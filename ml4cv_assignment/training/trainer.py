@@ -20,12 +20,14 @@ class Trainer:
         self,
         config: TrainerConfig,
         model: BaseModel,
+        experiment_raw_config: Dict[str, Any],
         train_loader: Optional[DataLoader] = None,
         val_loader: Optional[DataLoader] = None,
         test_loader: Optional[DataLoader] = None,
         device: Optional[Union[str, torch.device]] = None,
     ) -> None:
         self.config = config
+        self.experiment_raw_config = experiment_raw_config
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.test_loader = test_loader
@@ -43,7 +45,7 @@ class Trainer:
 
         # Optimizer
         param_groups = self.model.get_param_groups()
-        self.optimizer = optim.AdamW(param_groups, fused=True)
+        self.optimizer = optim.AdamW(param_groups, fused=self.device.type == "cuda")
 
         # Scheduler
         self.scheduler = None
@@ -193,7 +195,7 @@ class Trainer:
             project=self.config.wandb_project_name,
             entity=self.config.wandb_entity,
             name=generate_run_name(self.config.wandb_base_run_name),
-            config=self.config.model_dump(),
+            config=self.experiment_raw_config,
         )
         wandb.watch(self.model, log="all", log_freq=100)
 

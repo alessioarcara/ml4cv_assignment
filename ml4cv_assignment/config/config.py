@@ -17,8 +17,6 @@ from ml4cv_assignment.data.collate import collate_fn
 from ml4cv_assignment.data.data_utils import MultiEpochsDataLoader
 from ml4cv_assignment.data.streethazards import StreetHazards
 from ml4cv_assignment.models.base_model import BaseModel as MyModel
-from ml4cv_assignment.utils.io import read_yaml
-from ml4cv_assignment.utils.typings import PathOrStr
 
 
 class Config(BaseModel):
@@ -114,9 +112,3 @@ class Config(BaseModel):
             logger.info(f"Loaded weights from {self.paths.checkpoint}")
 
         return model
-
-    @classmethod
-    def load(cls, path: PathOrStr) -> "Config":
-        """Load configuration from a YAML file"""
-        data = read_yaml(path)
-        return cls.model_validate(data)

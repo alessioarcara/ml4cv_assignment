@@ -2,144 +2,48 @@ seed: 42
 
 dataset_config:
   type: streethazards
-  add_anomalies: false
+  add_anomalies: false 
   mask_shift: true
 
 model_cfg:
-  losses:
-    - type: WeightedLoss
-      params:
-        loss:
-          type: FocalLoss
-          params:
-            alpha: 1.0
-            gamma: 3.0
-            reduction: "mean"
-        weight: 20.0
-    - type: DiceLoss
-      params:
-        average: "macro"
+  use_preprocessor: false 
   model:
-    #type: Mask2Former
-    #params: {}
-    type: DeepLabFPN
+    type: ProtoSegNet
     params:
-      encoder_lr: 1e-5
+      encoder_lr: 1e-4
       decoder_lr: 1e-3
-      encoder_weight_decay: 0.0
+      encoder_weight_decay: 0.00001
       decoder_weight_decay: 0.05
-      encoder:
-        type: timm
-        params:
-          #model_name: "efficientnet_b2"
-          model_name: "convnext_tiny.dinov3_lvd1689m"
-          features_only: true
-          pretrained: true 
-          #out_indices: [0, 1, 4]
-          out_indices: [0, 3]
-          output_stride: 8
-      decoder:
-        type: FaPNDecoder
-        params:
-          fpn_channels: [96, 768]
-          decoder_channels: 64
-          num_classes: 13
-          input_size: [360, 640]
-          output_stride: 8
+      num_classes: 13
+      T: 1.0
+      alpha: 0.5
+      xi: 5.0
+      anchors_magnitude: 10.0
+      use_running_centers: false 
+      centers_momentum: 0.9
+      losses:
+        - type: DiceLoss
+          params:
+            average: "macro"
+            ignore_index: 254
+        - type: PrototypicalGlobalLocalTripletLoss
+          params:
+            margin_global: 1.5
+            margin_local: 0.5
+            magnitude: 10
+            num_classes: 13
+            ignore_index: 254
 
 training:
   wandb_project_name: ml4cv_assignment
   wandb_entity: aarcara
-  wandb_base_run_name: "test_deeplab_fpn"
-  batch_size: 8
+  batch_size: 16
   num_epochs: 100
   evaluation_rate: 1
   use_mixed_precision: true 
   use_torch_compile: false 
-
-  train_transforms:
-    type: Compose
-    params:
-      transforms:
-        - type: LongestMaxSize 
-          params:
-            max_size: 640
-
-        # Geometric augmentations
-        - type: HorizontalFlip
-          params:
-            p: 0.5
-
-        # Occlusion augmentations
-        - type: OneOf
-          params:
-            transforms:
-              - type: CoarseDropout
-                params:
-                  num_holes_range: [1, 8]
-                  p: 1.0
-              - type: GridDropout
-                params:
-                  p: 0.5
-              - type: Erasing 
-                params:
-                  p: 0.5
-            p: 0.5
-
-        # Color augmentations
-        - type: OneOf
-          params:
-            transforms:
-              - type: RandomBrightnessContrast
-                params:
-                  brightness_limit: 0.2
-                  contrast_limit: 0.2
-                  p: 0.8
-              - type: ColorJitter
-                params:
-                  brightness: 0.2
-                  contrast: 0.2
-                  saturation: 0.2
-                  hue: 0.1
-                  p: 0.8
-              - type: HueSaturationValue
-                params:
-                  hue_shift_limit: 20 
-                  sat_shift_limit: 30
-                  val_shift_limit: 20
-                  p: 0.8
-              - type: RandomGamma
-                params:
-                  gamma_limit: [80, 120]
-                  p: 0.8
-            p: 0.7
-              
-        # Weather augmentations
-        - type: OneOf
-          params:
-            transforms:
-              - type: RandomShadow 
-                params:
-                  p: 1.0
-              - type: RandomSunFlare
-                params:
-                  p: 1.0
-              - type: RandomRain
-                params:
-                  p: 1.0
-            p: 0.2
-
-        # Normalization & tensor conversion
-        - type: Normalize
-          params:
-            mean: [0.331, 0.346, 0.373]
-            std: [0.162, 0.160, 0.174]
-            max_pixel_value: 255.0
-            p: 1.0
-        - type: ToTensorV2
-          params: 
-            p: 1.0
-        
+  num_workers: 8
+  
   val_transforms:
     type: Compose
     params:
@@ -162,11 +66,12 @@ training:
       params:
         num_classes: 13
         per_class: true
+        ignore_index: 254
 
   callbacks:
     - type: EarlyStoppingCallback
       params:
-        patience: 5
+        patience: 10
         minimize: false
         history_key: val/mIoU_epoch
     - type: ModelSavingCallback
@@ -175,9 +80,14 @@ training:
         minimize: false
         history_key: val/mIoU_epoch
     - type: VisualizeSegmentationResultsCallback
-      params: {}
+      params:
+        num_samples: 8
     - type: ModelSummaryCallback
       params: {}
+    - type: PixelEmbeddingsCallback
+      params:
+        anchors_magnitude: 10
+        min_num_pixels: 1000
 
 paths:
   street_hazards_train_dir: datasets/train

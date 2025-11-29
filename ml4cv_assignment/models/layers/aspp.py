@@ -1,11 +1,10 @@
+# Implementation adapted from
+# https://github.com/pytorch/vision/blob/main/torchvision/models/segmentation/deeplabv3.py
 from typing import Sequence
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-# Implementazione dell'ASPP basata su torchvision:
-# https://github.com/pytorch/vision/blob/main/torchvision/models/segmentation/deeplabv3.py
 
 
 class ASPPConv(nn.Sequential):
