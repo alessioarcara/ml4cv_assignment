@@ -16,3 +16,9 @@ class Stage(StrEnum):
     TRAIN = "train"
     VAL = "val"
     TEST = "test"
+
+
+class MetricModality(StrEnum):
+    FULL = "full"  # Returns the full history list
+    SINGLE = "single"  # Returns a single scalar value (min/max/last)
+    MEDIA = "media"  # Downloads and returns the local file path

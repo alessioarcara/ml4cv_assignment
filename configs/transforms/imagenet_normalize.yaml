@@ -1,0 +1,89 @@
+training:
+  wandb_base_run_name: "imagenet_normalize"
+  train_transforms:
+    type: Compose
+    params:
+      transforms:
+        - type: OneOf
+          params:
+            p: 1.0
+            transforms:
+              # Global context
+              - type: Resize
+                params:
+                  height: 360
+                  width: 640
+                  p: 1.0
+
+              # Zoom & Crop -> Scale invariance
+              - type: RandomResizedCrop
+                params:
+                  size: [360, 640]
+                  scale: [0.2, 1.0] 
+                  ratio: [1.5, 2.0] 
+                  p: 1.0
+      
+        # Geometric augmentations
+        - type: HorizontalFlip
+          params:
+            p: 0.5
+
+        # Occlusion augmentations
+        - type: GridDropout
+          params:
+            p: 0.5
+            fill_mask: 255
+
+        # Color augmentations
+        # Simulate different lightning conditions and weather scenarios
+        - type: ColorJitter
+          params:
+            brightness: 0.2
+            contrast: 0.2
+            saturation: 0.2
+            hue: 0.1
+            p: 0.5
+              
+        # Weather augmentations
+        # Simulate harsh environmental conditions
+        - type: OneOf
+          params:
+            transforms:
+              - type: RandomShadow 
+                params:
+                  p: 1.0
+              - type: RandomSunFlare
+                params:
+                  p: 1.0
+              - type: RandomRain
+                params:
+                  p: 1.0
+            p: 0.2
+
+          # Normalization & tensor conversion
+        - type: Normalize
+          params:
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            max_pixel_value: 255.0
+            p: 1.0
+        - type: ToTensorV2
+          params: 
+            p: 1.0
+
+  val_transforms:
+    type: Compose
+    params:
+      transforms:
+        - type: LongestMaxSize 
+          params:
+            max_size: 640
+        - type: Normalize
+          params:
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            max_pixel_value: 255.0
+            p: 1.0
+        - type: ToTensorV2
+          params: 
+            p: 1.0

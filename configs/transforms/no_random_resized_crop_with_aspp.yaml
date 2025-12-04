@@ -1,0 +1,59 @@
+training:
+  wandb_base_run_name: "no_random_resized_crop_with_aspp"
+  train_transforms:
+    type: Compose
+    params:
+      transforms:
+        - type: Resize
+          params:
+            height: 360
+            width: 640
+            p: 1.0
+      
+        # Geometric augmentations
+        - type: HorizontalFlip
+          params:
+            p: 0.5
+
+        # Occlusion augmentations
+        - type: GridDropout
+          params:
+            p: 0.5
+            fill_mask: 255
+
+        # Color augmentations
+        # Simulate different lightning conditions and weather scenarios
+        - type: ColorJitter
+          params:
+            brightness: 0.2
+            contrast: 0.2
+            saturation: 0.2
+            hue: 0.1
+            p: 0.5
+              
+        # Weather augmentations
+        # Simulate harsh environmental conditions
+        - type: OneOf
+          params:
+            transforms:
+              - type: RandomShadow 
+                params:
+                  p: 1.0
+              - type: RandomSunFlare
+                params:
+                  p: 1.0
+              - type: RandomRain
+                params:
+                  p: 1.0
+            p: 0.2
+
+          # Normalization & tensor conversion
+        - type: Normalize
+          params:
+            mean: [0.331, 0.346, 0.373]
+            std: [0.162, 0.160, 0.174]
+            max_pixel_value: 255.0
+            p: 1.0
+        - type: ToTensorV2
+          params: 
+            p: 1.0

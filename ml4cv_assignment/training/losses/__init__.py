@@ -1,4 +1,5 @@
 from ml4cv_assignment.training.losses.objectosphere_loss import ObjectosphereLoss
+from ml4cv_assignment.training.losses.open_world_dml_loss import OpenWorldDMLLoss
 from ml4cv_assignment.training.losses.ow_loss import OWLoss
 from ml4cv_assignment.training.losses.prototypical_global_local_triplet_loss import (
     PrototypicalGlobalLocalTripletLoss,
@@ -12,4 +13,5 @@ __all__ = [
     "WeightedLoss",
     "OWLoss",
     "PrototypicalGlobalLocalTripletLoss",
+    "OpenWorldDMLLoss",
 ]

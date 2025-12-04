@@ -5,7 +5,7 @@ from kornia.losses import DiceLoss, FocalLoss
 from torch.nn import CrossEntropyLoss
 
 from ml4cv_assignment.config.registry import Registry
-from ml4cv_assignment.models import FaPNDecoder, Mask2Former, ProtoSegNet
+from ml4cv_assignment.models import FaPNDecoder, FPNDecoder, Mask2Former, ProtoSegNet
 from ml4cv_assignment.training.callbacks import (
     Callback,
     EarlyStoppingCallback,
@@ -16,6 +16,7 @@ from ml4cv_assignment.training.callbacks import (
 )
 from ml4cv_assignment.training.losses import (
     ObjectosphereLoss,
+    OpenWorldDMLLoss,
     OWLoss,
     PrototypicalGlobalLocalTripletLoss,
     RejectedByAllLoss,
@@ -36,12 +37,14 @@ loss_registry.register(
     "PrototypicalGlobalLocalTripletLoss", PrototypicalGlobalLocalTripletLoss
 )
 loss_registry.register("ObjectosphereLoss", ObjectosphereLoss)
+loss_registry.register("OpenWorldDMLLoss", OpenWorldDMLLoss)
 loss_registry.register("RejectedByAllLoss", RejectedByAllLoss)
 
 # ------------------------
 # Registry transformations
 # ------------------------
 transform_registry = Registry[A.BasicTransform]()
+transform_registry.register("ToFloat", A.ToFloat)
 # --- Resize & geometric
 transform_registry.register("PadIfNeeded", A.PadIfNeeded)
 transform_registry.register("Resize", A.Resize)
@@ -96,4 +99,5 @@ model_registry = Registry[nn.Module]()
 model_registry.register("Mask2Former", Mask2Former)
 model_registry.register("FaPNDecoder", FaPNDecoder)
 model_registry.register("ProtoSegNet", ProtoSegNet)
+model_registry.register("FPNDecoder", FPNDecoder)
 model_registry.register("timm", timm.create_model)  # type: ignore

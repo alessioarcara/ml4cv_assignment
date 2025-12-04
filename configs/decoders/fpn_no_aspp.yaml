@@ -1,5 +1,5 @@
 training:
-  wandb_base_run_name: "fapn_no_dilation"
+  wandb_base_run_name: "fpn_no_aspp"
 
 model_cfg:
   model:
@@ -10,14 +10,15 @@ model_cfg:
           model_name: "efficientnet_b2"
           features_only: true
           pretrained: true 
-          out_indices: [0, 1, 2, 3, 4]
-          output_stride: 32 
+          out_indices: [0, 1, 4]
+          output_stride: 8
           drop_path_rate: 0.1
       decoder:
-        type: FaPNDecoder
+        type: FPNDecoder
         params:
-          fpn_channels: [16, 24, 48, 120, 352]
+          fpn_channels: [16, 24, 352]
           decoder_channels: 64
           num_classes: 13
           input_size: [360, 640]
-          output_stride: 32 
+          output_stride: 8
+          use_aspp: false
