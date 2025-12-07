@@ -1,10 +1,13 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from torch import Tensor
 
+from ml4cv_assignment.training.losses.base_pixel_metric_learning_loss import (
+    BasePixelMetricLearningLoss,
+)
 
-class OpenWorldDMLLoss(nn.Module):
+
+class DMLLoss(BasePixelMetricLearningLoss):
     """
     Loss derived from the paper 'Deep Metric Learning for Open World Semantic Segmentation'
     Combines Discriminative Cross Entropy and Variance Loss.
@@ -28,29 +31,28 @@ class OpenWorldDMLLoss(nn.Module):
          around the fixed centroid.
     """
 
-    centroids: Tensor
+    anchors: Tensor
 
     def __init__(
         self,
         num_classes: int,
-        magnitude: float = 4.0,
-        alpha: float = 0.5,
+        magnitude: float = 3.0,
+        alpha: float = 0.01,
         ignore_index: int = 255,
     ):
-        super().__init__()
-        self.num_classes = num_classes
-        self.magnitude = magnitude
+        super().__init__(num_classes, magnitude, ignore_index)
         self.alpha = alpha
-        self.ignore_index = ignore_index
 
-    def build_anchors(self) -> None:
+    def _compute_dists_sq(self, x: Tensor, c: Tensor) -> Tensor:
         """
-        Creates fixed anchors scaled by magnitude
+        ||x - c||^2 = ||x||^2 + ||c||^2 - 2<x, c>
         """
-        anchors = torch.zeros((self.num_classes, self.num_classes))
-        for i in range(self.num_classes):
-            anchors[i][i] = self.magnitude
-        self.register_buffer("anchors", anchors)
+        x2 = torch.sum(x**2, dim=1, keepdim=True)  # [N, 1]
+        c2 = torch.sum(c**2, dim=1).unsqueeze(0)  # [1, C]
+        xc = torch.mm(x, c.t())  # [N, C]
+
+        dists = x2 + c2 - 2 * xc  # [N, C]
+        return torch.clamp(dists, min=1e-12)
 
     def forward(
         self,
@@ -63,21 +65,9 @@ class OpenWorldDMLLoss(nn.Module):
         """
         embeds = embeds.permute(0, 2, 3, 1).contiguous()  # [B, H, W, C]
 
-        embeds_flat = embeds.view(-1, self.num_classes)  # [B*H*W, C]
-        targets_flat = targets.view(-1)  # [B*H*W]
+        embeds_flat, targets_flat, _ = self.preprocess_inputs(embeds, targets)
 
-        valid_mask = targets != self.ignore_index
-        embeds_flat = embeds_flat[valid_mask]
-        targets_flat = targets_flat[valid_mask]
-
-        # ||x - c||^2 = ||x||^2 + ||c||^2 - 2<x, c>
-        x2 = torch.sum(embeds_flat**2, dim=1, keepdim=True)  # [N, 1]
-        c2 = torch.sum(self.centroids**2, dim=1)  # [1, C]
-        xc = torch.mm(embeds_flat, self.centroids.t())  # [N, C]
-
-        dists_sq = x2 + c2 - 2 * xc  # [N, C]
-
-        dists_sq = torch.clamp(dists_sq, min=1e-12)
+        dists_sq = self._compute_dists_sq(embeds_flat, self.anchors)
 
         # ----------------------------------------
         # Discriminative Cross Entropy

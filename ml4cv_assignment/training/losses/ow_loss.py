@@ -4,108 +4,212 @@ import torch.nn.functional as F
 from torch import Tensor
 
 
-# https://github.com/PRBonn/ContMAV/blob/master/src/utils.py
+# Adapted from https://github.com/PRBonn/ContMAV/blob/master/src/utils.py
 class OWLoss(nn.Module):
-    def __init__(self, n_classes: int, hinged: bool = False, delta: float = 0.1):
-        super().__init__()
+    """
+    Open World Loss (OWLoss) adapted from ContMAV (Sodano et al., CVPR 2024).
 
-        self.n_classes = n_classes
+    The objective combines two distinct losses:
+    1.  Feature Loss: Minimizes the distance between pixel embeddings and their class Mean Activation Vector (MAV).
+        This distance is normalized by the class standard deviation to handle intra-class variance heterogeneity
+        (e.g., "Sky" naturally varies more than "Road").
+
+    2.  Contrastive Loss: An InfoNCE loss that aligns the current batch centroids with the
+        historical centroids. This prevents mode collapse and ensures consistency across epochs.
+
+    Moreover, the loss operates in two distinct phases:
+    - During TRAIN (Active Phase): Accumulates running statistics (Sum, SumSq, Count)
+      batch-by-batch to update class centroids (MAV) and variance at the end of the epoch.
+    - During LOSS COMPUTATION (Frozen Phase): Uses the fixed centroids (MAV) and
+      Standard Deviation (STD) calculated at the end of the PREVIOUS epoch to compute
+      the feature loss.
+    """
+
+    mav: Tensor
+    std: Tensor
+    initialized: Tensor
+    acc_sum: Tensor
+    acc_sq_sum: Tensor
+    acc_count: Tensor
+
+    def __init__(
+        self,
+        num_classes: int,
+        hinged: bool = False,
+        delta: float = 0.1,
+        ignore_index: int = 255,
+        tau: float = 0.1,
+        w_feat: float = 0.5,
+        w_cont: float = 0.5,
+    ):
+        super().__init__()
+        self.num_classes = num_classes
         self.hinged = hinged
         self.delta = delta
-        self.count = torch.zeros(self.n_classes).cuda()  # count for class
-        self.features = {
-            i: torch.zeros(self.n_classes).cuda() for i in range(self.n_classes)
-        }
-        # See https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
-        # for implementation of Welford Alg.
-        self.ex = {i: torch.zeros(self.n_classes).cuda() for i in range(self.n_classes)}
-        self.ex2 = {
-            i: torch.zeros(self.n_classes).cuda() for i in range(self.n_classes)
-        }
-        self.var = {
-            i: torch.zeros(self.n_classes).cuda() for i in range(self.n_classes)
-        }
+        self.ignore_index = ignore_index
+        self.tau = tau
+        self.w_feat = w_feat
+        self.w_cont = w_cont
 
-        self.criterion = torch.nn.L1Loss(reduction="none")
+        # Frozen stats from Epoch T-1 (MAV/STD)
+        self.register_buffer("mav", torch.zeros(num_classes, num_classes))
+        self.register_buffer("std", torch.ones(num_classes, num_classes))
+        self.register_buffer("initialized", torch.tensor(0, dtype=torch.bool))
 
-        self.previous_features = None
-        self.previous_count = None
+        # Epoch accumulators
+        self.register_buffer(
+            "acc_sum", torch.zeros(num_classes, num_classes), persistent=False
+        )
+        self.register_buffer(
+            "acc_sq_sum", torch.zeros(num_classes, num_classes), persistent=False
+        )
+        self.register_buffer("acc_count", torch.zeros(num_classes), persistent=False)
+
+    def forward(self, embeds: Tensor, targets: Tensor) -> Tensor:
+        """
+        Args:
+            embeds: [B, C, H, W].
+            targets: [B, H, W].
+        """
+        # Preprocessing and Flattening
+        # [B, C, H, W] -> [B, H, W, C]
+        embeds = embeds.permute(0, 2, 3, 1).contiguous()
+
+        embeds_flat = embeds.view(-1, self.num_classes)  # [N_total, C]
+        targets_flat = targets.view(-1)  # [N_total]
+
+        valid_mask = targets_flat != self.ignore_index
+        if not valid_mask.any():
+            return torch.tensor(0.0, device=embeds.device, requires_grad=True)
+
+        embeds_flat = embeds_flat[valid_mask]
+        targets_flat = targets_flat[valid_mask]
+
+        # We only update the running stats if the model is in training mode.
+        if self.training:
+            self._cumulate(embeds_flat, targets_flat)
+
+        # If initialized is False (first epoch), we don't have valid MAVs yet.
+        if not self.initialized:
+            return torch.tensor(0.0, device=embeds.device, requires_grad=True)
+
+        # PROTOTYPE LOSS -> every pixel is attracted to its class MAV
+        loss_feat = self._compute_feat_loss(embeds_flat, targets_flat)
+        # CONTRASTIVE LOSS -> car cluster centroid must be far from pedestrian centroid
+        loss_cont = self._compute_cont_loss(embeds_flat, targets_flat)
+
+        return (self.w_feat * loss_feat) + (self.w_cont * loss_cont)
 
     @torch.no_grad()
-    def cumulate(self, logits: Tensor, sem_gt: Tensor) -> None:
-        sem_pred = torch.argmax(torch.softmax(logits, dim=1), dim=1)
-        gt_labels = torch.unique(sem_gt).tolist()
-        logits_permuted = logits.permute(0, 2, 3, 1)
-        for label in gt_labels:
-            if label == 255:
-                continue
-            sem_gt_current = sem_gt == label
-            sem_pred_current = sem_pred == label
-            tps_current = torch.logical_and(sem_gt_current, sem_pred_current)
-            if tps_current.sum() == 0:
-                continue
-            logits_tps = logits_permuted[torch.where(tps_current == 1)]
-            # max_values = logits_tps[:, label].unsqueeze(1)
-            # logits_tps = logits_tps / max_values
-            avg_mav = torch.mean(logits_tps, dim=0)
-            n_tps = logits_tps.shape[0]
-            # features is running mean for mav
-            self.features[label] = (
-                self.features[label] * self.count[label] + avg_mav * n_tps
-            )
+    def _cumulate(self, embeds: Tensor, targets: Tensor) -> None:
+        preds = torch.argmax(embeds, dim=1)
 
-            self.ex[label] += (logits_tps).sum(dim=0)
-            self.ex2[label] += ((logits_tps) ** 2).sum(dim=0)
-            self.count[label] += n_tps
-            self.features[label] /= self.count[label] + 1e-8
+        # Filter: Only True Positives contribute to the class prototype
+        tp_mask = preds == targets
+        if not tp_mask.any():
+            return
 
-    def forward(self, logits: Tensor, sem_gt: Tensor, is_train: bool = False) -> Tensor:
-        if is_train:
-            # update mav only at training time
-            sem_gt = sem_gt.type(torch.uint8)
-            self.cumulate(logits, sem_gt)
-        if self.previous_features is None:
-            return torch.tensor(0.0).cuda()
-        gt_labels = torch.unique(sem_gt).tolist()
+        tp_logits = embeds[tp_mask]  # [N_tp, C]
+        tp_targets = targets[tp_mask]  # [N_tp]
 
-        logits_permuted = logits.permute(0, 2, 3, 1)
+        if tp_logits.dtype != torch.float32:
+            tp_logits = tp_logits.float()
 
-        acc_loss = torch.tensor(0.0).cuda()
-        for label in gt_labels[:-1]:
-            mav = self.previous_features[label]
-            logs = logits_permuted[torch.where(sem_gt == label)]
-            mav = mav.expand(logs.shape[0], -1)
-            if self.previous_count[label] > 0:
-                ew_l1 = self.criterion(logs, mav)
-                # ew_l1 = (ew_l1 * ew_l1) / (self.var[label] + 1e-8)
-                if self.hinged:
-                    ew_l1 = F.relu(ew_l1 - self.delta).sum(dim=1)
-                acc_loss += ew_l1.mean()
+        # Accumulates sums and squared sums for König-Huygens variance calculation.
+        self.acc_sum.index_add_(0, tp_targets, tp_logits)  # For E[X]
+        self.acc_sq_sum.index_add_(0, tp_targets, tp_logits.pow(2))  # For E[X^2]
+        self.acc_count += torch.bincount(tp_targets, minlength=self.num_classes).float()
 
-        return acc_loss
+    def _compute_feat_loss(self, embeds: Tensor, targets: Tensor) -> Tensor:
+        """
+        Computes the Feature Loss weighted by Standard Deviation (Eq. 5 in the paper).
+        L_feat = || f_p - mu_k || / sigma_k
+        """
+        # Retrieve the correct MAV and STD for each pixel based on its target class
+        target_mavs = F.embedding(targets, self.mav)
+        target_stds = F.embedding(targets, self.std)
 
-    def update(self):
-        self.previous_features = self.features
-        self.previous_count = self.count
-        for c in self.var.keys():
-            self.var[c] = (self.ex2[c] - self.ex[c] ** 2 / (self.count[c] + 1e-8)) / (
-                self.count[c] + 1e-8
-            )
+        if embeds.dtype != target_mavs.dtype:
+            embeds = embeds.to(target_mavs.dtype)
 
-        # resetting for next epoch
-        self.count = torch.zeros(self.n_classes)  # count for class
-        self.features = {
-            i: torch.zeros(self.n_classes).cuda() for i in range(self.n_classes)
-        }
-        self.ex = {i: torch.zeros(self.n_classes).cuda() for i in range(self.n_classes)}
-        self.ex2 = {
-            i: torch.zeros(self.n_classes).cuda() for i in range(self.n_classes)
-        }
+        # L1 Distance weighted by STD
+        diff = torch.abs(embeds - target_mavs)
+        weighted_dist = diff / (
+            target_stds + 0.01
+        )  # Aggressive clamp to avoid too small denominator
 
-        return self.previous_features, self.var
+        # Sum over channels (C) to get total distance per pixel
+        dist_per_pixel = weighted_dist.sum(dim=1)
 
-    def read(self):
-        mav_tensor = torch.zeros(self.n_classes, self.n_classes)
-        for key in self.previous_features.keys():
-            mav_tensor[key] = self.previous_features[key]
-        return mav_tensor
+        # Optional Hinge Loss
+        if self.hinged:
+            dist_per_pixel = F.relu(dist_per_pixel - self.delta)
+
+        return dist_per_pixel.mean()
+
+    def _compute_cont_loss(self, embeds: Tensor, targets: Tensor) -> Tensor:
+        """
+        Aligns current batch class centroids with historical centroids.
+        """
+        # return_indices -> returns a 1D tensor like [2,0,1,2,0,...]
+        unique_labels, inverse_idx = torch.unique(targets, return_inverse=True)
+
+        # Aggregate features to form batch centroids
+        # Sums embeds into buckets based on class index (using inverse indices).
+        batch_centers = torch.zeros(
+            len(unique_labels),
+            self.num_classes,
+            device=embeds.device,
+            dtype=embeds.dtype,
+        )
+        batch_centers.index_add_(0, inverse_idx, embeds)
+
+        # Compute mean for each class
+        counts = torch.bincount(inverse_idx).float().unsqueeze(1).to(embeds.dtype)
+        batch_centers = batch_centers / counts.clamp(min=1.0)
+
+        # Normalize f_k onto the sphere
+        batch_centers = F.normalize(batch_centers, p=2, dim=1)
+
+        # Retrieve Historical Anchors (mu)
+        # These are the fixed centroids from the previous epoch.
+        hist_centers = F.normalize(self.mav, p=2, dim=1)
+
+        # Compute Similarity Matrix (Logits)
+        # [K_batch, Dim] @ [Dim, K_total] -> [K_batch, K_total]
+        # How similar is each current batch cluster to ALL historical clusters?
+        logits = torch.matmul(batch_centers, hist_centers.T) / self.tau
+
+        # Cross Entropy (InfoNCE)
+        # Maximizes similarity to the correct historical class (diagonal),
+        # Minimizes similarity to all other historical classes (off-diagonal).
+        return F.cross_entropy(logits, unique_labels)
+
+    def on_epoch_end(self) -> None:
+        """
+        MUST BE CALLED AT THE END OF EACH EPOCH.
+        Updates the frozen MAV and STD buffers using the accumulated stats.
+        """
+        # Avoid division by zero
+        safe_count = self.acc_count.unsqueeze(1).clamp(min=1e-8)
+
+        # Compute New Mean (MAV) -> E[X]
+        new_mav = self.acc_sum / safe_count
+
+        # Compute New Variance -> E[X^2] - (E[X])^2
+        E_x2 = self.acc_sq_sum / safe_count
+        new_var = E_x2 - (new_mav**2)
+
+        # Clamp for numerical stability (variance cannot be negative)
+        new_var = torch.clamp(new_var, min=1e-8)
+        new_std = torch.sqrt(new_var)
+
+        # Update buffers
+        self.mav.copy_(new_mav)
+        self.std.copy_(new_std)
+        self.initialized.fill_(1)
+
+        # Reset accumulators
+        self.acc_sum.zero_()
+        self.acc_sq_sum.zero_()
+        self.acc_count.zero_()

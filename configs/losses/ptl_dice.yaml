@@ -1,0 +1,20 @@
+seed: 42
+
+training:
+  wandb_base_run_name: "ptl_dice"
+
+model_cfg:
+  model:
+    params:
+      losses:
+        - type: PrototypicalGlobalLocalTripletLoss
+          params:
+            margin_global: 1.5
+            margin_local: 0.5
+            magnitude: 10
+            num_classes: 13
+            ignore_index: 254
+        - type: DiceLoss
+          params:
+            average: "macro"
+            ignore_index: 254

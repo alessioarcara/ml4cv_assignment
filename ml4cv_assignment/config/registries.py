@@ -15,8 +15,8 @@ from ml4cv_assignment.training.callbacks import (
     VisualizeSegmentationResultsCallback,
 )
 from ml4cv_assignment.training.losses import (
+    DMLLoss,
     ObjectosphereLoss,
-    OpenWorldDMLLoss,
     OWLoss,
     PrototypicalGlobalLocalTripletLoss,
     RejectedByAllLoss,
@@ -37,7 +37,7 @@ loss_registry.register(
     "PrototypicalGlobalLocalTripletLoss", PrototypicalGlobalLocalTripletLoss
 )
 loss_registry.register("ObjectosphereLoss", ObjectosphereLoss)
-loss_registry.register("OpenWorldDMLLoss", OpenWorldDMLLoss)
+loss_registry.register("OpenWorldDMLLoss", DMLLoss)
 loss_registry.register("RejectedByAllLoss", RejectedByAllLoss)
 
 # ------------------------

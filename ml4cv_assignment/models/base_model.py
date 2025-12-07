@@ -16,6 +16,7 @@ class BaseModel(nn.Module, ABC):
 
     Subclasses may optionally override:
     - `on_epoch_start`
+    - `on_train_epoch_start`
     - `on_train_epoch_end`
     """
 
@@ -33,15 +34,26 @@ class BaseModel(nn.Module, ABC):
 
     def on_train_epoch_start(self) -> None:
         """
-        Hook to be called at the beginning of a training epoch.
-        Override this method in subclasses to perform specific actions
+        Hook called at training epoch start.
         """
         pass
 
+    def on_train_epoch_end(self) -> None:
+        """
+        Hook called at training epoch end.
+        """
+        for loss_fn in self.losses:
+            hook = getattr(loss_fn, "on_epoch_end", None)
+
+            if hook is None and hasattr(loss_fn, "loss"):
+                hook = getattr(loss_fn.loss, "on_epoch_end", None)
+
+            if callable(hook):
+                hook()
+
     def on_eval_start(self) -> None:
         """
-        Hook to be called at the end of a training epoch.
-        Override this method in subclasses to perform specific actions
+        Hook called at evaluation start.
         """
         pass
 

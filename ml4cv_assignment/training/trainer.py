@@ -88,6 +88,10 @@ class Trainer:
     def _on_training_end(self) -> None:
         self._run_callbacks("on_train_end")
 
+    def _on_eval_start(self) -> None:
+        self.model.eval()
+        self.model.on_eval_start()
+
     def _on_eval_end(self) -> None:
         self._run_callbacks("on_eval_end")
 
@@ -95,9 +99,8 @@ class Trainer:
         self.model.train()
         self.model.on_train_epoch_start()
 
-    def _on_eval_start(self) -> None:
-        self.model.eval()
-        self.model.on_eval_start()
+    def _on_train_epoch_end(self) -> None:
+        self.model.on_train_epoch_end()
 
     def get_loader(self, stage: Stage) -> Optional[DataLoader]:
         match stage:
@@ -217,6 +220,8 @@ class Trainer:
                     batch_log = self._train_step(batch)
                     self._log_scheduler_lrs(batch_log)
                     wandb.log(batch_log)
+
+                self._on_train_epoch_end()
 
                 if epoch % self.config.evaluation_rate == 0:
                     self._on_eval_start()

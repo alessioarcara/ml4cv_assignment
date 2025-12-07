@@ -1,0 +1,17 @@
+training:
+  wandb_base_run_name: "dml_dice_losses"
+
+model_cfg:
+  model:
+    params:
+      losses:
+        - type: OpenWorldDMLLoss
+          params:
+            num_classes: 13
+            magnitude: 10
+            ignore_index: 254
+            alpha: 0.01
+        - type: DiceLoss
+          params:
+            average: "macro"
+            ignore_index: 254
