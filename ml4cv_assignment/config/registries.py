@@ -17,6 +17,7 @@ from ml4cv_assignment.training.callbacks import (
 from ml4cv_assignment.training.losses import (
     DMLLoss,
     ObjectosphereLoss,
+    OoDBCELoss,
     OWLoss,
     PrototypicalGlobalLocalTripletLoss,
     RejectedByAllLoss,
@@ -39,6 +40,7 @@ loss_registry.register(
 loss_registry.register("ObjectosphereLoss", ObjectosphereLoss)
 loss_registry.register("OpenWorldDMLLoss", DMLLoss)
 loss_registry.register("RejectedByAllLoss", RejectedByAllLoss)
+loss_registry.register("OoDBCELoss", OoDBCELoss)
 
 # ------------------------
 # Registry transformations

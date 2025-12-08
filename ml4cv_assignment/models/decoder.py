@@ -49,7 +49,7 @@ class BaseDecoder(nn.Module, ABC):
     @abstractmethod
     def build_fusion_block(self, cin: int, cout: int) -> nn.Module: ...
 
-    def forward(self, feats: Tuple[Tensor, ...]) -> Tensor:
+    def forward(self, feats: Tuple[Tensor, ...]) -> Tuple[Tensor, Tensor]:
         # feats[-1] -> lowest resolution, highest semantic
         # feats[0] -> highest resolution, lowest semantic
         x = self.aspp(feats[-1])
@@ -60,9 +60,11 @@ class BaseDecoder(nn.Module, ABC):
         for block, high_res_feat in zip(self.fusion_blocks, features_to_fuse):
             x = block(high_res_feat, x)
 
-        x = F.interpolate(x, size=self.input_size, mode="bilinear", align_corners=False)
+        prelogits = F.interpolate(
+            x, size=self.input_size, mode="bilinear", align_corners=False
+        )
 
-        return self.scoring_layer(x)
+        return self.scoring_layer(prelogits), prelogits
 
     @staticmethod
     def _compute_rates(height: int, stride: int) -> List[int]:

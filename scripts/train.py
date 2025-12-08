@@ -1,13 +1,11 @@
 import argparse
 import sys
-from pathlib import Path
 from typing import List
 
 import torch
 from loguru import logger
 
-from ml4cv_assignment.config.config import Config
-from ml4cv_assignment.config.utils import get_experiment_config
+from ml4cv_assignment.config.utils import build_config
 from ml4cv_assignment.training.trainer import Trainer
 from ml4cv_assignment.utils.misc import fix_random
 
@@ -15,19 +13,7 @@ torch.set_float32_matmul_precision("high")
 
 
 def main(config_paths: List[str]) -> None:
-    paths = [Path(p) for p in config_paths]
-
-    try:
-        merged_config_dict = get_experiment_config(paths)
-    except Exception as e:
-        logger.error(f"❌ Error merging configs: {e}")
-        sys.exit(1)
-
-    try:
-        cfg = Config.model_validate(merged_config_dict)
-    except Exception as e:
-        logger.error(f"❌ Configuration validation failed:\n{e}")
-        sys.exit(1)
+    cfg, merged_config_dict = build_config(config_paths)
 
     fix_random(cfg.seed)
 
@@ -52,7 +38,7 @@ def main(config_paths: List[str]) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Train segmentation model on Street Hazards"
+        description="Train segmentation model on StreetHazards"
     )
     parser.add_argument(
         "--configs",

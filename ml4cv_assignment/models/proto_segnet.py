@@ -5,6 +5,7 @@ import torch.nn as nn
 from torch import Tensor
 
 from ml4cv_assignment.models.base_model import BaseModel
+from ml4cv_assignment.models.ood_head import OoDHead
 
 
 class RunningCenters(nn.Module):
@@ -76,6 +77,8 @@ class ProtoSegNet(BaseModel):
         anchors_magnitude: float,
         use_running_centers: bool,
         centers_momentum: float,
+        use_ood_head: bool = False,
+        ood_head_hidden_dim: int = 256,
         losses: Optional[List[nn.Module]] = None,
     ) -> None:
         super().__init__(losses=losses)
@@ -94,6 +97,24 @@ class ProtoSegNet(BaseModel):
         self.alpha = alpha
         self.xi = xi
         self.use_running_centers = use_running_centers
+        self.use_ood_head = use_ood_head
+
+        self.ood_head: nn.Module = nn.Identity()
+        if self.use_ood_head:
+            if hasattr(decoder, "scoring_layer"):
+                decoder_channels: int = decoder.scoring_layer.in_channels  # type: ignore
+            else:
+                raise ValueError("Cannot infer `decoder_channels` for OoD head.")
+
+            self.ood_head = OoDHead(
+                in_channels=decoder_channels,
+                hidden_dim=ood_head_hidden_dim,
+                out_channels=1,
+                use_batch_norm=True,
+                use_leaky_relu=True,
+            )
+            self._freeze_module(self.encoder)
+            self._freeze_module(self.decoder)
 
         # fixed anchors shouldn't be saved in the state dict
         # they are only used to reset the anchors at the start of each epoch
@@ -104,8 +125,22 @@ class ProtoSegNet(BaseModel):
         if self.use_running_centers:
             self.running_centers = RunningCenters(num_classes, centers_momentum)
 
+    def _freeze_module(self, module: nn.Module) -> None:
+        for param in module.parameters():
+            param.requires_grad = False
+        module.eval()
+
     # override
     def get_param_groups(self) -> List[Dict[str, Any]]:
+        if self.use_ood_head:
+            return [
+                {
+                    "params": self.ood_head.parameters(),
+                    "lr": self.decoder_lr,
+                    "weight_decay": self.decoder_weight_decay,
+                }
+            ]
+
         return [
             {
                 "params": self.encoder.parameters(),
@@ -151,8 +186,13 @@ class ProtoSegNet(BaseModel):
         self, inputs: Dict[str, Tensor], return_preds: bool
     ) -> Dict[str, Tensor]:
         feats = self.encoder(inputs["pixel_values"])
-        logits = self.decoder(feats)
+        logits, prelogits = self.decoder(feats)
         outputs_dict = {"logits": logits}
+
+        # HACK: overwrite logits if OoD head is used
+        if self.use_ood_head:
+            ood_logits = self.ood_head(prelogits)
+            outputs_dict["logits"] = ood_logits
 
         needs_flat_processing = return_preds or (
             self.training and self.use_running_centers
@@ -182,8 +222,11 @@ class ProtoSegNet(BaseModel):
 
             outputs_dict["preds"] = preds
 
-            flat_ood_scores = self._compute_ood_scores(embeds, dists)
-            outputs_dict["ood_score"] = flat_ood_scores.view(B, H, W)
+            if self.use_ood_head:
+                outputs_dict["ood_score"] = ood_logits.squeeze(1).sigmoid()
+            else:
+                flat_ood_scores = self._compute_ood_scores(embeds, dists)
+                outputs_dict["ood_score"] = flat_ood_scores.view(B, H, W)
 
         return outputs_dict
 

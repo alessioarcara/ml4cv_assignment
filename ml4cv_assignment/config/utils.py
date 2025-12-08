@@ -1,8 +1,11 @@
-from typing import Any, Dict, List
+import sys
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
 
 from loguru import logger
-from pydantic import FilePath, validate_call
+from pydantic import FilePath, ValidationError, validate_call
 
+from ml4cv_assignment.config import Config
 from ml4cv_assignment.utils.io import read_yaml
 
 
@@ -22,7 +25,7 @@ def _deep_merge(a: Dict[str, Any], b: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @validate_call
-def get_experiment_config(config_paths: List[FilePath]) -> Dict[str, Any]:
+def _get_experiment_config(config_paths: List[FilePath]) -> Dict[str, Any]:
     """
     Loads and merges multiple YAML configuration files into a single configuration dictionary.
     Later files in the list override keys from earlier ones.
@@ -38,3 +41,38 @@ def get_experiment_config(config_paths: List[FilePath]) -> Dict[str, Any]:
         merged_config = _deep_merge(merged_config, config)
 
     return merged_config
+
+
+def build_config(config_paths: List[str]) -> Tuple[Config, Dict[str, Any]]:
+    """
+    Orchestrates the loading, merging, and validation of configuration files.
+
+    Args:
+        config_paths: A list of file paths (strings or Path objects).
+
+    Returns:
+        A tuple containing:
+        1. The validated Config object.
+        2. The raw merged dictionary.
+    """
+    if not config_paths:
+        logger.error("❌ No configuration paths provided.")
+        sys.exit(1)
+
+    paths = [Path(p) for p in config_paths]
+
+    try:
+        # Load and Merge configs
+        merged_config_dict = _get_experiment_config(paths)
+
+        # Validate merged config
+        config = Config.model_validate(merged_config_dict)
+
+        return config, merged_config_dict
+
+    except ValidationError as e:
+        logger.error(f"❌ Configuration validation failed:\n{e}")
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"❌ Error building config: {e}")
+        sys.exit(1)

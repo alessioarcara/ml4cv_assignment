@@ -1,0 +1,83 @@
+seed: 42
+
+dataset_config:
+  type: streethazards
+  add_anomalies: true 
+  prob_insert: 1.0
+
+training:
+  wandb_base_run_name: "ptl_dice_objectosphere"
+  num_workers: 15
+  train_transforms:
+    type: Compose
+    params:
+      transforms:
+        - type: LongestMaxSize 
+          params:
+            max_size: 640
+        - type: Normalize
+          params:
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            max_pixel_value: 255.0
+            p: 1.0
+        - type: ToTensorV2
+          params: 
+            p: 1.0
+
+  metrics:
+    - type: MeanIoU
+      params:
+        num_classes: 13
+        per_class: true
+        ignore_index: 13
+    - type: AUPR
+      params:
+        unknown_label: 13
+
+  callbacks:
+    - type: EarlyStoppingCallback
+      params:
+        patience: 10
+        minimize: false
+        history_key: val/OoDAUPR_epoch
+    - type: ModelSavingCallback
+      params:
+        out_dir: checkpoints  
+        minimize: false
+        history_key: val/OoDAUPR_epoch
+    - type: VisualizeSegmentationResultsCallback
+      params:
+        num_samples: 8
+    - type: ModelSummaryCallback
+      params: {}
+    - type: PixelEmbeddingsCallback
+      params:
+        anchors_magnitude: 10
+        min_num_pixels: 1000
+
+model_cfg:
+  model:
+    type: ProtoSegNet
+    params:
+      encoder_lr: 1e-5
+      decoder_lr: 1e-4
+      losses:
+        - type: PrototypicalGlobalLocalTripletLoss
+          params:
+            margin_global: 1.5
+            margin_local: 0.5
+            magnitude: 10
+            num_classes: 13
+            ignore_index: 13
+        - type: DiceLoss
+          params:
+            average: "macro"
+            ignore_index: 13
+        - type: ObjectosphereLoss
+          params:
+            xi: 5.0
+            unknown_label: 13
+
+paths:
+  checkpoint: checkpoints/ptl_dice_20251206_235304_val-mIoU_epoch_0.6933.pth
