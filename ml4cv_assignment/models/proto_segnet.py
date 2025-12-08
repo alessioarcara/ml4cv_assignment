@@ -113,8 +113,8 @@ class ProtoSegNet(BaseModel):
                 use_batch_norm=True,
                 use_leaky_relu=True,
             )
-            self._freeze_module(self.encoder)
-            self._freeze_module(self.decoder)
+            self.freeze_module(self.encoder)
+            self.freeze_module(self.decoder)
 
         # fixed anchors shouldn't be saved in the state dict
         # they are only used to reset the anchors at the start of each epoch
@@ -124,11 +124,6 @@ class ProtoSegNet(BaseModel):
 
         if self.use_running_centers:
             self.running_centers = RunningCenters(num_classes, centers_momentum)
-
-    def _freeze_module(self, module: nn.Module) -> None:
-        for param in module.parameters():
-            param.requires_grad = False
-        module.eval()
 
     # override
     def get_param_groups(self) -> List[Dict[str, Any]]:
@@ -187,35 +182,36 @@ class ProtoSegNet(BaseModel):
     ) -> Dict[str, Tensor]:
         feats = self.encoder(inputs["pixel_values"])
         logits, prelogits = self.decoder(feats)
+
+        # Overwrite logits if OoD head is used
+        if self.use_ood_head:
+            logits = self.ood_head(prelogits)
+
         outputs_dict = {"logits": logits}
 
-        # HACK: overwrite logits if OoD head is used
-        if self.use_ood_head:
-            ood_logits = self.ood_head(prelogits)
-            outputs_dict["logits"] = ood_logits
-
-        needs_flat_processing = return_preds or (
-            self.training and self.use_running_centers
-        )
-
-        if not needs_flat_processing:
+        update_centers = self.training and self.use_running_centers
+        if not (return_preds or update_centers):
             return outputs_dict
 
         B, C, H, W = logits.shape
         embeds = logits.permute(0, 2, 3, 1).contiguous().view(-1, C)
 
-        # Update centers
-        if self.training and self.use_running_centers:
+        if update_centers:
             self.running_centers.update(embeds, inputs["orig_masks"].view(-1))
 
         # Inference / Metrics
         if return_preds:
-            dists = torch.cdist(embeds, self.anchors, p=2)  # [B*H*W, C]
+            dists = None  # Lazy initialization since it's costly
+            needs_dists = self.use_running_centers or (not self.use_ood_head)
+
+            if needs_dists:
+                dists = torch.cdist(embeds, self.anchors, p=2)  # [B*H*W, C]
 
             # If using fixed orthogonal anchors, Max Logit is equivalent to Min Distance.
             # If using Running Centers (which might not be orthogonal),
             # we must use Min Distance to find the nearest center.
             if self.use_running_centers:
+                assert dists is not None
                 preds = torch.argmin(dists, dim=1).view(B, H, W)
             else:
                 preds = torch.argmax(logits, dim=1)
@@ -223,8 +219,9 @@ class ProtoSegNet(BaseModel):
             outputs_dict["preds"] = preds
 
             if self.use_ood_head:
-                outputs_dict["ood_score"] = ood_logits.squeeze(1).sigmoid()
+                outputs_dict["ood_score"] = logits.sigmoid().squeeze(1)
             else:
+                assert dists is not None
                 flat_ood_scores = self._compute_ood_scores(embeds, dists)
                 outputs_dict["ood_score"] = flat_ood_scores.view(B, H, W)
 

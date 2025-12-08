@@ -36,24 +36,14 @@ class Mask2Former(BaseModel):
             model_id, config=config, ignore_mismatched_sizes=True
         )
 
+        # We finetune only the mask-prediction MLP and the post-decoder classification layer
+        # to preserve the model closed-set performance.
         if freeze_all_except_heads:
-            self._freeze_parameters()
-
-    def _freeze_parameters(self):
-        """
-        We finetune only the mask-prediction MLP and the post-decoder classification layer
-        to preserve the model closed-set performance.
-        """
-        for p in self.model.parameters():
-            p.requires_grad = False
-
-        for (
-            p
-        ) in self.model.model.transformer_module.decoder.mask_predictor.parameters():
-            p.requires_grad = True
-
-        for p in self.model.class_predictor.parameters():
-            p.requires_grad = True
+            self.freeze_module(self.model)
+            self.unfreeze_module(
+                self.model.model.transformer_module.decoder.mask_predictor
+            )
+            self.unfreeze_module(self.model.class_predictor)
 
     # override
     def get_param_groups(self):

@@ -104,3 +104,19 @@ class BaseModel(nn.Module, ABC):
                     outputs["loss"] = total_loss
 
         return outputs
+
+    def freeze_module(self, module: nn.Module) -> None:
+        """
+        Freezes the parameters of a specified module.
+        """
+        for param in module.parameters():
+            param.requires_grad = False
+        module.eval()
+
+    def unfreeze_module(self, module: nn.Module) -> None:
+        """
+        Unfreezes the parameters of a specified module.
+        """
+        for param in module.parameters():
+            param.requires_grad = True
+        module.train()
