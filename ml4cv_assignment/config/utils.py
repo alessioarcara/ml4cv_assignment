@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from loguru import logger
 from pydantic import FilePath, ValidationError, validate_call
@@ -43,12 +43,15 @@ def _get_experiment_config(config_paths: List[FilePath]) -> Dict[str, Any]:
     return merged_config
 
 
-def build_config(config_paths: List[str]) -> Tuple[Config, Dict[str, Any]]:
+def build_config(
+    config_paths: List[str], overrides: Optional[Dict[str, Any]] = None
+) -> Tuple[Config, Dict[str, Any]]:
     """
     Orchestrates the loading, merging, and validation of configuration files.
 
     Args:
         config_paths: A list of file paths (strings or Path objects).
+        overrides: An optional dictionary for the final override.
 
     Returns:
         A tuple containing:
@@ -64,6 +67,9 @@ def build_config(config_paths: List[str]) -> Tuple[Config, Dict[str, Any]]:
     try:
         # Load and Merge configs
         merged_config_dict = _get_experiment_config(paths)
+
+        if overrides:
+            merged_config_dict = _deep_merge(merged_config_dict, overrides)
 
         # Validate merged config
         config = Config.model_validate(merged_config_dict)

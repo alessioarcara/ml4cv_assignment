@@ -1,0 +1,54 @@
+seed: 42
+
+dataset_config:
+  type: streethazards
+  add_anomalies: false 
+  mask_shift: true
+
+model_cfg:
+  model:
+    type: ProtoSegNet 
+    params:
+      encoder_lr: 1e-4
+      decoder_lr: 1e-3
+      encoder_weight_decay: 0.00001
+      decoder_weight_decay: 0.05
+      num_classes: 13
+      T: 1.0
+      alpha: 0.5
+      xi: 5.0
+      anchors_magnitude: 10.0
+      use_running_centers: false 
+      centers_momentum: 0.9
+      encoder:
+        type: timm
+        params:
+          model_name: "efficientnet_b2"
+          features_only: true
+          pretrained: true 
+          out_indices: [0, 1, 4]
+          output_stride: 8
+      decoder:
+        type: FaPNDecoder
+        params:
+          fpn_channels: [16, 24, 384]
+          decoder_channels: 128
+          num_classes: 13
+          input_size: [360, 640]
+          output_stride: 8
+
+training:
+  wandb_project_name: ml4cv_assignment
+  wandb_entity: aarcara
+  wandb_base_run_name: "data_analysis"
+  batch_size: 16
+  num_epochs: 100
+  evaluation_rate: 1
+  use_mixed_precision: true 
+  use_torch_compile: false 
+  num_workers: 8
+
+paths:
+  street_hazards_train_dir: ../datasets/train
+  street_hazards_test_dir: ../datasets/test
+  coco_data_dir: ../datasets/coco

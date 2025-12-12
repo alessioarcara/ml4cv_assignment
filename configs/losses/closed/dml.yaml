@@ -1,0 +1,13 @@
+training:
+  wandb_base_run_name: "dml"
+
+model_cfg:
+  model:
+    params:
+      losses:
+        - type: OpenWorldDMLLoss
+          params:
+            num_classes: 13
+            magnitude: 10
+            ignore_index: 254
+            alpha: 1.0

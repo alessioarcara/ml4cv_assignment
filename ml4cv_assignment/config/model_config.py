@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Dict
 
 from pydantic import BaseModel, Field
 
@@ -13,4 +13,8 @@ class ModelConfig(BaseModel, arbitrary_types_allowed=True):
     )
     use_preprocessor: bool = Field(
         False, description="Whether to use the Mask2Former processor during collation"
+    )
+    ckpt_remap: Dict[str, str] = Field(
+        default_factory=dict,
+        description="Map old checkpoint keys to new keys when loading weights",
     )

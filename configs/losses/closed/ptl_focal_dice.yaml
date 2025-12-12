@@ -1,7 +1,5 @@
-seed: 42
-
 training:
-  wandb_base_run_name: "ptl_dice"
+  wandb_base_run_name: "ptl_focal_dice"
 
 model_cfg:
   model:
@@ -14,6 +12,16 @@ model_cfg:
             magnitude: 10
             num_classes: 13
             ignore_index: 254
+        - type: WeightedLoss
+          params:
+            loss:
+              type: FocalLoss
+              params:
+                alpha: 1.0
+                gamma: 2.0
+                reduction: "mean"
+                ignore_index: 254
+            weight: 20.0
         - type: DiceLoss
           params:
             average: "macro"

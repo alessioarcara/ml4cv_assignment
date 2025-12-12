@@ -67,7 +67,7 @@ class TrainerConfig(BaseModel, arbitrary_types_allowed=True):
         self, transform_type: Type[A.BasicTransform], in_train: bool
     ) -> Optional[A.BasicTransform]:
         """
-        Search for a transform in train or validation pipeline
+        Recursively searches for a specific transform type in the train or validation pipeline.
         """
         transforms = (
             self.train_transforms.transforms
@@ -87,12 +87,17 @@ class TrainerConfig(BaseModel, arbitrary_types_allowed=True):
 
         return search(transforms)
 
-    @property
-    def denormalize(self) -> Denormalize:
-        normalize: Optional[A.Normalize] = self.find_transform(
-            A.Normalize, in_train=False
+    def get_denormalize(self, in_train: bool = False) -> Denormalize:
+        """
+        Factories a Denormalize object based on the Normalize transform found in the specified pipeline.
+        """
+        normalize_transform: Optional[A.Normalize] = self.find_transform(
+            A.Normalize, in_train=in_train
         )
-        if normalize is None:
-            raise ValueError("No Normalize transform found in val_transforms")
+        if normalize_transform is None:
+            pipeline_name = "train" if in_train else "validation"
+            raise ValueError(
+                f"No Normalize transform found in the {pipeline_name} pipeline."
+            )
 
-        return Denormalize(mean=normalize.mean, std=normalize.std)
+        return Denormalize(mean=normalize_transform.mean, std=normalize_transform.std)

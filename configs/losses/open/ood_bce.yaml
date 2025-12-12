@@ -1,13 +1,10 @@
-seed: 42
-
 dataset_config:
   type: streethazards
   add_anomalies: true 
   prob_insert: 1.0
 
 training:
-  wandb_base_run_name: "ptl_dice_objectosphere"
-  num_workers: 15
+  wandb_base_run_name: "ood_bce"
   train_transforms:
     type: Compose
     params:
@@ -51,33 +48,19 @@ training:
         num_samples: 8
     - type: ModelSummaryCallback
       params: {}
-    - type: PixelEmbeddingsCallback
-      params:
-        anchors_magnitude: 10
-        min_num_pixels: 1000
 
 model_cfg:
   model:
     type: ProtoSegNet
     params:
-      encoder_lr: 1e-5
-      decoder_lr: 1e-4
+      decoder_lr: 1e-3
+      use_ood_head: true
+      ood_head_hidden_dim: 256
       losses:
-        - type: PrototypicalGlobalLocalTripletLoss
+        - type: OoDBCELoss 
           params:
-            margin_global: 1.5
-            margin_local: 0.5
-            magnitude: 10
-            num_classes: 13
-            ignore_index: 13
-        - type: DiceLoss
-          params:
-            average: "macro"
-            ignore_index: 13
-        - type: ObjectosphereLoss
-          params:
-            xi: 5.0
             unknown_label: 13
+            ignore_index: 254
 
 paths:
   checkpoint: checkpoints/ptl_dice_20251206_235304_val-mIoU_epoch_0.6933.pth

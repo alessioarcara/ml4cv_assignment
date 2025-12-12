@@ -43,17 +43,6 @@ class DMLLoss(BasePixelMetricLearningLoss):
         super().__init__(num_classes, magnitude, ignore_index)
         self.alpha = alpha
 
-    def _compute_dists_sq(self, x: Tensor, c: Tensor) -> Tensor:
-        """
-        ||x - c||^2 = ||x||^2 + ||c||^2 - 2<x, c>
-        """
-        x2 = torch.sum(x**2, dim=1, keepdim=True)  # [N, 1]
-        c2 = torch.sum(c**2, dim=1).unsqueeze(0)  # [1, C]
-        xc = torch.mm(x, c.t())  # [N, C]
-
-        dists = x2 + c2 - 2 * xc  # [N, C]
-        return torch.clamp(dists, min=1e-12)
-
     def forward(
         self,
         embeds: Tensor,
@@ -63,11 +52,10 @@ class DMLLoss(BasePixelMetricLearningLoss):
         embeds: [B, C, H, W] predicted embeddings
         targets: [B, H, W] ground-truth labels
         """
-        embeds = embeds.permute(0, 2, 3, 1).contiguous()  # [B, H, W, C]
-
         embeds_flat, targets_flat, _ = self.preprocess_inputs(embeds, targets)
 
-        dists_sq = self._compute_dists_sq(embeds_flat, self.anchors)
+        dists = torch.cdist(embeds_flat, self.anchors, p=2)  # [N, C]
+        dists_sq = dists.pow(2)
 
         # ----------------------------------------
         # Discriminative Cross Entropy

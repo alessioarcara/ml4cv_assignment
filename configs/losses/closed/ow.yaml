@@ -1,0 +1,16 @@
+seed: 42
+
+training:
+  wandb_base_run_name: "ow"
+
+model_cfg:
+  model:
+    params:
+      losses:
+        - type: OWLoss
+          params:
+            num_classes: 13
+            tau: 0.1
+            w_feat: 0.5
+            w_cont: 0.5
+            ignore_index: 254

@@ -1,0 +1,57 @@
+seed: 42
+
+dataset_config:
+  type: streethazards
+  add_anomalies: false 
+  mask_shift: true
+
+model_cfg:
+  use_preprocessor: true 
+
+  model:
+    type: Mask2Former
+    params:
+      model_id: "facebook/mask2former-swin-tiny-cityscapes-semantic"
+      num_classes: 13
+      should_compute_hf_loss: true 
+
+training:
+  wandb_project_name: ml4cv_assignment
+  wandb_entity: aarcara
+  wandb_base_run_name: "mask2former"
+  batch_size: 8
+  num_epochs: 100
+  evaluation_rate: 1
+  use_mixed_precision: true 
+  use_torch_compile: false 
+  num_workers: 8
+
+  metrics:
+    - type: MeanIoU
+      params:
+        num_classes: 13
+        per_class: true
+        ignore_index: 13
+
+  callbacks:
+    - type: EarlyStoppingCallback
+      params:
+        patience: 10
+        minimize: false
+        history_key: val/mIoU_epoch
+    - type: ModelSavingCallback
+      params:
+        out_dir: checkpoints  
+        minimize: false
+        history_key: val/mIoU_epoch
+    - type: VisualizeSegmentationResultsCallback
+      params:
+        num_samples: 8
+    - type: ModelSummaryCallback
+      params: {}
+
+
+paths:
+  street_hazards_train_dir: datasets/train
+  street_hazards_test_dir: datasets/test
+  coco_data_dir: datasets/coco

@@ -11,6 +11,7 @@ StepOutput: TypeAlias = Dict[str, float]
 MetricResults: TypeAlias = Dict[str, float]
 Batch: TypeAlias = Dict[str, Tensor]
 OptTensor: TypeAlias = Union[Tensor, None]
+StateDict: TypeAlias = Dict[str, Tensor]
 
 
 class Stage(StrEnum):

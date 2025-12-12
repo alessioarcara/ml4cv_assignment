@@ -33,7 +33,7 @@ class Trainer:
         self.test_loader = test_loader
         self.callbacks = config.callbacks
         self.metric_collection = MetricCollection(config.metrics)
-        self.denormalize = config.denormalize
+        self.denormalize = config.get_denormalize()
         self.history: Dict[str, float] = {}
         self._stop_training = False
 

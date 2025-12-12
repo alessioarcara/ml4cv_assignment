@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
 
+import pandas as pd
 from loguru import logger
 from prettytable import PrettyTable
 from pydantic import validate_call
@@ -10,6 +11,10 @@ from ml4cv_assignment.utils.typings import MetricModality
 
 
 class WandBRetriever:
+    """
+    An utility class to retrieve metrics and media from WandB runs.
+    """
+
     def __init__(
         self,
         entity: str,
@@ -18,9 +23,19 @@ class WandBRetriever:
     ):
         self.entity = entity
         self.project = project
-        self.api = wandb.Api(overrides={"project": project, "entity": entity})
         self.download_dir = Path(download_dir)
         self.download_dir.mkdir(parents=True, exist_ok=True)
+
+        self._api: Optional[wandb.Api] = None
+
+    @property
+    def api(self):
+        if self._api is None:
+            logger.info("🔌 Connecting to WandB API...")
+            self._api = wandb.Api(
+                overrides={"project": self.project, "entity": self.entity}
+            )
+        return self._api
 
     def _get_step_from_name(self, filename: str) -> int:
         """
@@ -32,17 +47,20 @@ class WandBRetriever:
                 return int(part)
         return -1
 
-    def _download_media(self, file_obj, run_id: str) -> Optional[str]:
+    def _download_media(self, file_obj, run_dir: Path) -> Optional[str]:
         """
         Downloads a specified media file from a WandB run and saves it locally.
         """
+        target_path = run_dir / file_obj.name
+
+        if target_path.exists():
+            return str(target_path)
+
         try:
-            run_dir = self.download_dir / run_id
-            run_dir.mkdir(parents=True, exist_ok=True)
             # .download() returns a file object that needs to be closed after use
             f = file_obj.download(root=run_dir, replace=True)
             f.close()
-            return str(run_dir / file_obj.name)
+            return str(target_path)
         except Exception:
             return None
 
@@ -75,6 +93,7 @@ class WandBRetriever:
         mode: Literal["min", "max", "last"],
     ) -> List[Dict[str, Any]]:
         data = []
+
         scalar_keys = [
             k
             for k, t in metrics_config.items()
@@ -85,20 +104,41 @@ class WandBRetriever:
         keys_to_fetch = list(set(scalar_keys + [reference_metric, "_step"]))
 
         for rid in run_ids:
-            # 1. Retrieve the run
-            try:
-                path = f"{self.entity}/{self.project}/{rid}"
-                run = self.api.run(path)
-            except Exception as e:
-                logger.error(f"⚠️ Failed to retrieve run {rid}: {e}")
-                continue
+            run_result: Dict[str, Any] = {}
+            df = None
 
-            run_result = {"run_name": run.name}
+            run_dir = self.download_dir / rid
+            run_dir.mkdir(parents=True, exist_ok=True)
+            csv_path = run_dir / "history.csv"
 
-            # 2. Fetch history
-            df = run.history(keys=keys_to_fetch, pandas=True)
+            # 1. Try to load from cache first
+            if csv_path.exists():
+                logger.info(f"📂 Loading run {rid} from local CSV...")
+                try:
+                    df = pd.read_csv(csv_path)
+                    run_result["run_name"] = str(df.iloc[0]["run_name"])
+                except Exception as e:
+                    logger.warning(f"⚠️ Failed to load local CSV for run {rid}: {e}")
+                    df = None
 
-            if reference_metric not in df.columns:
+            # 2. Retrieve from WandB if local not available
+            # and cache it locally
+            if df is None:
+                try:
+                    path = f"{self.entity}/{self.project}/{rid}"
+                    run = self.api.run(path)
+
+                    df = run.history(keys=keys_to_fetch, pandas=True)
+                    df["run_name"] = run.name
+                    run_result["run_name"] = run.name
+
+                    df.to_csv(csv_path, index=False)
+
+                except Exception as e:
+                    logger.error(f"⚠️ Failed to retrieve run {rid}: {e}")
+                    continue
+
+            if df is None or reference_metric not in df.columns:
                 logger.warning(
                     f"⚠️ Reference metric '{reference_metric}' not found in run {run.name}. Skipping."
                 )
@@ -138,7 +178,7 @@ class WandBRetriever:
                     try:
                         target_file = target_files[best_idx]
 
-                        run_result[key] = self._download_media(target_file, run.name)
+                        run_result[key] = self._download_media(target_file, run_dir)
 
                     except IndexError:
                         logger.warning(

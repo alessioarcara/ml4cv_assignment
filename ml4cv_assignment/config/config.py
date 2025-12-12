@@ -17,6 +17,7 @@ from ml4cv_assignment.data.collate import collate_fn
 from ml4cv_assignment.data.data_utils import MultiEpochsDataLoader
 from ml4cv_assignment.data.streethazards import StreetHazards
 from ml4cv_assignment.models.base_model import BaseModel as MyModel
+from ml4cv_assignment.utils.checkpoint import remap_state_dict_keys
 
 
 class Config(BaseModel):
@@ -106,9 +107,20 @@ class Config(BaseModel):
     def model(self) -> MyModel:
         model = self.model_cfg.model
 
-        if self.paths.checkpoint is not None:
-            checkpoint = torch.load(self.paths.checkpoint, map_location="cpu")
-            model.load_state_dict(checkpoint, strict=False)
-            logger.info(f"Loaded weights from {self.paths.checkpoint}")
+        if self.paths.checkpoint:
+            ckpt = torch.load(self.paths.checkpoint, map_location="cpu")
+
+            state_dict = remap_state_dict_keys(ckpt, self.model_cfg.ckpt_remap)
+
+            missing_keys, unexpected_keys = model.load_state_dict(
+                state_dict, strict=False
+            )
+
+            if len(missing_keys) > 0:
+                logger.warning(f"Missing keys: {missing_keys}")
+            if len(unexpected_keys) > 0:
+                logger.warning(f"Unexpected keys: {unexpected_keys}")
+
+            logger.info("✅ Checkpoint loaded successfully")
 
         return model

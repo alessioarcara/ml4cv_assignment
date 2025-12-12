@@ -2,13 +2,20 @@
 Source: https://github.com/hendrycks/anomaly-seg/issues/15#issuecomment-890300278
 """
 
-from typing import List, Union
+import math
+import random
+from typing import Any, Callable, List, Optional, Tuple, Union
 
+import ipywidgets as widgets
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
+from IPython.display import clear_output, display
 from loguru import logger
 from PIL import Image
 
+from ml4cv_assignment.models.base_model import BaseModel as Model
+from ml4cv_assignment.utils.misc import resolve_device
 from ml4cv_assignment.utils.typings import MetricModality
 from ml4cv_assignment.utils.wandb_retriever import WandBRetriever
 
@@ -59,8 +66,78 @@ def apply_colormap(mask: np.ndarray, cmap_name: str = "jet") -> np.ndarray:
     return colored_rgb_uint8
 
 
-def _plot_lines(data: List[dict]):
-    _, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 5))
+def show_injected_outlier(sample, figsize: Tuple[int, int] = (12, 8)) -> None:
+    """
+    Visualizes an image with an injected outlier and its corresponding segmentation mask.
+
+    Args:
+        sample: A tuple containing the image and its ground truth mask.
+        figsize: Size of the figure for visualization.
+    """
+    img, gt_mask = sample
+    label_vis = color(gt_mask, COLORS)
+
+    fig, axs = plt.subplots(1, 2, figsize=figsize)
+
+    axs[0].imshow(img)
+    axs[0].set_title("Image (Outlier Injected)")
+    axs[0].axis("off")
+
+    axs[1].imshow(label_vis)
+    axs[1].set_title("Segmentation Mask")
+    axs[1].axis("off")
+
+    plt.tight_layout()
+    plt.show()
+
+
+def show_augmentations(
+    dataset: Any,
+    denorm: Callable[[torch.Tensor], np.ndarray],
+    idx: Optional[int] = None,
+    num_samples: int = 9,
+    cols: int = 3,
+) -> None:
+    """
+    Visualizes original image and its augmented versions from the dataset.
+
+    Args:
+        dataset: Torch Dataset object.
+        denorm: Function to convert tensor to numpy image (H, W, C).
+        idx: Index of the image. If None, random.
+        num_samples: Total images to show.
+        cols: Number of columns.
+    """
+    if idx is None:
+        idx = random.randint(0, len(dataset) - 1)
+
+    orig_img, _ = dataset.__getitem__(idx, apply_transforms=False)
+    imgs_to_show = [orig_img]
+
+    for _ in range(num_samples - 1):
+        aug_img, _ = dataset[idx]
+        imgs_to_show.append(denorm(aug_img))
+
+    rows = math.ceil(num_samples / cols)
+    _, axes = plt.subplots(rows, cols, figsize=(cols * 4, rows * 4))
+
+    axes = np.atleast_1d(axes).flatten()
+
+    for i, ax in enumerate(axes):
+        if i < len(imgs_to_show):
+            ax.imshow(imgs_to_show[i])
+            ax.set_title("Original" if i == 0 else f"Augmented {i}")
+            ax.axis("off")
+        else:
+            ax.set_visible(False)  # Hide unused subplots
+
+    plt.suptitle(f"Original and Augmented Images (Idx: {idx})", fontsize=14)
+    plt.tight_layout()
+    plt.show()
+
+
+def _plot_lines(data: List[dict]) -> None:
+    _, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 4))
 
     for run in data:
         name = run["run_name"]
@@ -69,19 +146,21 @@ def _plot_lines(data: List[dict]):
 
     ax1.set_title("Val Loss Comparison")
     ax1.set_xlabel("Epoch")
+    ax1.grid(True, linestyle="--", alpha=0.7)
     ax1.legend()
     ax2.set_title("Val mIoU Comparison")
     ax2.set_xlabel("Epoch")
+    ax2.grid(True, linestyle="--", alpha=0.7)
     ax2.legend()
     plt.tight_layout()
     plt.show()
 
 
-def _plot_radar(categories: List[str], data: dict):
+def _plot_radar(categories: List[str], data: dict) -> None:
     angles = np.linspace(0, 2 * np.pi, len(categories), endpoint=False).tolist()
     angles += angles[:1]  # Close the circle
 
-    _, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True))
+    _, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(polar=True))
     ax.set_facecolor("#fafafa")
     ax.grid(color="#b0b0b0", linestyle=":", linewidth=0.8, alpha=0.7)
     ax.spines["polar"].set_visible(False)
@@ -107,6 +186,7 @@ def compare_runs(
     run_ids: List[str],
     classes: List[str],
 ) -> None:
+    """Compares multiple runs using line and radar plots."""
     num_classes = len(classes) - 1  # Exclude anomaly class
 
     metrics_config = {
@@ -138,99 +218,83 @@ def compare_runs(
     _plot_radar(classes[:-1], radar_data)
 
 
-# def visualize_augmentations(dataset, data_transforms, denorm, num_samples=6, cols=3):
-#    img, _ = dataset.__getitem__(0, apply_transforms=False)  # original image
-#
-#    imgs = [img]
-#    for _ in range(num_samples - 1):
-#        augmented = data_transforms["train"](image=img)["image"]
-#        imgs.append(denorm(augmented))
-#
-#    rows = math.ceil(num_samples / cols)
-#    fig, axes = plt.subplots(rows, cols, figsize=(cols * 3, rows * 3))
-#
-#    axes = axes.flatten() if rows > 1 else [axes]
-#
-#    for i, ax in enumerate(axes):
-#        if i < num_samples:
-#            ax.imshow(imgs[i])
-#            ax.axis("off")
-#        else:
-#            ax.set_visible(False)  # Hide unused subplots
-#
-#    plt.suptitle("Original and Augmented Images", fontsize=14)
-#    plt.tight_layout()
-#    plt.show()
-#
-#
-# def visualize_added_outlier(sample, denorm, figsize=(12, 8)):
-#    fig, axs = plt.subplots(1, 2, figsize=figsize)
-#
-#    img = denorm(sample[0])
-#    axs[0].imshow(img)
-#    axs[0].set_title("Image")
-#    axs[0].axis("off")
-#
-#    label_vis = color(sample[1], COLORS)
-#    axs[1].imshow(label_vis)
-#    axs[1].set_title("Labels")
-#    axs[1].axis("off")
-#
-#    plt.tight_layout()
-#    plt.show()
-#
-#
+def interactive_inference_visualizer(
+    model: Model,
+    dataset: Any,
+    denorm: Callable[[torch.Tensor], np.ndarray],
+    device: Optional[Union[str, torch.device]] = None,
+):
+    """
+    Interactive visualizer for model inference on a dataset.
 
+    Args:
+        model: The segmentation model.
+        dataset: Dataset returning (image, ground_truth_mask) tuples.
+        denorm: Function to remove normalization and convert tensor to numpy image (H, W, C).
+        device: Device to run inference on.
+    """
+    device = resolve_device(device)
+    model = model.to(device)
+    model.eval()
 
-#
-# def visualize_predictions(segmenter, denorm, dataset, device, threshold: float = 0.5):
-#    def show_prediction(idx, threshold_value):
-#        img, mask = dataset[idx]
-#        img = img.unsqueeze(0).to(device)
-#
-#        closed_set_preds, open_set_probs = segmenter(img)
-#        open_set_mask = open_set_probs > threshold_value
-#
-#        open_set_preds = closed_set_preds.clone()
-#        open_set_preds[open_set_mask.squeeze(1)] = 13
-#
-#        plt.figure(figsize=(18, 10))
-#
-#        plt.subplot(231)
-#        plt.imshow(denorm(img))
-#        plt.title("Image")
-#        plt.axis("off")
-#
-#        plt.subplot(232)
-#        plt.imshow(color(mask.cpu().squeeze(), COLORS))
-#        plt.title("Ground-truth mask")
-#        plt.axis("off")
-#
-#        plt.subplot(233)
-#        plt.imshow(color(closed_set_preds.cpu().squeeze(), COLORS))
-#        plt.title("Closed-set mask")
-#        plt.axis("off")
-#
-#        plt.subplot(234)
-#        plt.imshow(open_set_probs.cpu().squeeze(), cmap="viridis")
-#        plt.title("Anomaly score")
-#        plt.axis("off")
-#
-#        plt.subplot(235)
-#        plt.imshow(color(open_set_preds.cpu().squeeze(), COLORS))
-#        plt.title("Open-set mask")
-#        plt.axis("off")
-#
-#        plt.tight_layout()
-#        plt.show()
-#
-#    idx_slider = widgets.IntSlider(
-#        value=0, min=0, max=len(dataset) - 1, step=1, description="Indice:"
-#    )
-#
-#    threshold_slider = widgets.FloatSlider(
-#        value=threshold, min=0.0, max=1.0, step=0.01, description="Threshold:"
-#    )
-#
-#    widgets.interact(show_prediction, idx=idx_slider, threshold_value=threshold_slider)
-#
+    idx_slider = widgets.IntSlider(
+        value=0, min=0, max=len(dataset) - 1, step=1, description="Index:"
+    )
+
+    out = widgets.Output()
+
+    @torch.inference_mode()
+    def update_plot(change):
+        idx = change["new"]
+
+        img, gt_mask = dataset[idx]
+        input_tensor = img.unsqueeze(0).to(device)  # [1, C, H, W]
+
+        inputs = {
+            "pixel_values": input_tensor,
+        }
+
+        outputs = model(inputs, return_preds=True)
+
+        closed_set_preds = outputs["preds"]
+        ood_score = outputs["ood_score"]
+
+        with out:
+            clear_output(wait=True)
+
+            # Layout 1x4: Img | GT Mask | Closed-set Preds | OOD Score
+            fig, axes = plt.subplots(1, 4, figsize=(20, 6))
+
+            img_vis = denorm(img)
+            # Original Image
+            axes[0].imshow(img_vis)
+            axes[0].set_title("Image")
+
+            # Ground-truth Mask
+            gt_vis = color(gt_mask.cpu().squeeze(), COLORS)
+            axes[1].imshow(gt_vis)
+            axes[1].set_title("Ground-truth mask")
+
+            # Closed-set Predictions
+            pred_vis = closed_set_preds.cpu().squeeze()
+            axes[2].imshow(color(pred_vis, COLORS))
+            axes[2].set_title("Closed-set mask")
+
+            # OOD Score
+            ood_vis = ood_score.cpu().squeeze()
+            im_ood = axes[3].imshow(ood_vis, cmap="viridis")
+            axes[3].set_title("Anomaly score")
+
+            plt.colorbar(im_ood, ax=axes[3], fraction=0.046, pad=0.04)
+
+            for a in axes:
+                a.axis("off")
+
+            plt.tight_layout()
+            plt.show()
+
+            plt.close(fig)
+
+    idx_slider.observe(lambda change: update_plot(change), names="value")
+    display(widgets.VBox([idx_slider, out]))
+    update_plot({"new": idx_slider.value})

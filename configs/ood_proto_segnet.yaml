@@ -1,12 +1,33 @@
-seed: 42
-
 dataset_config:
   type: streethazards
-  add_anomalies: true 
+  add_anomalies: true
   prob_insert: 1.0
 
+model_cfg:
+  model:
+    type: ProtoSegNet
+    params:
+      encoder_lr: 1e-5
+      decoder_lr: 1e-4
+      losses:
+        - type: DiceLoss
+          params:
+            average: "macro"
+            ignore_index: 13
+        - type: PrototypicalGlobalLocalTripletLoss
+          params:
+            margin_global: 1.5
+            margin_local: 0.5
+            magnitude: 10
+            num_classes: 13
+            ignore_index: 13
+        - type: ObjectosphereLoss
+          params:
+            xi: 5.0
+            unknown_label: 13
+
 training:
-  wandb_base_run_name: "ood_bce"
+  wandb_base_run_name: "ood_baseline_proto_segnet"
   train_transforms:
     type: Compose
     params:
@@ -16,8 +37,8 @@ training:
             max_size: 640
         - type: Normalize
           params:
-            mean: [0.485, 0.456, 0.406]
-            std: [0.229, 0.224, 0.225]
+            mean: [0.331, 0.346, 0.373]
+            std: [0.162, 0.160, 0.174]
             max_pixel_value: 255.0
             p: 1.0
         - type: ToTensorV2
@@ -50,20 +71,10 @@ training:
         num_samples: 8
     - type: ModelSummaryCallback
       params: {}
-
-model_cfg:
-  model:
-    type: ProtoSegNet
-    params:
-      decoder_lr: 1e-3
-      use_ood_head: true
-      ood_head_hidden_dim: 256
-      losses:
-        - type: OoDBCELoss 
-          params:
-            unknown_label: 13
-            ignore_index: 254
+    - type: PixelEmbeddingsCallback
+      params:
+        anchors_magnitude: 10
+        min_num_pixels: 1000
 
 paths:
-  #checkpoint: checkpoints/ptl_dice_20251206_235304_val-mIoU_epoch_0.6933.pth
-  checkpoint: checkpoints/ood_bce_20251208_035521_val-OoDAUPR_epoch_0.5944.pth
+  checkpoint: checkpoints/proto_segnet_efficientnet_b2_encoder_20251127_214917_val-mIoU_epoch_0.6772.pth

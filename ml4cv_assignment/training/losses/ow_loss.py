@@ -91,6 +91,7 @@ class OWLoss(nn.Module):
 
         # If initialized is False (first epoch), we don't have valid MAVs yet.
         if not self.initialized:
+            return self._compute_cont_loss(embeds_flat, targets_flat)
             return torch.tensor(0.0, device=embeds.device, requires_grad=True)
 
         # PROTOTYPE LOSS -> every pixel is attracted to its class MAV
@@ -133,6 +134,7 @@ class OWLoss(nn.Module):
             embeds = embeds.to(target_mavs.dtype)
 
         # L1 Distance weighted by STD
+        # |x - mu| / sigma
         diff = torch.abs(embeds - target_mavs)
         weighted_dist = diff / (
             target_stds + 0.01
@@ -145,7 +147,24 @@ class OWLoss(nn.Module):
         if self.hinged:
             dist_per_pixel = F.relu(dist_per_pixel - self.delta)
 
-        return dist_per_pixel.mean()
+        # --- Class balancing ---
+        loss_sum_class = torch.zeros(
+            self.num_classes, device=embeds.device, dtype=embeds.dtype
+        )
+
+        # Sum the loss per class
+        loss_sum_class.index_add_(0, targets, dist_per_pixel)
+
+        # Count pixels per class
+        count_per_class = (
+            torch.bincount(targets, minlength=self.num_classes).float().to(embeds.dtype)
+        )
+
+        # Mean loss per class (avoid division by zero)
+        mask = count_per_class > 0
+        mean_loss_per_class = loss_sum_class[mask] / count_per_class[mask]
+
+        return mean_loss_per_class.mean()
 
     def _compute_cont_loss(self, embeds: Tensor, targets: Tensor) -> Tensor:
         """

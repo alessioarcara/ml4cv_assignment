@@ -33,6 +33,8 @@ model_cfg:
             magnitude: 10
             num_classes: 13
             ignore_index: 254
+  ckpt_remap:
+    fam_blocks: "fusion_blocks"
 
 training:
   wandb_project_name: ml4cv_assignment
