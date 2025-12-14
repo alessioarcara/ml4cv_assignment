@@ -70,13 +70,13 @@ class Config(BaseModel):
     @property
     def dataloader(self) -> Callable[..., DataLoader]:
         processor = None
-        if self.model_cfg.use_preprocessor:
+        if self.model_cfg.preprocessor:
             processor = Mask2FormerImageProcessor(
                 do_resize=False,
                 do_rescale=False,
                 do_normalize=False,
                 num_labels=13,
-                ignore_index=255,
+                ignore_index=self.model_cfg.preprocessor.ignore_index,
             )
 
         collate_func = partial(collate_fn, processor=processor)

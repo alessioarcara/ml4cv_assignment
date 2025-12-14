@@ -2,6 +2,7 @@ from typing import Dict, List, Optional, Tuple
 
 import torch
 import torch.nn.functional as F
+from loguru import logger
 from torch import Tensor
 from transformers import (
     AutoConfig,
@@ -9,6 +10,9 @@ from transformers import (
 )
 
 from ml4cv_assignment.models.base_model import BaseModel
+from ml4cv_assignment.models.layers.modeling_mask2former import (
+    Mask2FormerPixelDecoder,
+)
 
 
 class Mask2Former(BaseModel):
@@ -21,6 +25,8 @@ class Mask2Former(BaseModel):
         losses: Optional[List[torch.nn.Module]] = None,
         freeze_all_except_heads: bool = False,
         should_compute_hf_loss: bool = True,
+        use_rba_decoder: bool = False,
+        decoder_num_layers: int = 2,
     ) -> None:
         super().__init__(losses=losses)
         self.lr = float(lr)
@@ -30,11 +36,28 @@ class Mask2Former(BaseModel):
         config = AutoConfig.from_pretrained(model_id)
         config.num_labels = num_classes
         config.pre_norm = True
-        config.decoder_layers = 2
+        config.decoder_layers = decoder_num_layers
 
         self.model = Mask2FormerForUniversalSegmentation.from_pretrained(
             model_id, config=config, ignore_mismatched_sizes=True
         )
+
+        if use_rba_decoder:
+            # Remove HF PixelDecoder and replace with custom one from RbA paper
+            original_decoder = self.model.model.pixel_level_module.decoder
+            feature_channels = original_decoder.feature_channels
+
+            custom_decoder = Mask2FormerPixelDecoder(config, feature_channels)
+
+            custom_decoder.load_state_dict(original_decoder.state_dict(), strict=False)
+
+            self.model.model.pixel_level_module.decoder = custom_decoder
+            logger.info("Using RbA Custom PixelDecoder")
+
+            self.model.model.transformer_module.num_feature_levels = 1
+            self.model.model.transformer_module.decoder.num_feature_levels = 1
+        else:
+            logger.info("Using Standard HuggingFace PixelDecoder")
 
         # We finetune only the mask-prediction MLP and the post-decoder classification layer
         # to preserve the model closed-set performance.

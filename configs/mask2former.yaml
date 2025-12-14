@@ -6,14 +6,19 @@ dataset_config:
   mask_shift: true
 
 model_cfg:
-  use_preprocessor: true 
+  preprocessor:
+    ignore_index: 254 
 
   model:
     type: Mask2Former
     params:
       model_id: "facebook/mask2former-swin-tiny-cityscapes-semantic"
       num_classes: 13
-      should_compute_hf_loss: true 
+      should_compute_hf_loss: true
+      lr: 10e-4
+      weight_decay: 0.05
+      use_rba_decoder: true
+      decoder_num_layers: 2
 
 training:
   wandb_project_name: ml4cv_assignment
@@ -31,7 +36,7 @@ training:
       params:
         num_classes: 13
         per_class: true
-        ignore_index: 13
+        ignore_index: 254
 
   callbacks:
     - type: EarlyStoppingCallback
@@ -49,7 +54,6 @@ training:
         num_samples: 8
     - type: ModelSummaryCallback
       params: {}
-
 
 paths:
   street_hazards_train_dir: datasets/train

@@ -4,7 +4,17 @@ Source: https://github.com/hendrycks/anomaly-seg/issues/15#issuecomment-89030027
 
 import math
 import random
-from typing import Any, Callable, List, Optional, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    Union,
+)
 
 import ipywidgets as widgets
 import matplotlib.pyplot as plt
@@ -12,12 +22,17 @@ import numpy as np
 import torch
 from IPython.display import clear_output, display
 from loguru import logger
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 from PIL import Image
 
-from ml4cv_assignment.models.base_model import BaseModel as Model
+from ml4cv_assignment.utils.charts import plot_radar_chart, plot_training_curves
 from ml4cv_assignment.utils.misc import resolve_device
+from ml4cv_assignment.utils.tables import print_eval_results, print_metrics_table
 from ml4cv_assignment.utils.typings import MetricModality
 from ml4cv_assignment.utils.wandb_retriever import WandBRetriever
+
+if TYPE_CHECKING:
+    from ml4cv_assignment.config import Config
 
 COLORS = np.array(
     [
@@ -136,55 +151,11 @@ def show_augmentations(
     plt.show()
 
 
-def _plot_lines(data: List[dict]) -> None:
-    _, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 4))
-
-    for run in data:
-        name = run["run_name"]
-        ax1.plot(run["val/loss_epoch"], label=name, linewidth=2)
-        ax2.plot(run["val/mIoU_epoch"], label=name, linewidth=2)
-
-    ax1.set_title("Val Loss Comparison")
-    ax1.set_xlabel("Epoch")
-    ax1.grid(True, linestyle="--", alpha=0.7)
-    ax1.legend()
-    ax2.set_title("Val mIoU Comparison")
-    ax2.set_xlabel("Epoch")
-    ax2.grid(True, linestyle="--", alpha=0.7)
-    ax2.legend()
-    plt.tight_layout()
-    plt.show()
-
-
-def _plot_radar(categories: List[str], data: dict) -> None:
-    angles = np.linspace(0, 2 * np.pi, len(categories), endpoint=False).tolist()
-    angles += angles[:1]  # Close the circle
-
-    _, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(polar=True))
-    ax.set_facecolor("#fafafa")
-    ax.grid(color="#b0b0b0", linestyle=":", linewidth=0.8, alpha=0.7)
-    ax.spines["polar"].set_visible(False)
-
-    for name, values in data.items():
-        values = values + values[:1]
-        ax.plot(angles, values, linewidth=2, label=name)
-        ax.fill(angles, values, alpha=0.15)
-
-    ax.set_xticks(angles[:-1])
-    ax.set_xticklabels(categories, size=9)
-    ax.set_ylim(0, 1.0)
-    ax.set_yticks([0.2, 0.4, 0.6, 0.8, 1.0])
-    ax.set_yticklabels(["0.2", "0.4", "0.6", "0.8", "1.0"], color="grey", size=8)
-
-    plt.title("Class-wise Val IoU Comparison", y=1.08)
-    plt.legend(loc="upper right", bbox_to_anchor=(1.3, 1.1))
-    plt.show()
-
-
-def compare_runs(
+def show_runs_comparison(
     retriever: WandBRetriever,
     run_ids: List[str],
     classes: List[str],
+    mode: Literal["closed", "open"] = "closed",
 ) -> None:
     """Compares multiple runs using line and radar plots."""
     num_classes = len(classes) - 1  # Exclude anomaly class
@@ -197,6 +168,9 @@ def compare_runs(
             for i in range(num_classes)
         },
     }
+
+    if mode == "open":
+        metrics_config["val/OoDAUPR_epoch"] = MetricModality.FULL
 
     data = retriever.get_metrics(
         run_ids=run_ids,
@@ -214,31 +188,66 @@ def compare_runs(
         for run in data
     }
 
-    _plot_lines(data)
-    _plot_radar(classes[:-1], radar_data)
+    print_metrics_table(data, mode=mode)
+    plot_training_curves(data)
+    plot_radar_chart(classes[:-1], radar_data)
+
+
+def show_split_results(
+    results: Dict[str, float],
+    classes: List[str],
+    metric_names: List[str] = ["mIoU", "OoDAUPR"],
+) -> None:
+    """
+    Shows a table for key metrics and a radar chart for class-wise IoU.
+
+    Args:
+        results: Dictionary containing evaluation results.
+        classes: List of class names.
+        metric_names: List of substrings to search for in keys.
+    """
+
+    def find_val(search_str):
+        return next((v for k, v in results.items() if search_str in k), 0.0)
+
+    # --- Metric Table ---
+    metric_data = {name: find_val(name) for name in metric_names}
+    print_eval_results(metric_data, "Quantitative Results")
+
+    # --- Radar Chart ---
+    plot_classes = classes[:-1]
+    radar_values = [find_val(f"IoU_class_{i}") for i in range(len(plot_classes))]
+    plot_radar_chart(classes[:-1], {"run": radar_values})
 
 
 def interactive_inference_visualizer(
-    model: Model,
-    dataset: Any,
-    denorm: Callable[[torch.Tensor], np.ndarray],
+    cfg: "Config",
+    split: Literal["val", "test"],
     device: Optional[Union[str, torch.device]] = None,
 ):
     """
     Interactive visualizer for model inference on a dataset.
 
     Args:
-        model: The segmentation model.
-        dataset: Dataset returning (image, ground_truth_mask) tuples.
-        denorm: Function to remove normalization and convert tensor to numpy image (H, W, C).
+        cfg: Configuration object containing model and dataset.
+        split: Dataset split to visualize ('val' or 'test').
         device: Device to run inference on.
     """
     device = resolve_device(device)
-    model = model.to(device)
+
+    model = cfg.model.to(device)
     model.eval()
 
+    dataset = cfg.val_dataset if split == "val" else cfg.test_dataset
+    denorm = cfg.training.get_denormalize()
+
     idx_slider = widgets.IntSlider(
-        value=0, min=0, max=len(dataset) - 1, step=1, description="Index:"
+        value=0,
+        min=0,
+        max=len(dataset) - 1,
+        step=1,
+        description="Index:",
+        continuous_update=False,
     )
 
     out = widgets.Output()
@@ -285,7 +294,10 @@ def interactive_inference_visualizer(
             im_ood = axes[3].imshow(ood_vis, cmap="viridis")
             axes[3].set_title("Anomaly score")
 
-            plt.colorbar(im_ood, ax=axes[3], fraction=0.046, pad=0.04)
+            # Colorbar for OOD Score
+            divider = make_axes_locatable(axes[3])
+            cax = divider.append_axes("right", size="5%", pad=0.05)
+            plt.colorbar(im_ood, cax=cax)
 
             for a in axes:
                 a.axis("off")

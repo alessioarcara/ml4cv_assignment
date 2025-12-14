@@ -1,0 +1,54 @@
+dataset_config:
+  type: streethazards
+  add_anomalies: true
+  prob_insert: 1.0
+
+model_cfg:
+  preprocessor:
+    ignore_index: 13
+
+  model:
+    type: Mask2Former 
+    params:
+      lr: 1e-4
+      weight_decay: 0.05
+      freeze_all_except_heads: true
+      should_compute_hf_loss: true
+      losses:
+        - type: RejectedByAllLoss
+          params:
+            alpha: 5.0
+            unknown_label: 13
+
+training:
+  wandb_base_run_name: "ood_mask2former"
+
+  metrics:
+    - type: MeanIoU
+      params:
+        num_classes: 13
+        per_class: true
+        ignore_index: 13
+    - type: AUPR
+      params:
+        unknown_label: 13
+
+  callbacks:
+    - type: EarlyStoppingCallback
+      params:
+        patience: 10
+        minimize: false
+        history_key: val/OoDAUPR_epoch
+    - type: ModelSavingCallback
+      params:
+        out_dir: checkpoints  
+        minimize: false
+        history_key: val/OoDAUPR_epoch
+    - type: VisualizeSegmentationResultsCallback
+      params:
+        num_samples: 8
+    - type: ModelSummaryCallback
+      params: {}
+
+paths:
+  checkpoint: checkpoints/mask2former_20251214_032006_val-mIoU_epoch_0.6833.pth

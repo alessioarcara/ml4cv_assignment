@@ -1,6 +1,6 @@
 dataset_config:
   type: streethazards
-  add_anomalies: false 
+  add_anomalies: true 
   prob_insert: 1.0
 
 training:
@@ -83,5 +83,4 @@ model_cfg:
             unknown_label: 13
 
 paths:
-  #checkpoint: checkpoints/ptl_focal_dice_20251209_153320_val-mIoU_epoch_0.6799.pth
-  checkpoint: checkpoints/ptl_focal_dice_objectosphere_20251210_173516_val-OoDAUPR_epoch_0.7718.pth
+  checkpoint: checkpoints/ptl_focal_dice_20251209_153320_val-mIoU_epoch_0.6799.pth

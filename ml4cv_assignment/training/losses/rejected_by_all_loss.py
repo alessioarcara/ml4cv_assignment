@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from torch import Tensor
 
 
+# Adapted from https://github.com/NazirNayal8/RbA/blob/main/mask2former/modeling/criterion.py
 class RejectedByAllLoss(nn.Module):
     def __init__(self, alpha: float = 5.0, unknown_label: int = -1) -> None:
         super().__init__()

@@ -1,29 +1,39 @@
 import argparse
-from typing import List
+from typing import Any, Dict, List, Literal, Optional
 
 import torch
 
 from ml4cv_assignment.config.utils import build_config
-from ml4cv_assignment.training.trainer import Trainer
-from ml4cv_assignment.utils.misc import display_eval_results, fix_random
-from ml4cv_assignment.utils.typings import Stage
-
-torch.set_float32_matmul_precision("high")
+from ml4cv_assignment.evaluation import evaluate_split
+from ml4cv_assignment.utils.misc import print_eval_results
 
 
-def main(config_paths: List[str]) -> None:
-    cfg, merged_config_dict = build_config(config_paths)
+def main(
+    config_paths: List[str],
+    split: Literal["val", "test"],
+    checkpoint_path: Optional[str],
+) -> None:
+    torch.set_float32_matmul_precision("high")
 
-    fix_random(cfg.seed)
+    override_config: Dict[str, Any] = {}
 
-    trainer = Trainer(
-        config=cfg.training,
-        model=cfg.model,
-        test_loader=cfg.test_dataloader,
-        experiment_raw_config=merged_config_dict,
-    )
+    # If the user wants to evaluate a specific checkpoint, override the config
+    if checkpoint_path:
+        override_config["paths"] = {"checkpoint": checkpoint_path}
 
-    display_eval_results(trainer.eval(Stage.TEST), title="Test Set Evaluation")
+    # Enforces the injection of anomalies only for only the validation set to
+    # serve as a proxy for OoD performance evaluation
+    if split == "val":
+        override_config["dataset_config"] = {"add_anomalies": True, "prob_insert": 1.0}
+    elif split == "test":
+        override_config["dataset_config"] = {"add_anomalies": False}
+    else:
+        raise ValueError(f"Invalid split: {split}. Must be 'val' or 'test'.")
+
+    cfg, _ = build_config(config_paths, override_config)
+
+    results = evaluate_split(cfg=cfg, split=split)
+    print_eval_results(results, title=f"{split.capitalize()} Set Evaluation")
 
 
 if __name__ == "__main__":
@@ -37,5 +47,19 @@ if __name__ == "__main__":
         required=True,
         help="Paths to the YAML config files",
     )
+    parser.add_argument(
+        "--split",
+        type=str,
+        choices=["val", "test"],
+        default="test",
+        help="Dataset split to evaluate on (default: test)",
+    )
+    parser.add_argument(
+        "--checkpoint_path",
+        type=str,
+        default=None,
+        help="Path to a specific model checkpoint to load",
+    )
     args = parser.parse_args()
-    main(args.configs)
+
+    main(args.configs, args.split, args.checkpoint_path)

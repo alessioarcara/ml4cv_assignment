@@ -14,7 +14,7 @@ echo "Lock acquired. Starting experiments..."
 EXPERIMENTS=(
   # Baseline model 
   #"configs/base.yaml configs/transforms/full.yaml configs/proto_segnet.yaml"
-  "configs/base.yaml configs/transforms/full.yaml configs/proto_segnet.yaml configs/ood_proto_segnet.yaml"
+  #"configs/base.yaml configs/transforms/full.yaml configs/proto_segnet.yaml configs/ood_proto_segnet.yaml"
 
   # Encoder ablation
   #"configs/base.yaml configs/transforms/full.yaml configs/encoders/resnet_18d.yaml"
@@ -56,6 +56,10 @@ EXPERIMENTS=(
   #"configs/base.yaml configs/transforms/ablation_result.yaml configs/decoders/fpn_no_aspp.yaml configs/losses/open/ptl_dice_objectosphere.yaml"
   #"configs/base.yaml configs/transforms/ablation_result.yaml configs/decoders/fpn_no_aspp.yaml configs/losses/open/ptl_focal_objectosphere.yaml"
   #"configs/base.yaml configs/transforms/ablation_result.yaml configs/decoders/fpn_no_aspp.yaml configs/losses/open/ptl_focal_dice_objectosphere.yaml"
+
+  # Mask2Former RbA
+  "configs/transforms/ablation_result.yaml configs/mask2former.yaml"
+  #"configs/transforms/ablation_result.yaml configs/mask2former.yaml configs/ood_mask2former.yaml"
 )
 
 echo "Found ${#EXPERIMENTS[@]} experiments to run."
