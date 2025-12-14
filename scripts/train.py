@@ -9,10 +9,10 @@ from ml4cv_assignment.config.utils import build_config
 from ml4cv_assignment.training.trainer import Trainer
 from ml4cv_assignment.utils.misc import fix_random
 
-torch.set_float32_matmul_precision("high")
-
 
 def main(config_paths: List[str]) -> None:
+    torch.set_float32_matmul_precision("high")
+
     cfg, merged_config_dict = build_config(config_paths)
 
     fix_random(cfg.seed)

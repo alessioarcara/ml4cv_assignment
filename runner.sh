@@ -58,8 +58,8 @@ EXPERIMENTS=(
   #"configs/base.yaml configs/transforms/ablation_result.yaml configs/decoders/fpn_no_aspp.yaml configs/losses/open/ptl_focal_dice_objectosphere.yaml"
 
   # Mask2Former RbA
-  "configs/transforms/ablation_result.yaml configs/mask2former.yaml"
-  #"configs/transforms/ablation_result.yaml configs/mask2former.yaml configs/ood_mask2former.yaml"
+  #"configs/transforms/ablation_result.yaml configs/mask2former.yaml"
+  "configs/transforms/ablation_result.yaml configs/mask2former.yaml configs/ood_mask2former.yaml"
 )
 
 echo "Found ${#EXPERIMENTS[@]} experiments to run."

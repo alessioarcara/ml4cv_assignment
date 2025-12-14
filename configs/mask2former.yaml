@@ -15,9 +15,9 @@ model_cfg:
       model_id: "facebook/mask2former-swin-tiny-cityscapes-semantic"
       num_classes: 13
       should_compute_hf_loss: true
-      lr: 10e-4
+      lr: 1e-5
       weight_decay: 0.05
-      use_rba_decoder: true
+      use_rba_decoder: false 
       decoder_num_layers: 2
 
 training:
