@@ -1,46 +1,125 @@
 # Machine Learning for Computer Vision Assignment
-University of Bologna, A.Y. 2024–2025.\
-francesco.ballerini4@unibo.it
+A.Y. 2024–2025.\
+alessio.arcara@studio.unibo.it
 
 ---
 
-## Introduction
-Over the last few years, a large portion of the semantic segmentation literature has been focusing on improving the segmentation performance on urban-scene images. However, traditional semantic segmentation methods cannot identify *unexpected objects* (i.e. object not included in the pre-defined classes seen during training), as they predict all pixels as belonging to one of those pre-defined classes. Addressing such an issue is crucial, especially for safety-critical applications such as autonomous driving: wrongly predicting a cat (i.e. an unexpected object) on the road as the road itself does not stop the autonomous vehicle, which may lead to roadkill. In this safety-critical scenario, the cat should be detected as an unexpected object; this information should then prompt the autonomous vehicle to handle the object differently (e.g. decide whether to stop the car or circumvent the cat).
+## Overview 
 
-This task, which I will call ***semantic segmentation of unexpected objects on roads***, is more generally referred to in the literature as *open-set semantic segmentation*, *open-world semantic segmentation*, or *anomaly segmentation*, each with slightly different nuances of meaning depending on the paper (it would not be true deep learning otherwise).
+Standard segmentation models fail to detect unexpected road hazards (e.g., animals or lost cargo), posing severe risks to autonomous driving. This project tackles **Open-Set Semantic Segmentation** to identify these anomalies while maintaining high-quality closed-set segmentation masks.
 
-## Dataset
-The dataset you are going to work with is called StreetHazards [[1](https://arxiv.org/abs/1911.11132)]. It was created with the [CARLA](https://carla.org/) simulation environment in combination with Unreal Engine in order to realistically insert anomalous objects into synthetic urban scenes. The dataset contains 5125 training `(image, segmentation_map)` pairs, 1031 validation pairs, and 1500 test pairs. The training and validation sets feature 12 classes: `building`, `fence`, `other`, `pedestrian`, `pole`, `road line`, `road`, `sidewalk`, `vegetation`, `car`, `wall`, and `traffic sign`. The 13th class is the `anomaly` class, which appears in the test set only.
+<div align="center">
+  <p>An example of open-set segmentation</p>
+  <img src="assets/both.png" alt="Open-set segmentation" width="700"/>
+</div>
+
+## Installation
+
+### 1. **Clone the repository:**
+
+```bash
+git clone https://github.com/alessioarcara/ml4cv_assignment
+cd ml4cv_assignment
+```
+
+### 2. **Set up the environment:**
+
+You can set up the environment using `uv` or standard `pip`.
+
+#### Option A: Using uv (recommended)
+
+```bash
+uv venv
+source .venv/bin/activate  # On Windows use `.venv\Scripts\activate`
+uv sync
+```
+
+#### Option B: Using pip
+
+This project adheres to PEP 621 standards using `pyproject.toml`.
+
+```bash
+python -m venv venv
+source venv/bin/activate   # On Windows: venv\Scripts\activate
+pip install -e .
+```
+
+### 3. **Dataset setup:**
+
+The dataset must be downloaded manually from the links provided above and extracted into the `datasets/` folder. Create the folder if it does not exist. The resulting structure should look like this:
+
+```plain
+├── datasets/
+│   ├── test/           # Extracted from streethazards_test.tar
+│   └── train/          # Extracted from streethazards_train.tar
+```
 
 * [Training and validation sets download link](https://people.eecs.berkeley.edu/~hendrycks/streethazards_train.tar)
 * [Test set download link](https://people.eecs.berkeley.edu/~hendrycks/streethazards_test.tar)
 
-Here is an example of a test pair, where a single anomalous object appears (a cat):
+## Usage
 
-<p align="center">
-  <img src="assets/both.png" />
-</p>
+All experiments were conducted locally on a dedicated machine with an **NVIDIA RTX 3090 GPU**.
 
-Segmentation maps like the one above can be produced with [this script](utils/visualize.py).
+This project extensively uses configuration files to manage experiments. To see how to use configurations, please refer to the `configs/` folder. You can compose multiple config files to override specific parameters.
 
-## Goal
-Your goal is to implement a model that is able to predict segmentation maps of input images, including masks of both known classes and the `anomaly` class. Test set `(image, semgmentation_map)` pairs (and, hence, the `anomaly` class) should remain **unseen** during training and only be used at test time.
+### Training a model
 
-## Rules
-In order to achieve the aforementioned goal, you are allowed to use **any** method of your choice, either existing (see § [References](#references)), re-adapted, or even invented by yourself. From an implementation standpoint, you can:
-* Use off-the-shelf pre-implemented PyTorch models.
-* Use pre-trained weights.
-* Use portions of existing code found in public repositories. If so, cite the source you took the code from.
-* Use any existing library for computing metrics, displaying results or providing any other functionality you need.
+To train a model, use the provided training script. You can pass one or multiple configuration files:
 
-Teams are not allowed: the assignment must be done **individually**.
+```bash
+uv run python scripts/train.py --configs configs/base.yaml configs/experiment_1.yaml
+```
 
-## Submission
+**Arguments:**
+* `--configs`: One or more paths to YAML config files (space-separated).
 
-### What to submit
-You must submit the following files:
-* A notebook called `main.ipynb`. You can either put all the code into the notebook or separate it into python scripts referenced by the notebook and use the notebook only for visualization purposes and textual explanations. The notebook must be runnable: disable the training (if you leave the training code inside the notebook) and load the model(s) weights to run inference. The first cell of the notebook must contain your student ID, full name, and institutional email.
-* The weights of your model(s) saved as `.pt` file(s).
-* A `README.md` describing your project structure and providing instructions on how to run it: specifically, tell me if I should run it locally or on Colab, Kaggle, etc.
-* If the notebook runs locally, a `requirements.txt` containing the packages I need to install to run it.
-* Any other file needed to run the notebook.
+For extensive ablation studies, the `runner.sh` script is available as reference. It automates the execution of `train.py` across multiple experiments:
+
+```bash
+bash runner.sh
+```
+
+### Evaluating a trained model
+
+To evaluate a model, use the `eval.py` script:
+
+```bash
+uv run python scripts/eval.py \
+    --configs configs/base.yaml configs/experiment_1.yaml \
+    --split test \
+    --checkpoint_path output/checkpoints/best_model.pth
+```
+
+**Arguments:**
+* `--configs`: One or more paths to YAML config files (space-separated).
+* `--split`: The dataset split to evaluate on (test or val). Defaults to test.
+* `--checkpoint_path`: (Optional) Path to a specific .pth model file. If not provided, the script will look for the default checkpoint defined in your config.
+
+## Project Structure
+
+```plain
+ml4cv_assignment/
+├── assets/             # Images for README/Notebooks
+├── checkpoints/        # Model checkpoints
+├── configs/            # YAML experiment configurations 
+│   ├── base.yaml       # Base configuration
+│   └── ...
+├── datasets/           # Dataset directory
+│   ├── test/           # Extracted from streethazards_test.tar
+│   └── train/          # Extracted from streethazards_train.tar
+├── ml4cv_assignment/   # Main package
+│   ├── config/         # Pydantic schemas and configuration logic
+│   ├── data/           # Dataset, augmentations and collation
+│   ├── models/         # Network architectures
+│   ├── training/       # Training loop, losses, metrics and callbacks
+│   └── utils/          # Utilities (Visualization, Logging, IO)
+├── notebooks/          
+│   ├── main.ipynb      # 📄 MAIN REPORT
+├── scripts/            # Entry points
+│   ├── eval.py         # Evaluation script
+│   └── train.py        # Training script
+├── runner.sh           # Bash script for batch experiments
+├── pyproject.toml      # Project dependencies and metadata
+└── README.md           # Project setup instructions
+```

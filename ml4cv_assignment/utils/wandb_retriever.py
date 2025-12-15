@@ -91,7 +91,11 @@ class WandBRetriever:
         metrics_config: Dict[str, MetricModality],
         reference_metric: str,
         mode: Literal["min", "max", "last"],
+        force_download: bool = False,
     ) -> List[Dict[str, Any]]:
+        """
+        Retrieves specified metrics and media from WandB runs with local caching.
+        """
         data = []
 
         scalar_keys = [
@@ -111,51 +115,50 @@ class WandBRetriever:
             run_dir.mkdir(parents=True, exist_ok=True)
             csv_path = run_dir / "history.csv"
 
-            # 1. Try to load from cache first
-            if csv_path.exists():
-                logger.info(f"📂 Loading run {rid} from local CSV...")
+            # --- 1. Load Run History (Local Cache or WandB Download) ---
+            # A. Attempt to load from local cache
+            if csv_path.exists() and not force_download:
                 try:
+                    logger.info(f"📂 Loading run {rid} from local CSV...")
                     df = pd.read_csv(csv_path)
                     run_result["run_name"] = str(df.iloc[0]["run_name"])
                 except Exception as e:
-                    logger.warning(f"⚠️ Failed to load local CSV for run {rid}: {e}")
+                    logger.warning(
+                        f"⚠️ [Run {rid}] Failed to read local CSV, will re-download: {e}"
+                    )
                     df = None
 
-            # 2. Retrieve from WandB if local not available
-            # and cache it locally
+            # B. Download from WandB if cache is missing or forced
             if df is None:
                 try:
-                    path = f"{self.entity}/{self.project}/{rid}"
-                    run = self.api.run(path)
+                    logger.info(f"🌐 Retrieving run {rid} from WandB...")
+                    run = self.api.run(f"{self.entity}/{self.project}/{rid}")
 
-                    df = run.history(keys=keys_to_fetch, pandas=True)
+                    df = run.history(keys=keys_to_fetch, pandas=True, samples=100000)
                     df["run_name"] = run.name
                     run_result["run_name"] = run.name
 
                     df.to_csv(csv_path, index=False)
-
                 except Exception as e:
-                    logger.error(f"⚠️ Failed to retrieve run {rid}: {e}")
+                    logger.error(f"❌ [Run {rid}] Failed to retrieve run data: {e}")
                     continue
 
             if df is None or reference_metric not in df.columns:
                 logger.warning(
-                    f"⚠️ Reference metric '{reference_metric}' not found in run {run.name}. Skipping."
+                    f"⚠️ [Run {rid}] Reference metric '{reference_metric}' not found. Skipping."
                 )
                 data.append(run_result)
                 continue
 
-            # 3. Get the best index based on the reference metric
-            ref_series = df[reference_metric]
-
+            # --- 2. Get the best index based on the reference metric ---
             if mode == "min":
-                best_idx = ref_series.idxmin()
+                best_idx = df[reference_metric].idxmin()
             elif mode == "max":
-                best_idx = ref_series.idxmax()
+                best_idx = df[reference_metric].idxmax()
             else:  # mode == "last"
-                best_idx = ref_series.index[-1]
+                best_idx = df.index[-1]
 
-            # 4. Collect scalar metrics
+            # --- 3. Collect scalar metrics ---
             for key in scalar_keys:
                 if key not in df:
                     run_result[key] = None
@@ -168,23 +171,64 @@ class WandBRetriever:
                     case MetricModality.SINGLE:
                         run_result[key] = df.loc[best_idx, key]
 
-            # 4. Download media files
-            if media_keys:
-                all_files = list(run.files())  # Costly API call, do it once
+            # --- 4. Collect media files ---
+            csv_updated = False
+            wandb_files = None
 
-                for key in media_keys:
-                    target_files = [f for f in all_files if key in f.name]
+            for key in media_keys:
+                # A. Cache Hit: Check if the file path is already saved in the CSV and exists on disk.
+                if key in df and pd.notna(df.loc[best_idx, key]):
+                    local_p = Path(str(df.loc[best_idx, key]))
+                    if local_p.exists():
+                        run_result[key] = str(local_p)
+                        continue
 
+                # B. Cache Miss: We need to fetch from WandB.
+                if wandb_files is None:
+                    logger.info(
+                        f"🔌 [Run {rid}] Connecting to API to fetch file list..."
+                    )
                     try:
-                        target_file = target_files[best_idx]
+                        run_api = self.api.run(f"{self.entity}/{self.project}/{rid}")
+                        wandb_files = list(run_api.files())
+                    except Exception as e:
+                        logger.error(f"❌ [Run {rid}] Failed to fetch file list: {e}")
+                        wandb_files = []
 
-                        run_result[key] = self._download_media(target_file, run_dir)
+                # Filter files matching the key (e.g., "pixel_embeddings_pca")
+                target_files = [f for f in wandb_files if key in f.name]
 
-                    except IndexError:
-                        logger.warning(
-                            f"⚠️ No media file found for key '{key}' in run {run.name}."
-                        )
+                try:
+                    # Select the file corresponding to the 'best_idx'.
+                    target_file = target_files[best_idx]
+
+                    # Download the file (function handles the physical disk check)
+                    saved_path = self._download_media(target_file, run_dir)
+
+                    if saved_path:
+                        run_result[key] = saved_path
+
+                        # Update DataFrame with the local path for future runs
+                        if key not in df:
+                            df[key] = None
+                        df.loc[best_idx, key] = saved_path
+                        csv_updated = True
+                    else:
                         run_result[key] = None
+
+                except IndexError:
+                    logger.warning(
+                        f"⚠️ [Run {rid}] Media '{key}' not found at index {best_idx}."
+                    )
+                    run_result[key] = None
+                except Exception as e:
+                    logger.error(
+                        f"❌ [Run {rid}] Unexpected error processing '{key}': {e}"
+                    )
+                    run_result[key] = None
+
+            if csv_updated:
+                df.to_csv(csv_path, index=False)
 
             data.append(run_result)
 

@@ -2,6 +2,7 @@ from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
+from PIL import Image
 
 from ml4cv_assignment.utils.constants import KEY_LOSS, KEY_MIOU, KEY_OOD
 
@@ -54,4 +55,16 @@ def plot_radar_chart(categories: List[str], data: dict) -> None:
 
     plt.title("Class-wise Val IoU Comparison", y=1.08)
     plt.legend(loc="upper right", bbox_to_anchor=(1.3, 1.1))
+    plt.show()
+
+
+def plot_latent_spaces(data: List[dict]) -> None:
+    plt.figure(figsize=(10 * len(data), 10))
+
+    for i, run in enumerate(data):
+        ax = plt.subplot(1, len(data), i + 1)
+        ax.imshow(Image.open(run["pixel_embeddings_pca"]))
+        ax.set_title(run["run_name"])
+        ax.axis("off")
+
     plt.show()

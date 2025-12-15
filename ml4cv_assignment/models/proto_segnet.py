@@ -79,6 +79,8 @@ class ProtoSegNet(BaseModel):
         centers_momentum: float,
         use_ood_head: bool = False,
         ood_head_hidden_dim: int = 256,
+        use_softmin_weighting: bool = True,
+        freeze_all: bool = False,
         losses: Optional[List[nn.Module]] = None,
     ) -> None:
         super().__init__(losses=losses)
@@ -98,6 +100,7 @@ class ProtoSegNet(BaseModel):
         self.xi = xi
         self.use_running_centers = use_running_centers
         self.use_ood_head = use_ood_head
+        self.use_softmin_weighting = use_softmin_weighting
 
         self.ood_head: nn.Module = nn.Identity()
         if self.use_ood_head:
@@ -115,6 +118,12 @@ class ProtoSegNet(BaseModel):
             )
             self.freeze_module(self.encoder)
             self.freeze_module(self.decoder)
+
+        if freeze_all:
+            self.freeze_module(self.encoder)
+            self.freeze_module(self.decoder)
+            if self.use_ood_head:
+                self.freeze_module(self.ood_head)
 
         # fixed anchors shouldn't be saved in the state dict
         # they are only used to reset the anchors at the start of each epoch
@@ -167,12 +176,17 @@ class ProtoSegNet(BaseModel):
         # 2. Prototype Distance Score
         # Open Space Risk: An input is OOD if it is EITHER far from all centers (Distance)
         # OR equidistant between centers (Uncertainty).
-        softmin = torch.softmax(-dists / self.T, dim=1)  # [B*H*W, K]
-        gamma = dists * (1 - softmin)
-        cac_score, _ = gamma.min(dim=1)  # [B*H*W]
+        if self.use_softmin_weighting:
+            # weight distances by softmin to capture uncertainty
+            softmin = torch.softmax(-dists / self.T, dim=1)  # [B*H*W, K]
+            gamma = dists * (1 - softmin)
+            cac_score = gamma.sum(dim=1)  # [B*H*W]
+        else:
+            # distance to closest center
+            cac_score, _ = dists.min(dim=1)  # [B*H*W]
 
         # I apply tanh to squash unbounded distance score into [0, 1]
-        normalized_cac_score = cac_score.tanh()
+        normalized_cac_score = cac_score  # .tanh()
 
         return self.alpha * feat_score + (1 - self.alpha) * normalized_cac_score
 

@@ -97,6 +97,8 @@ class Trainer:
 
     def _on_train_epoch_start(self) -> None:
         self.model.train()
+        if self.config.force_eval_mode:
+            self.model.eval()
         self.model.on_train_epoch_start()
 
     def _on_train_epoch_end(self) -> None:
@@ -157,7 +159,12 @@ class Trainer:
         ):
             outputs = self.model(inputs, return_preds=False)
 
-        loss = outputs["loss"]
+        loss = outputs.get("loss")
+        if loss is None:
+            if not hasattr(self, "_warned_no_loss"):
+                logger.warning("No loss returned by the model during training step.")
+                self._warned_no_loss = True
+            return {}
 
         self.scaler.scale(loss).backward()
         self.scaler.unscale_(self.optimizer)

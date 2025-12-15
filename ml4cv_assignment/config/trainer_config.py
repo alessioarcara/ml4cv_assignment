@@ -62,6 +62,10 @@ class TrainerConfig(BaseModel, arbitrary_types_allowed=True):
         ...,
         description="Base name for the wandb run; a timestamp will be appended",
     )
+    force_eval_mode: bool = Field(
+        default=False,
+        description="If True, enforces model.eval() during training",
+    )
 
     def find_transform(
         self, transform_type: Type[A.BasicTransform], in_train: bool

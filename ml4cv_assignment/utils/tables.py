@@ -36,7 +36,7 @@ def print_metrics_table(
     def get_max_val(run_data: dict, key: str) -> str:
         arr = np.array(run_data.get(key, []))
         val = np.max(arr) if arr.size > 0 else 0.0
-        return f"{val:.2f}"
+        return f"{val:.3f}"
 
     for run in data:
         row = []

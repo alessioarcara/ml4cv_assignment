@@ -25,7 +25,11 @@ from loguru import logger
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from PIL import Image
 
-from ml4cv_assignment.utils.charts import plot_radar_chart, plot_training_curves
+from ml4cv_assignment.utils.charts import (
+    plot_latent_spaces,
+    plot_radar_chart,
+    plot_training_curves,
+)
 from ml4cv_assignment.utils.misc import resolve_device
 from ml4cv_assignment.utils.tables import print_eval_results, print_metrics_table
 from ml4cv_assignment.utils.typings import MetricModality
@@ -156,6 +160,9 @@ def show_runs_comparison(
     run_ids: List[str],
     classes: List[str],
     mode: Literal["closed", "open"] = "closed",
+    force_download: bool = False,
+    show_latent_space: bool = False,
+    show_plots: bool = True,
 ) -> None:
     """Compares multiple runs using line and radar plots."""
     num_classes = len(classes) - 1  # Exclude anomaly class
@@ -172,11 +179,15 @@ def show_runs_comparison(
     if mode == "open":
         metrics_config["val/OoDAUPR_epoch"] = MetricModality.FULL
 
+    if show_latent_space:
+        metrics_config["pixel_embeddings_pca"] = MetricModality.MEDIA
+
     data = retriever.get_metrics(
         run_ids=run_ids,
         metrics_config=metrics_config,
         reference_metric="val/mIoU_epoch",
         mode="max",
+        force_download=force_download,
     )
 
     if not data:
@@ -189,8 +200,11 @@ def show_runs_comparison(
     }
 
     print_metrics_table(data, mode=mode)
-    plot_training_curves(data)
-    plot_radar_chart(classes[:-1], radar_data)
+    if show_plots:
+        plot_training_curves(data)
+        plot_radar_chart(classes[:-1], radar_data)
+    if show_latent_space:
+        plot_latent_spaces(data)
 
 
 def show_split_results(
@@ -224,6 +238,8 @@ def interactive_inference_visualizer(
     cfg: "Config",
     split: Literal["val", "test"],
     device: Optional[Union[str, torch.device]] = None,
+    static_preview: bool = True,
+    static_preview_index: int = 997,
 ):
     """
     Interactive visualizer for model inference on a dataset.
@@ -241,6 +257,59 @@ def interactive_inference_visualizer(
     dataset = cfg.val_dataset if split == "val" else cfg.test_dataset
     denorm = cfg.training.get_denormalize()
 
+    def visualize_single_sample(idx: int) -> plt.Figure:
+        img, gt_mask = dataset[idx]
+        input_tensor = img.unsqueeze(0).to(device)  # [1, C, H, W]
+
+        inputs = {"pixel_values": input_tensor}
+
+        with torch.inference_mode():
+            outputs = model(inputs, return_preds=True)
+
+        closed_set_preds = outputs["preds"]
+        ood_score = outputs["ood_score"]
+
+        # Layout 1x4: Img | GT Mask | Closed-set Preds | OOD Score
+        fig, axes = plt.subplots(1, 4, figsize=(20, 6))
+
+        # 1. Original Image
+        img_vis = denorm(img)
+        axes[0].imshow(img_vis)
+        axes[0].set_title("Image")
+
+        # 2. Ground-truth Mask
+        gt_vis = color(gt_mask.cpu().squeeze(), COLORS)
+        axes[1].imshow(gt_vis)
+        axes[1].set_title("Ground-truth mask")
+
+        # 3. Closed-set Predictions
+        pred_vis = closed_set_preds.cpu().squeeze()
+        axes[2].imshow(color(pred_vis, COLORS))
+        axes[2].set_title("Closed-set mask")
+
+        # 4. OOD Score
+        ood_vis = ood_score.cpu().squeeze()
+        im_ood = axes[3].imshow(ood_vis, cmap="viridis")
+        axes[3].set_title("Anomaly score")
+
+        # Colorbar
+        divider = make_axes_locatable(axes[3])
+        cax = divider.append_axes("right", size="5%", pad=0.05)
+        plt.colorbar(im_ood, cax=cax)
+
+        for a in axes:
+            a.axis("off")
+
+        plt.tight_layout()
+        return fig
+
+    if static_preview:
+        print(f"Static Preview (Index {static_preview_index}) for split '{split}':")
+        fig = visualize_single_sample(static_preview_index)
+        plt.show(fig)
+
+    print("\nInteractive Explorer:")
+
     idx_slider = widgets.IntSlider(
         value=0,
         min=0,
@@ -255,56 +324,10 @@ def interactive_inference_visualizer(
     @torch.inference_mode()
     def update_plot(change):
         idx = change["new"]
-
-        img, gt_mask = dataset[idx]
-        input_tensor = img.unsqueeze(0).to(device)  # [1, C, H, W]
-
-        inputs = {
-            "pixel_values": input_tensor,
-        }
-
-        outputs = model(inputs, return_preds=True)
-
-        closed_set_preds = outputs["preds"]
-        ood_score = outputs["ood_score"]
-
         with out:
             clear_output(wait=True)
-
-            # Layout 1x4: Img | GT Mask | Closed-set Preds | OOD Score
-            fig, axes = plt.subplots(1, 4, figsize=(20, 6))
-
-            img_vis = denorm(img)
-            # Original Image
-            axes[0].imshow(img_vis)
-            axes[0].set_title("Image")
-
-            # Ground-truth Mask
-            gt_vis = color(gt_mask.cpu().squeeze(), COLORS)
-            axes[1].imshow(gt_vis)
-            axes[1].set_title("Ground-truth mask")
-
-            # Closed-set Predictions
-            pred_vis = closed_set_preds.cpu().squeeze()
-            axes[2].imshow(color(pred_vis, COLORS))
-            axes[2].set_title("Closed-set mask")
-
-            # OOD Score
-            ood_vis = ood_score.cpu().squeeze()
-            im_ood = axes[3].imshow(ood_vis, cmap="viridis")
-            axes[3].set_title("Anomaly score")
-
-            # Colorbar for OOD Score
-            divider = make_axes_locatable(axes[3])
-            cax = divider.append_axes("right", size="5%", pad=0.05)
-            plt.colorbar(im_ood, cax=cax)
-
-            for a in axes:
-                a.axis("off")
-
-            plt.tight_layout()
-            plt.show()
-
+            fig = visualize_single_sample(idx)
+            plt.show(fig)
             plt.close(fig)
 
     idx_slider.observe(lambda change: update_plot(change), names="value")
