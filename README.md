@@ -6,7 +6,7 @@ alessio.arcara@studio.unibo.it
 
 ## Overview 
 
-Standard segmentation models fail to detect unexpected road hazards (e.g., animals or lost cargo), posing severe risks to autonomous driving. This project tackles **Open-Set Semantic Segmentation**, aiming to identify these anomalies (unknown classes) while maintaining high-quality closed-set segmentation masks (known classes).
+Standard segmentation models are trained on a closed set of classes, forcing them to categorize every pixel into a known label. Consequently, when they encounter an unknown object, they erroneously classify it as a known class. This project tackles **Open-Set Semantic Segmentation** for autonomous driving to correct this behavior. The goal is to detect unexpected hazards (such as animals or lost cargo) by accurately identifying objects that fall outside the training distribution, while maintaining high-quality segmentation masks for known classes.
 
 <div align="center">
   <p>An example of open-set segmentation</p>
@@ -59,7 +59,19 @@ The dataset must be downloaded manually from the links provided above and extrac
 
 ### 4. **Download weights (optional):**
 
-**TODO** ...
+All pre-trained models are available for download in the table below. Once downloaded, please place the files into the `checkpoints/` directory.
+
+| Model Name | Download Link |
+| :--- | :---: |
+| **ProtoSegNet (Baseline)** | [weights](https://drive.google.com/file/d/15fM3p8VJRrLllwiO7Fu7f-O7N1LuGaqR/view?usp=share_link) |
+| **ProtoSegNet (Optimized)** | [weights](https://drive.google.com/file/d/1WaaYNKvnsZiBZ98xj5zM-Nawzo78xDGH/view?usp=share_link) |
+| **Mask2Former + RbA** | [weights](https://drive.google.com/file/d/16Js6iKtZAV30Mj56064mOYSVloMTtAOp/view?usp=share_link) |
+
+Alternatively, you can use the provided script to download all checkpoints automatically:
+
+```bash
+uv run download_checkpoints.py
+```
 
 ## Usage
 
