@@ -7,12 +7,15 @@ echo "Acquiring lock for GPU training..."
 touch "$LOCK_FILE" 2>/dev/null
 exec 200<"$LOCK_FILE"
 
-flock 200 || { echo "Failed to acquire lock. Exiting."; exit 1; }
+flock 200 || {
+  echo "Failed to acquire lock. Exiting."
+  exit 1
+}
 
 echo "Lock acquired. Starting experiments..."
 
 EXPERIMENTS=(
-  # Baseline model 
+  # Baseline model
   #"configs/base.yaml configs/transforms/full.yaml configs/proto_segnet.yaml"
   #"configs/base.yaml configs/transforms/full.yaml configs/proto_segnet.yaml configs/ood_proto_segnet.yaml"
 
@@ -40,7 +43,7 @@ EXPERIMENTS=(
   #"configs/base.yaml configs/decoders/fpn_no_aspp.yaml configs/transforms/imagenet_normalize.yaml"
   #"configs/base.yaml configs/decoders/fpn_no_aspp.yaml configs/transforms/per_image_normalize.yaml"
 
-  # Contrastive Losses 
+  # Contrastive Losses
   #"configs/base.yaml configs/transforms/ablation_result.yaml configs/decoders/fpn_no_aspp.yaml configs/losses/closed/ptl.yaml"
   #"configs/base.yaml configs/transforms/ablation_result.yaml configs/decoders/fpn_no_aspp.yaml configs/losses/closed/dml.yaml"
   #"configs/base.yaml configs/transforms/ablation_result.yaml configs/decoders/fpn_no_aspp.yaml configs/losses/closed/ow.yaml"
@@ -57,9 +60,17 @@ EXPERIMENTS=(
   #"configs/base.yaml configs/transforms/ablation_result.yaml configs/decoders/fpn_no_aspp.yaml configs/losses/open/ptl_focal_objectosphere.yaml"
   #"configs/base.yaml configs/transforms/ablation_result.yaml configs/decoders/fpn_no_aspp.yaml configs/losses/open/ptl_focal_dice_objectosphere.yaml"
 
+  # OoD scores
+  #"configs/base.yaml configs/transforms/full.yaml configs/proto_segnet.yaml configs/ood_proto_segnet.yaml configs/anomaly_identification_criterias/cac_feat_score.yaml"
+  #"configs/base.yaml configs/transforms/full.yaml configs/proto_segnet.yaml configs/ood_proto_segnet.yaml configs/anomaly_identification_criterias/feat_score.yaml"
+  #"configs/base.yaml configs/transforms/full.yaml configs/proto_segnet.yaml configs/ood_proto_segnet.yaml configs/anomaly_identification_criterias/cac_score.yaml"
+  #"configs/base.yaml configs/transforms/full.yaml configs/proto_segnet.yaml configs/ood_proto_segnet.yaml configs/anomaly_identification_criterias/dist_score.yaml"
+  #"configs/base.yaml configs/transforms/full.yaml configs/proto_segnet.yaml configs/ood_proto_segnet.yaml configs/anomaly_identification_criterias/cac_score_not_norm.yaml"
+  "configs/base.yaml configs/transforms/full.yaml configs/proto_segnet.yaml configs/ood_proto_segnet.yaml configs/anomaly_identification_criterias/cac_score_running_centers.yaml"
+
   # Mask2Former RbA
   #"configs/transforms/ablation_result.yaml configs/mask2former.yaml"
-  "configs/transforms/ablation_result.yaml configs/mask2former.yaml configs/ood_mask2former.yaml"
+  #"configs/transforms/ablation_result.yaml configs/mask2former.yaml configs/ood_mask2former.yaml"
 )
 
 echo "Found ${#EXPERIMENTS[@]} experiments to run."
@@ -69,3 +80,4 @@ for EXP_ARGS in "${EXPERIMENTS[@]}"; do
 done
 
 echo "Releasing lock for GPU training..."
+

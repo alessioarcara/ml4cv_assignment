@@ -163,18 +163,21 @@ def show_runs_comparison(
     force_download: bool = False,
     show_latent_space: bool = False,
     show_plots: bool = True,
+    include_loss: bool = True,
 ) -> None:
     """Compares multiple runs using line and radar plots."""
     num_classes = len(classes) - 1  # Exclude anomaly class
 
     metrics_config = {
         "val/mIoU_epoch": MetricModality.FULL,
-        "val/loss_epoch": MetricModality.FULL,
         **{
             f"val/IoU_class_{i}_epoch": MetricModality.SINGLE
             for i in range(num_classes)
         },
     }
+
+    if include_loss:
+        metrics_config["val/loss_epoch"] = MetricModality.FULL
 
     if mode == "open":
         metrics_config["val/OoDAUPR_epoch"] = MetricModality.FULL
@@ -239,7 +242,7 @@ def interactive_inference_visualizer(
     split: Literal["val", "test"],
     device: Optional[Union[str, torch.device]] = None,
     static_preview: bool = True,
-    static_preview_index: int = 997,
+    static_preview_index: int = 1025,
 ):
     """
     Interactive visualizer for model inference on a dataset.

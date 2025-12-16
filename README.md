@@ -6,7 +6,7 @@ alessio.arcara@studio.unibo.it
 
 ## Overview 
 
-Standard segmentation models fail to detect unexpected road hazards (e.g., animals or lost cargo), posing severe risks to autonomous driving. This project tackles **Open-Set Semantic Segmentation** to identify these anomalies while maintaining high-quality closed-set segmentation masks.
+Standard segmentation models fail to detect unexpected road hazards (e.g., animals or lost cargo), posing severe risks to autonomous driving. This project tackles **Open-Set Semantic Segmentation**, aiming to identify these anomalies (unknown classes) while maintaining high-quality closed-set segmentation masks (known classes).
 
 <div align="center">
   <p>An example of open-set segmentation</p>
@@ -39,8 +39,8 @@ uv sync
 This project adheres to PEP 621 standards using `pyproject.toml`.
 
 ```bash
-python -m venv venv
-source venv/bin/activate   # On Windows: venv\Scripts\activate
+python -m venv .venv
+source .venv/bin/activate   # On Windows: .venv\Scripts\activate
 pip install -e .
 ```
 
@@ -56,6 +56,10 @@ The dataset must be downloaded manually from the links provided above and extrac
 
 * [Training and validation sets download link](https://people.eecs.berkeley.edu/~hendrycks/streethazards_train.tar)
 * [Test set download link](https://people.eecs.berkeley.edu/~hendrycks/streethazards_test.tar)
+
+### 4. **Download weights (optional):**
+
+**TODO** ...
 
 ## Usage
 

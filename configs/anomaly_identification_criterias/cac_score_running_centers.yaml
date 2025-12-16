@@ -1,0 +1,17 @@
+model_cfg:
+  model:
+    params:
+      alpha: 0.0
+      freeze_all: true
+      normalize_cac: false
+      use_running_centers: true
+      centers_momentum: 0.999
+      losses: []
+
+training:
+  wandb_base_run_name: "cac_score_running_centers"
+  num_epochs: 1
+  force_eval_mode: true
+
+paths:
+  checkpoint: checkpoints/ood_baseline_proto_segnet_20251213_052614_val-OoDAUPR_epoch_0.7577.pth

@@ -80,6 +80,7 @@ class ProtoSegNet(BaseModel):
         use_ood_head: bool = False,
         ood_head_hidden_dim: int = 256,
         use_softmin_weighting: bool = True,
+        normalize_cac: bool = True,
         freeze_all: bool = False,
         losses: Optional[List[nn.Module]] = None,
     ) -> None:
@@ -101,6 +102,7 @@ class ProtoSegNet(BaseModel):
         self.use_running_centers = use_running_centers
         self.use_ood_head = use_ood_head
         self.use_softmin_weighting = use_softmin_weighting
+        self.normalize_cac = normalize_cac
 
         self.ood_head: nn.Module = nn.Identity()
         if self.use_ood_head:
@@ -180,13 +182,16 @@ class ProtoSegNet(BaseModel):
             # weight distances by softmin to capture uncertainty
             softmin = torch.softmax(-dists / self.T, dim=1)  # [B*H*W, K]
             gamma = dists * (1 - softmin)
-            cac_score = gamma.sum(dim=1)  # [B*H*W]
+            cac_score, _ = gamma.min(dim=1)  # [B*H*W]
         else:
             # distance to closest center
             cac_score, _ = dists.min(dim=1)  # [B*H*W]
 
         # I apply tanh to squash unbounded distance score into [0, 1]
-        normalized_cac_score = cac_score  # .tanh()
+        if self.normalize_cac:
+            normalized_cac_score = cac_score.tanh()
+        else:
+            normalized_cac_score = cac_score
 
         return self.alpha * feat_score + (1 - self.alpha) * normalized_cac_score
 

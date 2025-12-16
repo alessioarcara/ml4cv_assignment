@@ -1,5 +1,5 @@
 training:
-  wandb_base_run_name: "fuse_stem"
+  wandb_base_run_name: "no_fuse_stem"
 
 model_cfg:
   model:
