@@ -58,23 +58,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-6f93e1a908849c5893da5ee10211d920.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-6f93e1a908849c5893da5ee10211d920.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -152,34 +152,34 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#setup-and-imports" id="toc-setup-and-imports" class="nav-link active" data-scroll-target="#setup-and-imports"><span class="header-section-number">1</span> 0. Setup and Imports</a></li>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction"><span class="header-section-number">2</span> 1. Introduction</a></li>
-  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset"><span class="header-section-number">3</span> 2. Dataset</a></li>
-  <li><a href="#proposed-methodology" id="toc-proposed-methodology" class="nav-link" data-scroll-target="#proposed-methodology"><span class="header-section-number">4</span> 3. Proposed Methodology</a>
+  <li><a href="#setup-and-imports" id="toc-setup-and-imports" class="nav-link active" data-scroll-target="#setup-and-imports"><span class="header-section-number">1</span> Setup and Imports</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction"><span class="header-section-number">2</span> Introduction</a></li>
+  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset"><span class="header-section-number">3</span> Dataset</a></li>
+  <li><a href="#proposed-methodology" id="toc-proposed-methodology" class="nav-link" data-scroll-target="#proposed-methodology"><span class="header-section-number">4</span> Proposed Methodology</a>
   <ul class="collapse">
-  <li><a href="#latent-space-shaping-for-ood-detection" id="toc-latent-space-shaping-for-ood-detection" class="nav-link" data-scroll-target="#latent-space-shaping-for-ood-detection"><span class="header-section-number">4.1</span> 3.1 Latent Space Shaping for OOD Detection</a></li>
-  <li><a href="#network-architecture" id="toc-network-architecture" class="nav-link" data-scroll-target="#network-architecture"><span class="header-section-number">4.2</span> 3.2 Network Architecture</a></li>
-  <li><a href="#training-objectives" id="toc-training-objectives" class="nav-link" data-scroll-target="#training-objectives"><span class="header-section-number">4.3</span> 3.3 Training Objectives</a></li>
-  <li><a href="#anomaly-identification-criterion" id="toc-anomaly-identification-criterion" class="nav-link" data-scroll-target="#anomaly-identification-criterion"><span class="header-section-number">4.4</span> 3.4 Anomaly Identification Criterion</a></li>
-  <li><a href="#training-recipe" id="toc-training-recipe" class="nav-link" data-scroll-target="#training-recipe"><span class="header-section-number">4.5</span> 3.5 Training Recipe</a></li>
+  <li><a href="#latent-space-shaping-for-ood-detection" id="toc-latent-space-shaping-for-ood-detection" class="nav-link" data-scroll-target="#latent-space-shaping-for-ood-detection"><span class="header-section-number">4.1</span> Latent Space Shaping for OOD Detection</a></li>
+  <li><a href="#network-architecture" id="toc-network-architecture" class="nav-link" data-scroll-target="#network-architecture"><span class="header-section-number">4.2</span> Network Architecture</a></li>
+  <li><a href="#training-objectives" id="toc-training-objectives" class="nav-link" data-scroll-target="#training-objectives"><span class="header-section-number">4.3</span> Training Objectives</a></li>
+  <li><a href="#anomaly-identification-criterion" id="toc-anomaly-identification-criterion" class="nav-link" data-scroll-target="#anomaly-identification-criterion"><span class="header-section-number">4.4</span> Anomaly Identification Criterion</a></li>
+  <li><a href="#training-recipe" id="toc-training-recipe" class="nav-link" data-scroll-target="#training-recipe"><span class="header-section-number">4.5</span> Training Recipe</a></li>
   </ul></li>
-  <li><a href="#the-baseline-model" id="toc-the-baseline-model" class="nav-link" data-scroll-target="#the-baseline-model"><span class="header-section-number">5</span> 4. The baseline model</a></li>
-  <li><a href="#ablation-study" id="toc-ablation-study" class="nav-link" data-scroll-target="#ablation-study"><span class="header-section-number">6</span> 5. Ablation Study</a>
+  <li><a href="#the-baseline-model" id="toc-the-baseline-model" class="nav-link" data-scroll-target="#the-baseline-model"><span class="header-section-number">5</span> The baseline model</a></li>
+  <li><a href="#ablation-study" id="toc-ablation-study" class="nav-link" data-scroll-target="#ablation-study"><span class="header-section-number">6</span> Ablation Study</a>
   <ul class="collapse">
-  <li><a href="#encoders" id="toc-encoders" class="nav-link" data-scroll-target="#encoders"><span class="header-section-number">6.1</span> 5.1 Encoders</a></li>
-  <li><a href="#decoder" id="toc-decoder" class="nav-link" data-scroll-target="#decoder"><span class="header-section-number">6.2</span> 5.2 Decoder</a></li>
-  <li><a href="#data-augmentations-1" id="toc-data-augmentations-1" class="nav-link" data-scroll-target="#data-augmentations-1"><span class="header-section-number">6.3</span> 5.3 Data Augmentations</a></li>
-  <li><a href="#loss-functions" id="toc-loss-functions" class="nav-link" data-scroll-target="#loss-functions"><span class="header-section-number">6.4</span> 5.4 Loss Functions</a></li>
-  <li><a href="#anomaly-identification-criteria" id="toc-anomaly-identification-criteria" class="nav-link" data-scroll-target="#anomaly-identification-criteria"><span class="header-section-number">6.5</span> 5.5 Anomaly Identification Criteria</a></li>
-  <li><a href="#ood-head-vs-objectosphere-loss" id="toc-ood-head-vs-objectosphere-loss" class="nav-link" data-scroll-target="#ood-head-vs-objectosphere-loss"><span class="header-section-number">6.6</span> 5.6 OOD Head vs Objectosphere Loss</a></li>
+  <li><a href="#encoders" id="toc-encoders" class="nav-link" data-scroll-target="#encoders"><span class="header-section-number">6.1</span> Encoders</a></li>
+  <li><a href="#decoder" id="toc-decoder" class="nav-link" data-scroll-target="#decoder"><span class="header-section-number">6.2</span> Decoder</a></li>
+  <li><a href="#data-augmentations-1" id="toc-data-augmentations-1" class="nav-link" data-scroll-target="#data-augmentations-1"><span class="header-section-number">6.3</span> Data Augmentations</a></li>
+  <li><a href="#loss-functions" id="toc-loss-functions" class="nav-link" data-scroll-target="#loss-functions"><span class="header-section-number">6.4</span> Loss Functions</a></li>
+  <li><a href="#anomaly-identification-criteria" id="toc-anomaly-identification-criteria" class="nav-link" data-scroll-target="#anomaly-identification-criteria"><span class="header-section-number">6.5</span> Anomaly Identification Criteria</a></li>
+  <li><a href="#ood-head-vs-objectosphere-loss" id="toc-ood-head-vs-objectosphere-loss" class="nav-link" data-scroll-target="#ood-head-vs-objectosphere-loss"><span class="header-section-number">6.6</span> OOD Head vs Objectosphere Loss</a></li>
   </ul></li>
-  <li><a href="#results-and-discussion" id="toc-results-and-discussion" class="nav-link" data-scroll-target="#results-and-discussion"><span class="header-section-number">7</span> 6. Results and Discussion</a>
+  <li><a href="#results-and-discussion" id="toc-results-and-discussion" class="nav-link" data-scroll-target="#results-and-discussion"><span class="header-section-number">7</span> Results and Discussion</a>
   <ul class="collapse">
-  <li><a href="#rba-segmenting-unknowns-regions-rejected-by-all-mask2former" id="toc-rba-segmenting-unknowns-regions-rejected-by-all-mask2former" class="nav-link" data-scroll-target="#rba-segmenting-unknowns-regions-rejected-by-all-mask2former"><span class="header-section-number">7.1</span> 6.1 RbA: Segmenting Unknowns Regions Rejected by All (Mask2Former)</a></li>
-  <li><a href="#test-results" id="toc-test-results" class="nav-link" data-scroll-target="#test-results"><span class="header-section-number">7.2</span> 6.2 Test Results</a></li>
-  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion"><span class="header-section-number">7.3</span> 7.2 Discussion</a></li>
+  <li><a href="#rba-segmenting-unknowns-regions-rejected-by-all-mask2former" id="toc-rba-segmenting-unknowns-regions-rejected-by-all-mask2former" class="nav-link" data-scroll-target="#rba-segmenting-unknowns-regions-rejected-by-all-mask2former"><span class="header-section-number">7.1</span> RbA: Segmenting Unknowns Regions Rejected by All (Mask2Former)</a></li>
+  <li><a href="#test-results" id="toc-test-results" class="nav-link" data-scroll-target="#test-results"><span class="header-section-number">7.2</span> Test Results</a></li>
+  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion"><span class="header-section-number">7.3</span> Discussion</a></li>
   </ul></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">8</span> 7. References</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">8</span> References</a></li>
   </ul>
 </nav>
     </div>
@@ -193,7 +193,7 @@ window.Quarto = {
 <p><strong>Interactive Notebook:</strong> This notebook contains widgets and sliders that are not visible in static previews. Please run the cells to interact with the data.</p>
 </div>
 <section id="setup-and-imports" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="setup-and-imports"><span class="header-section-number">1</span> 0. Setup and Imports</h2>
+<h2 data-number="1" class="anchored" data-anchor-id="setup-and-imports"><span class="header-section-number">1</span> Setup and Imports</h2>
 <div id="d877c6f5" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
@@ -227,39 +227,41 @@ window.Quarto = {
 </div>
 </section>
 <section id="introduction" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="introduction"><span class="header-section-number">2</span> 1. Introduction</h2>
+<h2 data-number="2" class="anchored" data-anchor-id="introduction"><span class="header-section-number">2</span> Introduction</h2>
 <p>This work is situated within the field of <strong>Anomaly Segmentation</strong>, defined as the ability of a model to segment anomalies in an image, i.e., objects that do not belong to the classes seen during training. This task is critical in domains such as industrial inspection (e.g., defect detection on products) and autonomous driving (e.g., detecting unexpected objects such as animals crossing the road). Consequently, the problem involves a dual objective: maintaining high performance on <strong>closed-set segmentation</strong> (segmenting known classes) while also achieving robust <strong>open-set segmentation</strong> (identifying anomalies).</p>
 <p>Specifically, I have investigated <strong>contrastive learning</strong> approaches, which aim to structure the latent space to create a well-defined logit space. In this space, pixels corresponding to known classes (<strong>Known Classes - KC</strong>) are distinctly separated from those corresponding to unknown classes (<strong>Unknown Classes - UC</strong>).</p>
-<div style="text-align: center;">
-<pre><code>&lt;img src="../assets/both.png" width="50%"/&gt;</code></pre>
-</div>
+<p><img src="../assets/both.png" class="img-fluid"></p>
 <p>To provide a comprehensive evaluation, I have also implemented a <strong>mask-classification</strong> approach based on <strong>Mask2Former</strong> with an anomaly segmentation component. As Mask2Former represents the current SOTA, it serves as a benchmark to assess the effectiveness of the proposed approach.</p>
-<p>Guided by these implementations, I seek to answer the following questions: * How does the proposed contrastive learning approach compare to other contrastive approaches found in the literature? * Can the proposed contrastive learning approach compete with SOTA methods based on Mask Classification?</p>
+<p>Guided by these implementations, I seek to answer the following questions:</p>
+<ul>
+<li>How does the proposed contrastive learning approach compare to other contrastive approaches found in the literature?</li>
+<li>Can the proposed contrastive learning approach compete with SOTA methods based on Mask Classification?</li>
+</ul>
 </section>
 <section id="dataset" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="dataset"><span class="header-section-number">3</span> 2. Dataset</h2>
+<h2 data-number="3" class="anchored" data-anchor-id="dataset"><span class="header-section-number">3</span> Dataset</h2>
 <p>This work utilizes the <strong>StreetHazards</strong> dataset, a benchmark designed for anomaly segmentation. It has been generated using a modified version of the CARLA simulator, which allows for the creation of <strong>synthetic images</strong> with precise ground truth annotations for every pixel. The dataset simulates a <em>vehicle navigating through various urban environments</em>. The dataset is divided into three subsets: training, validation, and test sets, with anomalies present only in the test set.</p>
 <p>Before detailing the methodology, it’s essential to analyze the dataset’s characteristics to understand the specific challenges it presents and the solutions designed to tackle them.</p>
 <div id="93f88f51" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ml4cv_assignment.data.data_analysis <span class="im">import</span> (</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    analyze_dataset,</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    browse_dataset,</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    compute_class_heatmap,</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    plot_class_counts,</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    plot_class_heatmaps,</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    plot_rgb_means,</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>cfg, _ <span class="op">=</span> build_config([<span class="st">"../configs/data_analysis.yaml"</span>])</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>train_ds <span class="op">=</span> cfg.train_dataset</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>val_ds <span class="op">=</span> cfg.val_dataset</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>id_to_label_map <span class="op">=</span> train_ds.id_to_label_map()</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of training images: </span><span class="sc">{</span><span class="bu">len</span>(train_ds)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of validation images: </span><span class="sc">{</span><span class="bu">len</span>(val_ds)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ml4cv_assignment.data.data_analysis <span class="im">import</span> (</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    analyze_dataset,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    browse_dataset,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    compute_class_heatmap,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    plot_class_counts,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    plot_class_heatmaps,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    plot_rgb_means,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>cfg, _ <span class="op">=</span> build_config([<span class="st">"../configs/data_analysis.yaml"</span>])</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>train_ds <span class="op">=</span> cfg.train_dataset</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>val_ds <span class="op">=</span> cfg.val_dataset</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>id_to_label_map <span class="op">=</span> train_ds.id_to_label_map()</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of training images: </span><span class="sc">{</span><span class="bu">len</span>(train_ds)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of validation images: </span><span class="sc">{</span><span class="bu">len</span>(val_ds)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.</code></pre>
@@ -272,8 +274,8 @@ Number of validation images: 1031</code></pre>
 <div id="04bed8ac" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>train_ds_stats <span class="op">=</span> analyze_dataset(train_ds)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>val_ds_stats <span class="op">=</span> analyze_dataset(val_ds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>train_ds_stats <span class="op">=</span> analyze_dataset(train_ds)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>val_ds_stats <span class="op">=</span> analyze_dataset(val_ds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Analyzing dataset:   0%|          | 0/5125 [00:00&lt;?, ?img/s]Analyzing dataset: 100%|██████████| 5125/5125 [04:47&lt;00:00, 17.81img/s]
@@ -283,8 +285,8 @@ Analyzing dataset: 100%|██████████| 1031/1031 [00:58&lt;00:0
 <div id="75c22a0d" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Image sizes in train set: </span><span class="sc">{</span>train_ds_stats<span class="sc">.</span>image_sizes<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Image sizes in val set: </span><span class="sc">{</span>val_ds_stats<span class="sc">.</span>image_sizes<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Image sizes in train set: </span><span class="sc">{</span>train_ds_stats<span class="sc">.</span>image_sizes<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Image sizes in val set: </span><span class="sc">{</span>val_ds_stats<span class="sc">.</span>image_sizes<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Image sizes in train set: {(720, 1280)}
@@ -297,9 +299,9 @@ Image sizes in val set: {(720, 1280)}</code></pre>
 <div id="36960985" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>plot_class_counts(</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    train_ds_stats.pixel_counts, val_ds_stats.pixel_counts, id_to_label_map, <span class="st">"Pixel"</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>plot_class_counts(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    train_ds_stats.pixel_counts, val_ds_stats.pixel_counts, id_to_label_map, <span class="st">"Pixel"</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -312,9 +314,9 @@ Image sizes in val set: {(720, 1280)}</code></pre>
 <div id="f3d493d7" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>plot_class_counts(</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    train_ds_stats.image_counts, val_ds_stats.image_counts, id_to_label_map, <span class="st">"Image"</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>plot_class_counts(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    train_ds_stats.image_counts, val_ds_stats.image_counts, id_to_label_map, <span class="st">"Image"</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -330,10 +332,10 @@ Image sizes in val set: {(720, 1280)}</code></pre>
 <div id="3b529725" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Training set mean per channel (R, G, B):"</span>, train_ds_stats.rgb_means.mean(axis<span class="op">=</span><span class="dv">0</span>))</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Training set std per channel (R, G, B):"</span>, train_ds_stats.rgb_stds.mean(axis<span class="op">=</span><span class="dv">0</span>))</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Validation set mean per channel (R, G, B):"</span>, val_ds_stats.rgb_means.mean(axis<span class="op">=</span><span class="dv">0</span>))</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Validation set std per channel (R, G, B):"</span>, val_ds_stats.rgb_stds.mean(axis<span class="op">=</span><span class="dv">0</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Training set mean per channel (R, G, B):"</span>, train_ds_stats.rgb_means.mean(axis<span class="op">=</span><span class="dv">0</span>))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Training set std per channel (R, G, B):"</span>, train_ds_stats.rgb_stds.mean(axis<span class="op">=</span><span class="dv">0</span>))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Validation set mean per channel (R, G, B):"</span>, val_ds_stats.rgb_means.mean(axis<span class="op">=</span><span class="dv">0</span>))</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Validation set std per channel (R, G, B):"</span>, val_ds_stats.rgb_stds.mean(axis<span class="op">=</span><span class="dv">0</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Training set mean per channel (R, G, B): [0.3307164  0.34626445 0.37320235]
@@ -345,8 +347,8 @@ Validation set std per channel (R, G, B): [0.16222227 0.15592927 0.16400203]</co
 <div id="b7ceb3f8" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>plot_rgb_means(train_ds_stats.rgb_means)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>plot_rgb_means(val_ds_stats.rgb_means)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>plot_rgb_means(train_ds_stats.rgb_means)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>plot_rgb_means(val_ds_stats.rgb_means)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -371,8 +373,8 @@ Validation set std per channel (R, G, B): [0.16222227 0.15592927 0.16400203]</co
 <div id="b9196b90" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>train_class_heatmap <span class="op">=</span> compute_class_heatmap(train_ds)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>val_class_heatmap <span class="op">=</span> compute_class_heatmap(val_ds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>train_class_heatmap <span class="op">=</span> compute_class_heatmap(train_ds)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>val_class_heatmap <span class="op">=</span> compute_class_heatmap(val_ds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Computing heatmap: 100%|██████████| 5125/5125 [02:10&lt;00:00, 39.35img/s]
@@ -382,7 +384,7 @@ Computing heatmap: 100%|██████████| 1031/1031 [00:27&lt;00:0
 <div id="c121f359" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>plot_class_heatmaps(train_class_heatmap, val_class_heatmap, id_to_label_map)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>plot_class_heatmaps(train_class_heatmap, val_class_heatmap, id_to_label_map)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -399,7 +401,7 @@ Computing heatmap: 100%|██████████| 1031/1031 [00:27&lt;00:0
 <div id="f6c5deb2" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>browse_dataset(train_ds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>browse_dataset(train_ds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
@@ -410,7 +412,7 @@ Computing heatmap: 100%|██████████| 1031/1031 [00:27&lt;00:0
 <div id="4b440423" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>browse_dataset(val_ds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>browse_dataset(val_ds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
@@ -423,9 +425,9 @@ Computing heatmap: 100%|██████████| 1031/1031 [00:27&lt;00:0
 <p>Finally, there is some <strong>ambiguity</strong> in the labeling. For example, some objects belonging to buildings or other structures end up in the <strong>“unlabeled” category along with the sky</strong>. This ambiguity could affect the model, as similar pixels may have different labels (e.g., one building labeled correctly and another considered unlabeled).</p>
 </section>
 <section id="proposed-methodology" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="proposed-methodology"><span class="header-section-number">4</span> 3. Proposed Methodology</h2>
+<h2 data-number="4" class="anchored" data-anchor-id="proposed-methodology"><span class="header-section-number">4</span> Proposed Methodology</h2>
 <section id="latent-space-shaping-for-ood-detection" class="level3" data-number="4.1">
-<h3 data-number="4.1" class="anchored" data-anchor-id="latent-space-shaping-for-ood-detection"><span class="header-section-number">4.1</span> 3.1 Latent Space Shaping for OOD Detection</h3>
+<h3 data-number="4.1" class="anchored" data-anchor-id="latent-space-shaping-for-ood-detection"><span class="header-section-number">4.1</span> Latent Space Shaping for OOD Detection</h3>
 <p>As previously discussed, the goal is to construct a <strong>well-behaved logit space</strong> in which the Known Classes (KC) form compact, well-separated clusters, while Unknown Classes (UC) are kept at a distance from these clusters. If one uses a standard cross-entropy loss, the resulting latent geometry is known to become <strong>star-shaped</strong>, with classes arranged radially around the origin. This structure is suboptimal for OOD detection because UC embeddings often fall near KC regions, leading to misclassification.</p>
 <p>To enforce compact clusters for the KCs, <strong>a contrastive loss has therefore been adopted</strong>, which naturally encourages intra-class compactness and inter-class separation. Once this structure is established, <strong>distance-based scoring functions</strong> in the latent space can be used to reliably identify UC pixels.</p>
 <p>A possible strategy would be to learn a prototype for each KC—for example, using moving averages of pixel embeddings. However, it has been shown that learned prototypes can be unstable, since they continuously shift during training. To avoid this issue, an alternative approach is followed: <strong>fixed class centroids are assigned</strong>, aligned with the canonical basis vectors and scaled by a magnitude <span class="math inline">\(T\)</span>. That is, the centroid for class <span class="math inline">\(i\)</span> is the vector</p>
@@ -438,13 +440,13 @@ Computing heatmap: 100%|██████████| 1031/1031 [00:27&lt;00:0
 <p>Below is a schematic representation of the desired latent space geometry:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="../assets/ood_methodology.png" class="img-fluid figure-img"></p>
+<p><img src="../assets/ood_methodology.png" class="img-fluid figure-img" style="width:65.0%"></p>
 <figcaption>OOD Latent Space</figcaption>
 </figure>
 </div>
 </section>
 <section id="network-architecture" class="level3" data-number="4.2">
-<h3 data-number="4.2" class="anchored" data-anchor-id="network-architecture"><span class="header-section-number">4.2</span> 3.2 Network Architecture</h3>
+<h3 data-number="4.2" class="anchored" data-anchor-id="network-architecture"><span class="header-section-number">4.2</span> Network Architecture</h3>
 <p>Concerning the architecture of the network, the starting point was a DeepLabV3+ model, which was then modified in various ways to improve closed-set segmentation performance.</p>
 <p>It leverages the <strong>Timm library</strong> to easily select pre-trained encoders, specify stride with dilation, and choose activation maps. I utilize an EfficientNet B2 encoder with stride 8 and extract feature maps from <strong>stages 1, 4, and the stem output</strong>. The dilated convolutions increase the receptive field without losing spatial resolution, which is crucial for semantic segmentation.</p>
 <p>Then the high-level feature map (stage 4) is passed through an <strong>ASPP module</strong> to capture multi-scale context from the encoded features. However, instead of relying on standard atrous rates (e.g., 6, 12, 18), the atrous rates are calculated based on the input resolution, following the findings from the paper <a href="https://arxiv.org/pdf/2307.14179">Resolution-Aware Design of Atrous Rates for Semantic Segmentation Networks</a>.</p>
@@ -465,7 +467,7 @@ Computing heatmap: 100%|██████████| 1031/1031 [00:27&lt;00:0
 </div>
 </section>
 <section id="training-objectives" class="level3" data-number="4.3">
-<h3 data-number="4.3" class="anchored" data-anchor-id="training-objectives"><span class="header-section-number">4.3</span> 3.3 Training Objectives</h3>
+<h3 data-number="4.3" class="anchored" data-anchor-id="training-objectives"><span class="header-section-number">4.3</span> Training Objectives</h3>
 <p>To achieve the objectives outlined in section 3.1, the following training pipeline is utilized:</p>
 <ol type="1">
 <li><strong>Closed-Set Metric Learning</strong>: The first stage performs closed-set training using a contrastive loss to position KCs compactly and close to fixed centroids on a hypersphere of radius <span class="math inline">\(T\)</span> along the axes of the canonical basis.</li>
@@ -474,14 +476,14 @@ Computing heatmap: 100%|██████████| 1031/1031 [00:27&lt;00:0
 <div id="ba7347d7" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ml4cv_assignment.utils.visualize <span class="im">import</span> show_injected_outlier</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>cfg, _ <span class="op">=</span> build_config(</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    [<span class="st">"../configs/data_analysis.yaml"</span>],</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    overrides<span class="op">=</span>{<span class="st">"dataset_config"</span>: {<span class="st">"add_anomalies"</span>: <span class="va">True</span>, <span class="st">"prob_insert"</span>: <span class="fl">1.0</span>}},</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>show_injected_outlier(cfg.train_dataset[<span class="dv">0</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ml4cv_assignment.utils.visualize <span class="im">import</span> show_injected_outlier</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>cfg, _ <span class="op">=</span> build_config(</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    [<span class="st">"../configs/data_analysis.yaml"</span>],</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    overrides<span class="op">=</span>{<span class="st">"dataset_config"</span>: {<span class="st">"add_anomalies"</span>: <span class="va">True</span>, <span class="st">"prob_insert"</span>: <span class="fl">1.0</span>}},</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>show_injected_outlier(cfg.train_dataset[<span class="dv">0</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.</code></pre>
@@ -503,7 +505,7 @@ Computing heatmap: 100%|██████████| 1031/1031 [00:27&lt;00:0
 <p>During training, the global triplet term typically dominates early on due to larger distances, but as training progresses, the local triplet term becomes more significant, helping refine boundaries and reduce uncertainty.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="../assets/prototypical_triplet_loss.png" class="img-fluid figure-img"></p>
+<p><img src="../assets/prototypical_triplet_loss.png" class="img-fluid figure-img" style="width:75.0%"></p>
 <figcaption>Prototypical Triplet Loss</figcaption>
 </figure>
 </div>
@@ -549,20 +551,20 @@ Computing heatmap: 100%|██████████| 1031/1031 [00:27&lt;00:0
 </table>
 </section>
 <section id="anomaly-identification-criterion" class="level3" data-number="4.4">
-<h3 data-number="4.4" class="anchored" data-anchor-id="anomaly-identification-criterion"><span class="header-section-number">4.4</span> 3.4 Anomaly Identification Criterion</h3>
+<h3 data-number="4.4" class="anchored" data-anchor-id="anomaly-identification-criterion"><span class="header-section-number">4.4</span> Anomaly Identification Criterion</h3>
 <p>Once the latent space has been constructed as described in section 3.1, the next step is to exploit its geometry to identify pixels belonging to UC classes.</p>
 <p>To decide whether a pixel is KC or UC, a combination of two scores is used: - <strong>Feature-Norm Score</strong>: measures how close the pixel embedding is to the origin, - <strong>Prototype Distance Score</strong>: inspired by <a href="https://arxiv.org/pdf/2004.02434">Class Anchor Clustering: A Loss for Distance-based Open Set Recognition</a>, it measures the distance between the pixel embedding and the centroids of known classes. These distances are weighted by the softmin of the distances themselves, which highlights uncertainty when the embedding is similarly distant from multiple centroids.</p>
 <p>A pixel is therefore classified as an anomaly if: - it is projected close to the origin (low feature norm), - it is projected far from all centroids (high absolute distance), - or the model exhibits uncertainty between multiple centroids (high uncertainty in softmin weights).</p>
 <p>These three possible scenarios are summarized in the figure below:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="../assets/anomaly_identification_criteria.png" class="img-fluid figure-img"></p>
+<p><img src="../assets/anomaly_identification_criteria.png" class="img-fluid figure-img" style="width:65.0%"></p>
 <figcaption>Anomaly Identification Criteria</figcaption>
 </figure>
 </div>
 </section>
 <section id="training-recipe" class="level3" data-number="4.5">
-<h3 data-number="4.5" class="anchored" data-anchor-id="training-recipe"><span class="header-section-number">4.5</span> 3.5 Training Recipe</h3>
+<h3 data-number="4.5" class="anchored" data-anchor-id="training-recipe"><span class="header-section-number">4.5</span> Training Recipe</h3>
 <p>All models were trained on a single NVIDIA RTX 3090 GPU (24 GB) using <strong>mixed precision</strong>. Input images were resized to <span class="math inline">\(360\times640\)</span> to maintain the rectangular aspect ratio and avoid distortions associated with resizing to a square format. While this reduction in resolution negatively impacts model performance, it was necessary to ensure manageable training times. Furthermore, the lower resolution allowed for a larger batch size of 16, which benefits contrastive losses.</p>
 <p>A summary of the hyperparameters used is provided below. Any hyperparameter not explicitly listed followed the default values from the original papers. For full details, the config files can be found in the <code>configs/</code> folder.</p>
 <table style="width:100%">
@@ -760,7 +762,7 @@ For closed set losses
 </tbody>
 </table>
 <section id="data-augmentations" class="level4" data-number="4.5.1">
-<h4 data-number="4.5.1" class="anchored" data-anchor-id="data-augmentations"><span class="header-section-number">4.5.1</span> 3.5.1 Data Augmentations</h4>
+<h4 data-number="4.5.1" class="anchored" data-anchor-id="data-augmentations"><span class="header-section-number">4.5.1</span> Data Augmentations</h4>
 <p>I used <strong>Albumentations</strong>, a leading open-source library for image augmentation, to implement the augmentation pipeline. It offers a wide range of transformations, inclusing those specifically designed for street images like StreetHazards. Albumentations automatically handles bounding boxes and masks during transformations, applying the same changes to images, bounding boxes and segmentation masks.</p>
 <p>Following the <a href="https://albumentations.ai/docs/3-basic-usage/choosing-augmentations/">Albumentations guidelines</a>, the augmentation pipeline is structured as follows:</p>
 <ul>
@@ -781,19 +783,19 @@ For closed set losses
 <div id="579579b3" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ml4cv_assignment.utils.visualize <span class="im">import</span> show_augmentations</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>cfg, _ <span class="op">=</span> build_config(</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    [<span class="st">"../configs/data_analysis.yaml"</span>, <span class="st">"../configs/transforms/full.yaml"</span>]</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>show_augmentations(</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    cfg.train_dataset,</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    denorm<span class="op">=</span>cfg.training.get_denormalize(in_train<span class="op">=</span><span class="va">True</span>),</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    idx<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    num_samples<span class="op">=</span><span class="dv">9</span>,</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    cols<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ml4cv_assignment.utils.visualize <span class="im">import</span> show_augmentations</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>cfg, _ <span class="op">=</span> build_config(</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    [<span class="st">"../configs/data_analysis.yaml"</span>, <span class="st">"../configs/transforms/full.yaml"</span>]</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>show_augmentations(</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    cfg.train_dataset,</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    denorm<span class="op">=</span>cfg.training.get_denormalize(in_train<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    idx<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    num_samples<span class="op">=</span><span class="dv">9</span>,</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    cols<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.</code></pre>
@@ -810,28 +812,28 @@ For closed set losses
 </section>
 </section>
 <section id="the-baseline-model" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="the-baseline-model"><span class="header-section-number">5</span> 4. The baseline model</h2>
+<h2 data-number="5" class="anchored" data-anchor-id="the-baseline-model"><span class="header-section-number">5</span> The baseline model</h2>
 <p>The architecture described thus far serves as our <strong>baseline model</strong> for subsequent studies. It has a total of <strong>8,156,351</strong> parameters. However, despite being relatively lightweight in terms of parameter count, the <strong>encoder output stride of 8</strong> burdens the model with significant computational complexity.</p>
 <p>Below you can find the quantitative and qualitative results of the baseline model on the validation set. The metrics used for the closed-set part is the <strong>mean Intersection over Union (mIoU)</strong>, while for the open-set part <strong>Area Under the Precision-Recall curve (AUPR)</strong> with respect to the unknown class (13) was used. In the validation set, anomalies were injected to be used as a proxy to see the model’s ability to identify OOD objects. Obviously, this is <em>optimistic</em>, as the anomalies present in the validation set may be simpler than those in the test set, but it is still an indicator to evaluate the model.</p>
 <p>Next, I present the ablation study which help me to identify the impact of various components on both closed-set and open-set segmentation performance. These findings guided the design of the optimized model presented later.</p>
 <div id="f19211e2" class="cell" data-execution_count="15">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>cfg, _ <span class="op">=</span> build_config(</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    [</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/base.yaml"</span>,</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/transforms/full.yaml"</span>,</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/proto_segnet.yaml"</span>,</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/ood_proto_segnet.yaml"</span>,</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    ],</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    overrides<span class="op">=</span>{</span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dataset_config"</span>: {<span class="st">"add_anomalies"</span>: <span class="va">True</span>, <span class="st">"prob_insert"</span>: <span class="fl">1.0</span>},</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"paths"</span>: {</span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>            <span class="op">**</span>NOTEBOOK_PATHS,</span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"checkpoint"</span>: <span class="st">"../checkpoints/ood_baseline_proto_segnet_20251213_052614_val-OoDAUPR_epoch_0.7577.pth"</span>,</span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>        },</span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>cfg, _ <span class="op">=</span> build_config(</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    [</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/base.yaml"</span>,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/transforms/full.yaml"</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/proto_segnet.yaml"</span>,</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/ood_proto_segnet.yaml"</span>,</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    overrides<span class="op">=</span>{</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dataset_config"</span>: {<span class="st">"add_anomalies"</span>: <span class="va">True</span>, <span class="st">"prob_insert"</span>: <span class="fl">1.0</span>},</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"paths"</span>: {</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>            <span class="op">**</span>NOTEBOOK_PATHS,</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"checkpoint"</span>: <span class="st">"../checkpoints/ood_baseline_proto_segnet_20251213_052614_val-OoDAUPR_epoch_0.7577.pth"</span>,</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.</code></pre>
@@ -840,7 +842,7 @@ For closed set losses
 <div id="1bc10789" class="cell" data-execution_count="16">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>show_split_results(evaluate_split(cfg<span class="op">=</span>cfg, split<span class="op">=</span><span class="st">"val"</span>), StreetHazards.CLASSES)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>show_split_results(evaluate_split(cfg<span class="op">=</span>cfg, split<span class="op">=</span><span class="st">"val"</span>), StreetHazards.CLASSES)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <div class="ansi-escaped-output">
@@ -883,7 +885,7 @@ For closed set losses
 <div id="f8e5ebab" class="cell" data-execution_count="17">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>interactive_inference_visualizer(cfg<span class="op">=</span>cfg, split<span class="op">=</span><span class="st">"val"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>interactive_inference_visualizer(cfg<span class="op">=</span>cfg, split<span class="op">=</span><span class="st">"val"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Static Preview (Index 997) for split 'val':</code></pre>
@@ -907,29 +909,29 @@ Interactive Explorer:</code></pre>
 </div>
 </section>
 <section id="ablation-study" class="level2" data-number="6">
-<h2 data-number="6" class="anchored" data-anchor-id="ablation-study"><span class="header-section-number">6</span> 5. Ablation Study</h2>
+<h2 data-number="6" class="anchored" data-anchor-id="ablation-study"><span class="header-section-number">6</span> Ablation Study</h2>
 <p>While encoders, decoders, and transformations were evaluated only in the closed-set setting, the loss functions and anomaly identification criteria were evaluated in the open-set setting.</p>
 <div id="867e8f5f" class="cell" data-execution_count="18">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ml4cv_assignment.utils.visualize <span class="im">import</span> show_runs_comparison</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ml4cv_assignment.utils.wandb_retriever <span class="im">import</span> WandBRetriever</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>retriever <span class="op">=</span> WandBRetriever(entity<span class="op">=</span><span class="st">"aarcara"</span>, project<span class="op">=</span><span class="st">"ml4cv_assignment"</span>)</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="co"># retriever.show_available_runs()</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ml4cv_assignment.utils.visualize <span class="im">import</span> show_runs_comparison</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ml4cv_assignment.utils.wandb_retriever <span class="im">import</span> WandBRetriever</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>retriever <span class="op">=</span> WandBRetriever(entity<span class="op">=</span><span class="st">"aarcara"</span>, project<span class="op">=</span><span class="st">"ml4cv_assignment"</span>)</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="co"># retriever.show_available_runs()</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <section id="encoders" class="level3" data-number="6.1">
-<h3 data-number="6.1" class="anchored" data-anchor-id="encoders"><span class="header-section-number">6.1</span> 5.1 Encoders</h3>
+<h3 data-number="6.1" class="anchored" data-anchor-id="encoders"><span class="header-section-number">6.1</span> Encoders</h3>
 <p>For the first step of the ablation study, I analyzed the impact of the encoder choice on closed-set performance. Although <a href="https://arxiv.org/abs/2310.19909">Battle of the Backbones: A Large-Scale Comparison of Pretrained Models across Computer Vision Tasks</a> finds <strong>ResNet18d</strong> to be the best “small” backbone for detection and segmentation tasks, I compared three different encoders: <strong>ResNet18d</strong>, <strong>EfficientNet B2</strong> and <strong>ConvNeXt Tiny</strong>.</p>
 <p>The first two models are pretrained on <strong>ImageNet</strong>. Literature suggests that, in the absence of domain-specific pretraining (e.g., using Cityscapes for StreetHazards), initialization on ImageNet only accelerates convergence for dense tasks.</p>
 <p>In contrast, <strong>ConvNeXt Tiny</strong> utilizes weights from <strong><a href="https://arxiv.org/pdf/2508.10104">DinoV3</a></strong>, which were distilled from a 7B variant of ViT using a self-supervised method that has demonstrated excellent performance on dense tasks due to the semantic richness of the extracted features. Therefore, it is interesting to see if this self-supervised pretraining can bring benefits to this segmentation task as well.</p>
 <div id="dbb9abec" class="cell" data-execution_count="19">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    retriever, [<span class="st">"zcwl3yl4"</span>, <span class="st">"g4d7dovx"</span>, <span class="st">"bttuyake"</span>], StreetHazards.CLASSES</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    retriever, [<span class="st">"zcwl3yl4"</span>, <span class="st">"g4d7dovx"</span>, <span class="st">"bttuyake"</span>], StreetHazards.CLASSES</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -971,19 +973,19 @@ Interactive Explorer:</code></pre>
 <p>Although DinoV3 weights indeed lead to superior convergence and faster fitting of both loss and mIoU; however, due to the larger number of parameters, it quickly exhibits overfitting. This overfitting behavior was also observed with other larger encoders, leading me to utilize smaller encoders, which yield more stable convergence in my runs.</p>
 </section>
 <section id="decoder" class="level3" data-number="6.2">
-<h3 data-number="6.2" class="anchored" data-anchor-id="decoder"><span class="header-section-number">6.2</span> 5.2 Decoder</h3>
+<h3 data-number="6.2" class="anchored" data-anchor-id="decoder"><span class="header-section-number">6.2</span> Decoder</h3>
 <section id="fapn-vs-fpn" class="level4" data-number="6.2.1">
-<h4 data-number="6.2.1" class="anchored" data-anchor-id="fapn-vs-fpn"><span class="header-section-number">6.2.1</span> 5.2.1 FaPN vs FPN</h4>
+<h4 data-number="6.2.1" class="anchored" data-anchor-id="fapn-vs-fpn"><span class="header-section-number">6.2.1</span> FaPN vs FPN</h4>
 <p>I evaluated the impact of the <code>FaPN</code> by comparing it to a standard <code>FPN</code> decoder. The baseline uses a simplified fusion block consisting of <code>Conv1x1 + BN + ReLU</code> to align channels for low level feature maps, while upsampling for the high level one. The feature maps are then summed together and fed into a <code>Conv3x3 + BN + ReLU</code> to produce the fused output. It follows the <code>ResizeConv</code> idea from <a href="https://distill.pub/">Distil.pub</a>.</p>
 <div id="0066e167" class="cell" data-execution_count="20">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"zcwl3yl4"</span>, <span class="st">"ryjncr1t"</span>],</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"zcwl3yl4"</span>, <span class="st">"ryjncr1t"</span>],</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -1023,17 +1025,17 @@ Interactive Explorer:</code></pre>
 <p>I found that <code>FPN</code> achieves comparable results as <code>FaPN</code> but is lighter and faster, as it avoids complex deformable convolutions and channel attention mechanisms. Therefore, I opted to use <code>FPN</code> in the optimized model.</p>
 </section>
 <section id="aspp-vs-no-aspp" class="level4" data-number="6.2.2">
-<h4 data-number="6.2.2" class="anchored" data-anchor-id="aspp-vs-no-aspp"><span class="header-section-number">6.2.2</span> 5.2.2 ASPP vs No ASPP</h4>
+<h4 data-number="6.2.2" class="anchored" data-anchor-id="aspp-vs-no-aspp"><span class="header-section-number">6.2.2</span> ASPP vs No ASPP</h4>
 <p>Same as above, I replaced the <code>ASPP</code> module with a simple <code>Conv1x1 + BN + ReLU</code> block to reduce the number of channels to 64.</p>
 <div id="414129c8" class="cell" data-execution_count="21">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"zcwl3yl4"</span>, <span class="st">"t8t0bprm"</span>],</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"zcwl3yl4"</span>, <span class="st">"t8t0bprm"</span>],</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -1076,12 +1078,12 @@ Interactive Explorer:</code></pre>
 <div id="2bbc0286" class="cell" data-execution_count="22">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"zcwl3yl4"</span>, <span class="st">"tg8vtl2y"</span>],</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"zcwl3yl4"</span>, <span class="st">"tg8vtl2y"</span>],</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -1122,12 +1124,12 @@ Interactive Explorer:</code></pre>
 <div id="58eb91e5" class="cell" data-execution_count="23">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"ryjncr1t"</span>, <span class="st">"xrvpx0vs"</span>],</span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"ryjncr1t"</span>, <span class="st">"xrvpx0vs"</span>],</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -1166,16 +1168,16 @@ Interactive Explorer:</code></pre>
 </div>
 </section>
 <section id="decoder-channels-32-vs-64-vs-128" class="level4" data-number="6.2.3">
-<h4 data-number="6.2.3" class="anchored" data-anchor-id="decoder-channels-32-vs-64-vs-128"><span class="header-section-number">6.2.3</span> 5.2.3 Decoder channels: 32 vs 64 vs 128</h4>
+<h4 data-number="6.2.3" class="anchored" data-anchor-id="decoder-channels-32-vs-64-vs-128"><span class="header-section-number">6.2.3</span> Decoder channels: 32 vs 64 vs 128</h4>
 <div id="c54e3e4c" class="cell" data-execution_count="24">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"zcwl3yl4"</span>, <span class="st">"hyb323ts"</span>, <span class="st">"aeaqgfpf"</span>],</span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"zcwl3yl4"</span>, <span class="st">"hyb323ts"</span>, <span class="st">"aeaqgfpf"</span>],</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -1217,17 +1219,17 @@ Interactive Explorer:</code></pre>
 <p>64 channels were chosen as the best trade-off between performance and complexity. Reducing to 32 channels led to a noticeable performance drop, while increasing to 128 channels resulted in overfitting without significant gains.</p>
 </section>
 <section id="incorporating-stem-output-vs-not-incorporating-stem-output-into-decoder-fusion" class="level4" data-number="6.2.4">
-<h4 data-number="6.2.4" class="anchored" data-anchor-id="incorporating-stem-output-vs-not-incorporating-stem-output-into-decoder-fusion"><span class="header-section-number">6.2.4</span> 5.2.4 Incorporating stem output vs not incorporating stem output into decoder fusion</h4>
+<h4 data-number="6.2.4" class="anchored" data-anchor-id="incorporating-stem-output-vs-not-incorporating-stem-output-into-decoder-fusion"><span class="header-section-number">6.2.4</span> Incorporating stem output vs not incorporating stem output into decoder fusion</h4>
 <p>To assess the impact of low-level features from the stem, I removed the stem feature map from the decoder fusion process.</p>
 <div id="08fb55ec" class="cell" data-execution_count="25">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"zcwl3yl4"</span>, <span class="st">"60229qb2"</span>],</span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"zcwl3yl4"</span>, <span class="st">"60229qb2"</span>],</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -1267,17 +1269,17 @@ Interactive Explorer:</code></pre>
 <p>Excluding the stem output resulted in a minor decrease in performance, indicating that the stem provides some valuable spatial details for segmentation boundaries. This quantitative drop was also confirmed visually in the predicted segmentation masks.</p>
 </section>
 <section id="use-dilated-convolutions-in-the-encoder-vs-not-using-them" class="level4" data-number="6.2.5">
-<h4 data-number="6.2.5" class="anchored" data-anchor-id="use-dilated-convolutions-in-the-encoder-vs-not-using-them"><span class="header-section-number">6.2.5</span> 5.2.5 Use dilated convolutions in the encoder vs not using them</h4>
+<h4 data-number="6.2.5" class="anchored" data-anchor-id="use-dilated-convolutions-in-the-encoder-vs-not-using-them"><span class="header-section-number">6.2.5</span> Use dilated convolutions in the encoder vs not using them</h4>
 <p>I removed dilated convolutions from the encoder, resulting in an output stride of 32 instead of 8, to test if spatial details could be recovered exclusively through the decoder. If successful, this would enable the use of architectures that do not support natively dilation, such as <strong>Hierarchical Vision Transformers</strong>.</p>
 <div id="98836e95" class="cell" data-execution_count="26">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"zcwl3yl4"</span>, <span class="st">"16v10zty"</span>],</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"zcwl3yl4"</span>, <span class="st">"16v10zty"</span>],</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -1317,12 +1319,12 @@ Interactive Explorer:</code></pre>
 <div id="a0ac6a33" class="cell" data-execution_count="27">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"ryjncr1t"</span>, <span class="st">"b7hw1edr"</span>],</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"ryjncr1t"</span>, <span class="st">"b7hw1edr"</span>],</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -1364,18 +1366,18 @@ Interactive Explorer:</code></pre>
 </section>
 </section>
 <section id="data-augmentations-1" class="level3" data-number="6.3">
-<h3 data-number="6.3" class="anchored" data-anchor-id="data-augmentations-1"><span class="header-section-number">6.3</span> 5.3 Data Augmentations</h3>
+<h3 data-number="6.3" class="anchored" data-anchor-id="data-augmentations-1"><span class="header-section-number">6.3</span> Data Augmentations</h3>
 <section id="no-random-resized-crop-vs-random-resized-crop" class="level4" data-number="6.3.1">
-<h4 data-number="6.3.1" class="anchored" data-anchor-id="no-random-resized-crop-vs-random-resized-crop"><span class="header-section-number">6.3.1</span> 5.3.1 No random resized crop vs random resized crop</h4>
+<h4 data-number="6.3.1" class="anchored" data-anchor-id="no-random-resized-crop-vs-random-resized-crop"><span class="header-section-number">6.3.1</span> No random resized crop vs random resized crop</h4>
 <div id="f6773d5b" class="cell" data-execution_count="28">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"xrvpx0vs"</span>, <span class="st">"v178pooz"</span>, <span class="st">"j0mo30xw"</span>],</span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"xrvpx0vs"</span>, <span class="st">"v178pooz"</span>, <span class="st">"j0mo30xw"</span>],</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -1417,17 +1419,17 @@ Interactive Explorer:</code></pre>
 <p><code>RandomResizedCrop</code> appears to yield better performance compared to simple <code>Resize</code> as expected. Counterintuively, reinserting <code>ASPP</code> module when <code>RandomResizedCrop</code> was removed didn’t help to recover lost performance.</p>
 </section>
 <section id="no-grid-dropout-vs-grid-dropout" class="level4" data-number="6.3.2">
-<h4 data-number="6.3.2" class="anchored" data-anchor-id="no-grid-dropout-vs-grid-dropout"><span class="header-section-number">6.3.2</span> 5.3.2 No grid dropout vs grid dropout</h4>
+<h4 data-number="6.3.2" class="anchored" data-anchor-id="no-grid-dropout-vs-grid-dropout"><span class="header-section-number">6.3.2</span> No grid dropout vs grid dropout</h4>
 <p>I compared the performance of the model without <code>GridDropout</code> against two different ways of using it: * <strong>Masked with ignore index</strong>: the labels of masked regions are set to 255 and ignored with <code>ignore_index=255</code> during loss computation. This prevent the model from learning from zero pixels and possibly having the contrastive loss pull those pixels to the centroids, which could corrupt the latent space structure. The model is forced to learn only from visible pixels, even if some parts are missing. * <strong>Semantic inpainting</strong>: keep the original labels under the dropout part and do not ignore them. In this case, the behavior is similar to semantic inpainting, where the model is also tasked with filling in the missing parts based on surrounding pixels, which is a more challenging task.</p>
 <div id="950322ea" class="cell" data-execution_count="29">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"xrvpx0vs"</span>, <span class="st">"1tofo3c8"</span>, <span class="st">"0njwfjz9"</span>],</span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"xrvpx0vs"</span>, <span class="st">"1tofo3c8"</span>, <span class="st">"0njwfjz9"</span>],</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -1469,16 +1471,16 @@ Interactive Explorer:</code></pre>
 <p>Ultimately, the model peformed best without any grid dropout at all. Therefore, I discarded it from the augmentation pipeline for the optimized model.</p>
 </section>
 <section id="no-photometric-augmentations-vs-photometric-augmentations" class="level4" data-number="6.3.3">
-<h4 data-number="6.3.3" class="anchored" data-anchor-id="no-photometric-augmentations-vs-photometric-augmentations"><span class="header-section-number">6.3.3</span> 5.3.2 No photometric augmentations vs photometric augmentations</h4>
+<h4 data-number="6.3.3" class="anchored" data-anchor-id="no-photometric-augmentations-vs-photometric-augmentations"><span class="header-section-number">6.3.3</span> No photometric augmentations vs photometric augmentations</h4>
 <div id="5e0083b0" class="cell" data-execution_count="30">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"xrvpx0vs"</span>, <span class="st">"55gik79i"</span>],</span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"xrvpx0vs"</span>, <span class="st">"55gik79i"</span>],</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -1518,16 +1520,16 @@ Interactive Explorer:</code></pre>
 <p><code>ColorJitter</code> shows a small but positive impact on performance, particularly in terms of loss reduction. Consequently, I retained it in the augmentation pipeline for the optimized model.</p>
 </section>
 <section id="no-weather-augmentations-vs-weather-augmentations" class="level4" data-number="6.3.4">
-<h4 data-number="6.3.4" class="anchored" data-anchor-id="no-weather-augmentations-vs-weather-augmentations"><span class="header-section-number">6.3.4</span> 5.3.4 No weather augmentations vs weather augmentations</h4>
+<h4 data-number="6.3.4" class="anchored" data-anchor-id="no-weather-augmentations-vs-weather-augmentations"><span class="header-section-number">6.3.4</span> No weather augmentations vs weather augmentations</h4>
 <div id="9961fc32" class="cell" data-execution_count="31">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"xrvpx0vs"</span>, <span class="st">"u3x6ssj4"</span>],</span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"xrvpx0vs"</span>, <span class="st">"u3x6ssj4"</span>],</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -1568,23 +1570,23 @@ Interactive Explorer:</code></pre>
 <div id="5d4efd7b" class="cell" data-execution_count="32">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>img_weather <span class="op">=</span> Image.<span class="bu">open</span>(<span class="st">"../assets/weather.png"</span>)</span>
-<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>img_clear <span class="op">=</span> Image.<span class="bu">open</span>(<span class="st">"../assets/no_weather.png"</span>)</span>
-<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">4</span>))</span>
-<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].imshow(img_weather)</span>
-<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"With weather data augmentations"</span>)</span>
-<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axis(<span class="st">"off"</span>)</span>
-<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].imshow(img_clear)</span>
-<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"No weather data augmentations"</span>)</span>
-<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axis(<span class="st">"off"</span>)</span>
-<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>img_weather <span class="op">=</span> Image.<span class="bu">open</span>(<span class="st">"../assets/weather.png"</span>)</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>img_clear <span class="op">=</span> Image.<span class="bu">open</span>(<span class="st">"../assets/no_weather.png"</span>)</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">4</span>))</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].imshow(img_weather)</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"With weather data augmentations"</span>)</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axis(<span class="st">"off"</span>)</span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].imshow(img_clear)</span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"No weather data augmentations"</span>)</span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axis(<span class="st">"off"</span>)</span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -1597,17 +1599,17 @@ Interactive Explorer:</code></pre>
 <p>As shown above, the model trained without weather augmentations produces noticeable artifacts in the segmentation mask, particularly in regions affected by glare. The same model also struggles with shadows cast by the sun near the brick fence on the right side of the image. For these reasons, I decided to keep the weather augmentations.</p>
 </section>
 <section id="dataset-statistics-vs-imagenet-statistics-vs-per-image-normalization" class="level4" data-number="6.3.5">
-<h4 data-number="6.3.5" class="anchored" data-anchor-id="dataset-statistics-vs-imagenet-statistics-vs-per-image-normalization"><span class="header-section-number">6.3.5</span> 5.3.4 Dataset statistics vs ImageNet statistics vs Per-Image normalization</h4>
+<h4 data-number="6.3.5" class="anchored" data-anchor-id="dataset-statistics-vs-imagenet-statistics-vs-per-image-normalization"><span class="header-section-number">6.3.5</span> Dataset statistics vs ImageNet statistics vs Per-Image normalization</h4>
 <p>I’ve tested different normalization strategies for input images, drawing inspiration from <a href="https://albumentations.ai/blog/2025/03-the-mystery-of-input-normalization/">Input Normalization: What We Know, What We Don’t, and Why It Works Anyway</a>. The first comparison is between using <em>dataset-specific statistics</em> versus <em>ImageNet statistics</em>. Since my encoder is pretrained on ImageNet, it expects inputs normalized with those statistics, which could potentially speed up convergence. However, when training from scratch, dataset-specific statistics are typically preferred for slightly better performance. I also explored <strong>Per-Image normalization</strong>, where each image is normalized using its own mean and standard deviation. In this way, the model learns to be invariant to overall brightness and contrast variations across images, focusing instead on patterns and textures rather than absolute pixel values. This could be particularly useful when there are significant lighting variations in the dataset.</p>
 <div id="be4017dd" class="cell" data-execution_count="33">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"xrvpx0vs"</span>, <span class="st">"60dsw8jt"</span>, <span class="st">"coefkdxx"</span>],</span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
-<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"xrvpx0vs"</span>, <span class="st">"60dsw8jt"</span>, <span class="st">"coefkdxx"</span>],</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -1650,9 +1652,9 @@ Interactive Explorer:</code></pre>
 </section>
 </section>
 <section id="loss-functions" class="level3" data-number="6.4">
-<h3 data-number="6.4" class="anchored" data-anchor-id="loss-functions"><span class="header-section-number">6.4</span> 5.4 Loss Functions</h3>
+<h3 data-number="6.4" class="anchored" data-anchor-id="loss-functions"><span class="header-section-number">6.4</span> Loss Functions</h3>
 <section id="prototypical-triplet-loss-vs-other-contrastive-losses" class="level4" data-number="6.4.1">
-<h4 data-number="6.4.1" class="anchored" data-anchor-id="prototypical-triplet-loss-vs-other-contrastive-losses"><span class="header-section-number">6.4.1</span> 5.4.1 Prototypical Triplet Loss vs other contrastive losses</h4>
+<h4 data-number="6.4.1" class="anchored" data-anchor-id="prototypical-triplet-loss-vs-other-contrastive-losses"><span class="header-section-number">6.4.1</span> Prototypical Triplet Loss vs other contrastive losses</h4>
 <p>To assess the effectiveness of the chosen <code>Prototypical Triplet Loss</code>, I compared it against the other two popular contrastive losses found in the literature for open-set semantic segmentation.</p>
 <ol type="1">
 <li><a href="https://arxiv.org/abs/2108.04562">Deep Metric Learning for Open World Segmentation</a>: this work proposes the <code>Discriminative Cross Entropy Loss</code> that uses squared distances between pixel embeddings and class centroids instead of logits. This modification promotes spherical clusters around centroids rather than the cone-like structures formed by standard cross-entropy. To further improve intra-class compactness, the paper also introduces a <code>Variance Loss</code>, which minimizes the absolute distance between pixel embeddings and their class centroids. Consequently, the <code>DML Loss</code> is defined as the sum of <code>DCE</code> and <code>Variance Loss</code>.</li>
@@ -1662,14 +1664,14 @@ Interactive Explorer:</code></pre>
 <div id="fcc37022" class="cell" data-execution_count="34">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
-<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"3e8z2cx1"</span>, <span class="st">"vj09b8px"</span>],</span>
-<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
-<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"open"</span>,</span>
-<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>    force_download<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>    show_latent_space<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"3e8z2cx1"</span>, <span class="st">"vj09b8px"</span>],</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"open"</span>,</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    force_download<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>    show_latent_space<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -1716,13 +1718,13 @@ Interactive Explorer:</code></pre>
 <div id="9d0d71fb" class="cell" data-execution_count="35">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
-<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"9qj4m9pr"</span>],</span>
-<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
-<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
-<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>    show_latent_space<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"9qj4m9pr"</span>],</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"closed"</span>,</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>    show_latent_space<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -1768,17 +1770,17 @@ Interactive Explorer:</code></pre>
 <p>The <code>OW Loss</code> either failed to learn prototypes or diverged after a few epochs. Others have documented similar instability with this loss (see <a href="https://github.com/PRBonn/ContMAV/issues/4">ConvMAV</a>). This suggests that while learnable prototypes may capture more semantic nuance in the latent space, they are inherently unstable and challenging to train compared to fixed centroids.</p>
 </section>
 <section id="prototypical-triplet-loss-combined-with-other-losses" class="level4" data-number="6.4.2">
-<h4 data-number="6.4.2" class="anchored" data-anchor-id="prototypical-triplet-loss-combined-with-other-losses"><span class="header-section-number">6.4.2</span> 5.4.2 Prototypical Triplet Loss combined with other losses</h4>
+<h4 data-number="6.4.2" class="anchored" data-anchor-id="prototypical-triplet-loss-combined-with-other-losses"><span class="header-section-number">6.4.2</span> Prototypical Triplet Loss combined with other losses</h4>
 <p>In the original paper of <code>Prototypical Triplet Loss</code>, the authors showed that combining their metric learning loss with <code>Focal Loss</code> improved closed-set segmentation performance. Motivated by this, I experimented with coupling <code>Prototypical Triplet Loss</code> with various loss functions, including <code>Dice Loss</code>, <code>Focal Loss</code> and a combination of both (<code>Combo Loss</code> = <code>Dice + Focal</code>), to compare against using <code>Prototypical Triplet Loss</code> alone.</p>
 <div id="6f59e465" class="cell" data-execution_count="36">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
-<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"3e8z2cx1"</span>, <span class="st">"rxet775k"</span>, <span class="st">"gazwh9hp"</span>, <span class="st">"wt8r9zky"</span>],</span>
-<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
-<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"open"</span>,</span>
-<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"3e8z2cx1"</span>, <span class="st">"rxet775k"</span>, <span class="st">"gazwh9hp"</span>, <span class="st">"wt8r9zky"</span>],</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"open"</span>,</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -1823,19 +1825,19 @@ Interactive Explorer:</code></pre>
 </section>
 </section>
 <section id="anomaly-identification-criteria" class="level3" data-number="6.5">
-<h3 data-number="6.5" class="anchored" data-anchor-id="anomaly-identification-criteria"><span class="header-section-number">6.5</span> 5.5 Anomaly Identification Criteria</h3>
+<h3 data-number="6.5" class="anchored" data-anchor-id="anomaly-identification-criteria"><span class="header-section-number">6.5</span> Anomaly Identification Criteria</h3>
 <p>I explored three variations of the anomaly criteria from section 3.4 to identify the most effective configuration: - Feature-Norm Score only vs Prototype Distance Score only vs combination of both. - Softmin-weighted Prototype Distance Score (for uncertainty) vs raw Prototype Distance Score (for open space risk). - Unnormalized distances vs <code>tanh</code>-normalized distances (to bound scores between 0 and 1 for easier thresholding).</p>
 <div id="04e4e5be" class="cell" data-execution_count="37">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
-<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"vls6d14h"</span>, <span class="st">"ft2ex33f"</span>, <span class="st">"b0ua9ouk"</span>, <span class="st">"hjogxde3"</span>, <span class="st">"etvr59yj"</span>],</span>
-<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
-<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"open"</span>,</span>
-<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>    show_plots<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>    include_loss<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"vls6d14h"</span>, <span class="st">"ft2ex33f"</span>, <span class="st">"b0ua9ouk"</span>, <span class="st">"hjogxde3"</span>, <span class="st">"etvr59yj"</span>],</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"open"</span>,</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>    show_plots<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>    include_loss<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -1867,29 +1869,29 @@ Interactive Explorer:</code></pre>
 <div id="35367ebe" class="cell" data-execution_count="38">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
-<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>PATH <span class="op">=</span> Path(<span class="st">"../assets/ood_scores"</span>)</span>
-<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>images <span class="op">=</span> [f <span class="cf">for</span> f <span class="kw">in</span> PATH.iterdir() <span class="cf">if</span> f.is_file()]</span>
-<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>n_images <span class="op">=</span> <span class="bu">len</span>(images)</span>
-<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(n_images, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">8</span>))</span>
-<span id="cb50-13"><a href="#cb50-13" aria-hidden="true" tabindex="-1"></a>axes <span class="op">=</span> axes.flatten()</span>
-<span id="cb50-14"><a href="#cb50-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb50-15"><a href="#cb50-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, ax <span class="kw">in</span> <span class="bu">enumerate</span>(axes):</span>
-<span id="cb50-16"><a href="#cb50-16" aria-hidden="true" tabindex="-1"></a>    img_path <span class="op">=</span> images[i]</span>
-<span id="cb50-17"><a href="#cb50-17" aria-hidden="true" tabindex="-1"></a>    img <span class="op">=</span> Image.<span class="bu">open</span>(img_path)</span>
-<span id="cb50-18"><a href="#cb50-18" aria-hidden="true" tabindex="-1"></a>    ax.imshow(img)</span>
-<span id="cb50-19"><a href="#cb50-19" aria-hidden="true" tabindex="-1"></a>    ax.set_title(img_path.stem, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb50-20"><a href="#cb50-20" aria-hidden="true" tabindex="-1"></a>    ax.axis(<span class="st">"off"</span>)</span>
-<span id="cb50-21"><a href="#cb50-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb50-22"><a href="#cb50-22" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb50-23"><a href="#cb50-23" aria-hidden="true" tabindex="-1"></a>plt.show(fig)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>PATH <span class="op">=</span> Path(<span class="st">"../assets/ood_scores"</span>)</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>images <span class="op">=</span> [f <span class="cf">for</span> f <span class="kw">in</span> PATH.iterdir() <span class="cf">if</span> f.is_file()]</span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>n_images <span class="op">=</span> <span class="bu">len</span>(images)</span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(n_images, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">8</span>))</span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a>axes <span class="op">=</span> axes.flatten()</span>
+<span id="cb49-14"><a href="#cb49-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-15"><a href="#cb49-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, ax <span class="kw">in</span> <span class="bu">enumerate</span>(axes):</span>
+<span id="cb49-16"><a href="#cb49-16" aria-hidden="true" tabindex="-1"></a>    img_path <span class="op">=</span> images[i]</span>
+<span id="cb49-17"><a href="#cb49-17" aria-hidden="true" tabindex="-1"></a>    img <span class="op">=</span> Image.<span class="bu">open</span>(img_path)</span>
+<span id="cb49-18"><a href="#cb49-18" aria-hidden="true" tabindex="-1"></a>    ax.imshow(img)</span>
+<span id="cb49-19"><a href="#cb49-19" aria-hidden="true" tabindex="-1"></a>    ax.set_title(img_path.stem, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb49-20"><a href="#cb49-20" aria-hidden="true" tabindex="-1"></a>    ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb49-21"><a href="#cb49-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-22"><a href="#cb49-22" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb49-23"><a href="#cb49-23" aria-hidden="true" tabindex="-1"></a>plt.show(fig)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -1906,17 +1908,17 @@ Interactive Explorer:</code></pre>
 <p>The <code>Feature-Norm Score</code> produces the cleanest detection maps with minimal false positives. For these reasons, I selected it as the anomaly identification criterion for the optimized model.</p>
 </section>
 <section id="ood-head-vs-objectosphere-loss" class="level3" data-number="6.6">
-<h3 data-number="6.6" class="anchored" data-anchor-id="ood-head-vs-objectosphere-loss"><span class="header-section-number">6.6</span> 5.6 OOD Head vs Objectosphere Loss</h3>
+<h3 data-number="6.6" class="anchored" data-anchor-id="ood-head-vs-objectosphere-loss"><span class="header-section-number">6.6</span> OOD Head vs Objectosphere Loss</h3>
 <p>To conclude the ablation study, given the well-structured latent space yielded by the <code>Prototype Triplet Loss</code>, my final experiment investigates whether an OOD head that does a learned projection and then classifies OOD pixels could perform better than the <code>Objectosphere Loss</code>. This compares a learned vs fixed approach, both aiming to separate the OOD pixels from the known classes, but in this case the region is learned instead of fixed to the origin. Furthermore, this approach would allow for freezing the encoder and decoder used for closed-set segmentation and just train the additional head, which would leave intact the closed-set performance completely.</p>
 <div id="f2714b6b" class="cell" data-execution_count="39">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
-<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
-<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"rxet775k"</span>, <span class="st">"igt5oew9"</span>],</span>
-<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
-<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"open"</span>,</span>
-<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>show_runs_comparison(</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>    retriever<span class="op">=</span>retriever,</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>    run_ids<span class="op">=</span>[<span class="st">"rxet775k"</span>, <span class="st">"igt5oew9"</span>],</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>    classes<span class="op">=</span>StreetHazards.CLASSES,</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">"open"</span>,</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -1957,7 +1959,7 @@ Interactive Explorer:</code></pre>
 </section>
 </section>
 <section id="results-and-discussion" class="level2" data-number="7">
-<h2 data-number="7" class="anchored" data-anchor-id="results-and-discussion"><span class="header-section-number">7</span> 6. Results and Discussion</h2>
+<h2 data-number="7" class="anchored" data-anchor-id="results-and-discussion"><span class="header-section-number">7</span> Results and Discussion</h2>
 <p>The ablation study provided valuable insights into the contributions of various components to both closed-set and open-set segmentation performance. Based on these findings, the following modifications were made to the baseline model to create the optimized <code>ProtoSegNet</code> architecture:</p>
 <ul>
 <li><strong>Decoder</strong>: replaced <code>FaPN</code> with <code>FPN</code>, removed <code>ASPP</code>;</li>
@@ -1967,9 +1969,12 @@ Interactive Explorer:</code></pre>
 <p>As a result, the final model contains <strong>7,386,591</strong> parameters, reduced from <strong>8,156,351</strong> in the baseline.</p>
 <p>Before presenting the final results of the optimized model, I will briefly discuss the Mask2Former implementation with the RbA anomaly detection component, which serves as a benchmark for evaluating the proposed <code>ProtoSegNet</code> model.</p>
 <section id="rba-segmenting-unknowns-regions-rejected-by-all-mask2former" class="level3" data-number="7.1">
-<h3 data-number="7.1" class="anchored" data-anchor-id="rba-segmenting-unknowns-regions-rejected-by-all-mask2former"><span class="header-section-number">7.1</span> 6.1 RbA: Segmenting Unknowns Regions Rejected by All (Mask2Former)</h3>
-<div style="text-align: center; background-color: #f9f9f9; padding: 10px;">
-<pre><code>&lt;img src="../assets/mask2former_rba.png" width="50%"/&gt;</code></pre>
+<h3 data-number="7.1" class="anchored" data-anchor-id="rba-segmenting-unknowns-regions-rejected-by-all-mask2former"><span class="header-section-number">7.1</span> RbA: Segmenting Unknowns Regions Rejected by All (Mask2Former)</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../assets/mask2former_rba.png" class="img-fluid figure-img"></p>
+<figcaption>RbA Architecture</figcaption>
+</figure>
 </div>
 <p>For the anomaly segmentation task using Mask2Former, I implemented the method described in the paper <a href="https://arxiv.org/pdf/2211.14293">RbA: Segmenting Unknowns by Rejecting All</a>. This method is grounded in the observation that in mask classification architectures, <strong>object queries behave like one-vs-all classifiers</strong>. Each object query specializes in detecting a specific known class; consequently, a pixel is considered anomalous if <strong>no query classifies it as belonging to any known class with sufficient confidence</strong> (i.e., vote count). This consensus-based approach effectively mitigates uncertainty, particularly around class boundaries. At these boundaries, multiple queries may compete, whereas for anomalies, all queries should ideally produce low votes.</p>
 <p>The figure above illustrates the Mask2Former architecture with the RbA anomaly detection component. In the semantic segmentation task, the transformer decoder receives <span class="math inline">\(N\)</span> learnable object queries that interact with multi-scale feature maps extracted by the pixel decoder. These refined object queries are then fed into two parallel heads: an MLP generating binary masks <span class="math inline">\(M\)</span> and a linear layer producing class probabilities <span class="math inline">\(P\)</span>. By multiplying <span class="math inline">\(P\)</span> and <span class="math inline">\(M\)</span>, we obtain the <strong>weighted votes for each class contributed by all queries</strong>.</p>
@@ -1980,7 +1985,7 @@ Interactive Explorer:</code></pre>
 <p><span class="math display">\[\mathcal{L}_{RbA}=\sum_{x\in\Omega_{out}}\max(0,\alpha+\sum_{k=1}^K\sigma(L_k(x)))\]</span></p>
 </section>
 <section id="test-results" class="level3" data-number="7.2">
-<h3 data-number="7.2" class="anchored" data-anchor-id="test-results"><span class="header-section-number">7.2</span> 6.2 Test Results</h3>
+<h3 data-number="7.2" class="anchored" data-anchor-id="test-results"><span class="header-section-number">7.2</span> Test Results</h3>
 <blockquote class="blockquote">
 <p>ℹ️ <strong>Info</strong><br>
 It is worth noting that I did not evaluate the models at full resolution <span class="math inline">\(720\times 1280\)</span>, as the goal was not to achieve benchmark-beating performance, but rather to compare different methods and assess how my approach performs against a strong baseline. In practical deployments, one would likely opt for higher resolution for improved performance or lower resolution for faster inference, depending on application requirements. Therefore, I evaluated both models at a resolution of <span class="math inline">\(360\times640\)</span>.</p>
@@ -1988,21 +1993,21 @@ It is worth noting that I did not evaluate the models at full resolution <span c
 <div id="d4ded62e" class="cell" data-execution_count="48">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>cfg, _ <span class="op">=</span> build_config(</span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>    [</span>
-<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/transforms/ablation_result.yaml"</span>,</span>
-<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/mask2former.yaml"</span>,</span>
-<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/ood_mask2former.yaml"</span>,</span>
-<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>    ],</span>
-<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a>    overrides<span class="op">=</span>{</span>
-<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dataset_config"</span>: {<span class="st">"add_anomalies"</span>: <span class="va">False</span>},</span>
-<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"model_cfg"</span>: {<span class="st">"model"</span>: {<span class="st">"params"</span>: {<span class="st">"should_compute_hf_loss"</span>: <span class="va">False</span>}}},</span>
-<span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"paths"</span>: {</span>
-<span id="cb53-11"><a href="#cb53-11" aria-hidden="true" tabindex="-1"></a>            <span class="op">**</span>NOTEBOOK_PATHS,</span>
-<span id="cb53-12"><a href="#cb53-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"checkpoint"</span>: <span class="st">"../checkpoints/ood_mask2former_20251214_121509_val-OoDAUPR_epoch_0.6609.pth"</span>,</span>
-<span id="cb53-13"><a href="#cb53-13" aria-hidden="true" tabindex="-1"></a>        },</span>
-<span id="cb53-14"><a href="#cb53-14" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb53-15"><a href="#cb53-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>cfg, _ <span class="op">=</span> build_config(</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>    [</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/transforms/ablation_result.yaml"</span>,</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/mask2former.yaml"</span>,</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/ood_mask2former.yaml"</span>,</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>    overrides<span class="op">=</span>{</span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dataset_config"</span>: {<span class="st">"add_anomalies"</span>: <span class="va">False</span>},</span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"model_cfg"</span>: {<span class="st">"model"</span>: {<span class="st">"params"</span>: {<span class="st">"should_compute_hf_loss"</span>: <span class="va">False</span>}}},</span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"paths"</span>: {</span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a>            <span class="op">**</span>NOTEBOOK_PATHS,</span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"checkpoint"</span>: <span class="st">"../checkpoints/ood_mask2former_20251214_121509_val-OoDAUPR_epoch_0.6609.pth"</span>,</span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb51-14"><a href="#cb51-14" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb51-15"><a href="#cb51-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Some weights of the model checkpoint at facebook/mask2former-swin-tiny-cityscapes-semantic were not used when initializing Mask2FormerForUniversalSegmentation: ['model.transformer_module.decoder.layers.1.cross_attn.in_proj_bias', 'model.transformer_module.decoder.layers.1.cross_attn.in_proj_weight', 'model.transformer_module.decoder.layers.1.cross_attn.out_proj.bias', 'model.transformer_module.decoder.layers.1.cross_attn.out_proj.weight', 'model.transformer_module.decoder.layers.1.cross_attn_layer_norm.bias', 'model.transformer_module.decoder.layers.1.cross_attn_layer_norm.weight', 'model.transformer_module.decoder.layers.1.fc1.bias', 'model.transformer_module.decoder.layers.1.fc1.weight', 'model.transformer_module.decoder.layers.1.fc2.bias', 'model.transformer_module.decoder.layers.1.fc2.weight', 'model.transformer_module.decoder.layers.1.final_layer_norm.bias', 'model.transformer_module.decoder.layers.1.final_layer_norm.weight', 'model.transformer_module.decoder.layers.1.self_attn.k_proj.bias', 'model.transformer_module.decoder.layers.1.self_attn.k_proj.weight', 'model.transformer_module.decoder.layers.1.self_attn.out_proj.bias', 'model.transformer_module.decoder.layers.1.self_attn.out_proj.weight', 'model.transformer_module.decoder.layers.1.self_attn.q_proj.bias', 'model.transformer_module.decoder.layers.1.self_attn.q_proj.weight', 'model.transformer_module.decoder.layers.1.self_attn.v_proj.bias', 'model.transformer_module.decoder.layers.1.self_attn.v_proj.weight', 'model.transformer_module.decoder.layers.1.self_attn_layer_norm.bias', 'model.transformer_module.decoder.layers.1.self_attn_layer_norm.weight', 'model.transformer_module.decoder.layers.2.cross_attn.in_proj_bias', 'model.transformer_module.decoder.layers.2.cross_attn.in_proj_weight', 'model.transformer_module.decoder.layers.2.cross_attn.out_proj.bias', 'model.transformer_module.decoder.layers.2.cross_attn.out_proj.weight', 'model.transformer_module.decoder.layers.2.cross_attn_layer_norm.bias', 'model.transformer_module.decoder.layers.2.cross_attn_layer_norm.weight', 'model.transformer_module.decoder.layers.2.fc1.bias', 'model.transformer_module.decoder.layers.2.fc1.weight', 'model.transformer_module.decoder.layers.2.fc2.bias', 'model.transformer_module.decoder.layers.2.fc2.weight', 'model.transformer_module.decoder.layers.2.final_layer_norm.bias', 'model.transformer_module.decoder.layers.2.final_layer_norm.weight', 'model.transformer_module.decoder.layers.2.self_attn.k_proj.bias', 'model.transformer_module.decoder.layers.2.self_attn.k_proj.weight', 'model.transformer_module.decoder.layers.2.self_attn.out_proj.bias', 'model.transformer_module.decoder.layers.2.self_attn.out_proj.weight', 'model.transformer_module.decoder.layers.2.self_attn.q_proj.bias', 'model.transformer_module.decoder.layers.2.self_attn.q_proj.weight', 'model.transformer_module.decoder.layers.2.self_attn.v_proj.bias', 'model.transformer_module.decoder.layers.2.self_attn.v_proj.weight', 'model.transformer_module.decoder.layers.2.self_attn_layer_norm.bias', 'model.transformer_module.decoder.layers.2.self_attn_layer_norm.weight', 'model.transformer_module.decoder.layers.3.cross_attn.in_proj_bias', 'model.transformer_module.decoder.layers.3.cross_attn.in_proj_weight', 'model.transformer_module.decoder.layers.3.cross_attn.out_proj.bias', 'model.transformer_module.decoder.layers.3.cross_attn.out_proj.weight', 'model.transformer_module.decoder.layers.3.cross_attn_layer_norm.bias', 'model.transformer_module.decoder.layers.3.cross_attn_layer_norm.weight', 'model.transformer_module.decoder.layers.3.fc1.bias', 'model.transformer_module.decoder.layers.3.fc1.weight', 'model.transformer_module.decoder.layers.3.fc2.bias', 'model.transformer_module.decoder.layers.3.fc2.weight', 'model.transformer_module.decoder.layers.3.final_layer_norm.bias', 'model.transformer_module.decoder.layers.3.final_layer_norm.weight', 'model.transformer_module.decoder.layers.3.self_attn.k_proj.bias', 'model.transformer_module.decoder.layers.3.self_attn.k_proj.weight', 'model.transformer_module.decoder.layers.3.self_attn.out_proj.bias', 'model.transformer_module.decoder.layers.3.self_attn.out_proj.weight', 'model.transformer_module.decoder.layers.3.self_attn.q_proj.bias', 'model.transformer_module.decoder.layers.3.self_attn.q_proj.weight', 'model.transformer_module.decoder.layers.3.self_attn.v_proj.bias', 'model.transformer_module.decoder.layers.3.self_attn.v_proj.weight', 'model.transformer_module.decoder.layers.3.self_attn_layer_norm.bias', 'model.transformer_module.decoder.layers.3.self_attn_layer_norm.weight', 'model.transformer_module.decoder.layers.4.cross_attn.in_proj_bias', 'model.transformer_module.decoder.layers.4.cross_attn.in_proj_weight', 'model.transformer_module.decoder.layers.4.cross_attn.out_proj.bias', 'model.transformer_module.decoder.layers.4.cross_attn.out_proj.weight', 'model.transformer_module.decoder.layers.4.cross_attn_layer_norm.bias', 'model.transformer_module.decoder.layers.4.cross_attn_layer_norm.weight', 'model.transformer_module.decoder.layers.4.fc1.bias', 'model.transformer_module.decoder.layers.4.fc1.weight', 'model.transformer_module.decoder.layers.4.fc2.bias', 'model.transformer_module.decoder.layers.4.fc2.weight', 'model.transformer_module.decoder.layers.4.final_layer_norm.bias', 'model.transformer_module.decoder.layers.4.final_layer_norm.weight', 'model.transformer_module.decoder.layers.4.self_attn.k_proj.bias', 'model.transformer_module.decoder.layers.4.self_attn.k_proj.weight', 'model.transformer_module.decoder.layers.4.self_attn.out_proj.bias', 'model.transformer_module.decoder.layers.4.self_attn.out_proj.weight', 'model.transformer_module.decoder.layers.4.self_attn.q_proj.bias', 'model.transformer_module.decoder.layers.4.self_attn.q_proj.weight', 'model.transformer_module.decoder.layers.4.self_attn.v_proj.bias', 'model.transformer_module.decoder.layers.4.self_attn.v_proj.weight', 'model.transformer_module.decoder.layers.4.self_attn_layer_norm.bias', 'model.transformer_module.decoder.layers.4.self_attn_layer_norm.weight', 'model.transformer_module.decoder.layers.5.cross_attn.in_proj_bias', 'model.transformer_module.decoder.layers.5.cross_attn.in_proj_weight', 'model.transformer_module.decoder.layers.5.cross_attn.out_proj.bias', 'model.transformer_module.decoder.layers.5.cross_attn.out_proj.weight', 'model.transformer_module.decoder.layers.5.cross_attn_layer_norm.bias', 'model.transformer_module.decoder.layers.5.cross_attn_layer_norm.weight', 'model.transformer_module.decoder.layers.5.fc1.bias', 'model.transformer_module.decoder.layers.5.fc1.weight', 'model.transformer_module.decoder.layers.5.fc2.bias', 'model.transformer_module.decoder.layers.5.fc2.weight', 'model.transformer_module.decoder.layers.5.final_layer_norm.bias', 'model.transformer_module.decoder.layers.5.final_layer_norm.weight', 'model.transformer_module.decoder.layers.5.self_attn.k_proj.bias', 'model.transformer_module.decoder.layers.5.self_attn.k_proj.weight', 'model.transformer_module.decoder.layers.5.self_attn.out_proj.bias', 'model.transformer_module.decoder.layers.5.self_attn.out_proj.weight', 'model.transformer_module.decoder.layers.5.self_attn.q_proj.bias', 'model.transformer_module.decoder.layers.5.self_attn.q_proj.weight', 'model.transformer_module.decoder.layers.5.self_attn.v_proj.bias', 'model.transformer_module.decoder.layers.5.self_attn.v_proj.weight', 'model.transformer_module.decoder.layers.5.self_attn_layer_norm.bias', 'model.transformer_module.decoder.layers.5.self_attn_layer_norm.weight', 'model.transformer_module.decoder.layers.6.cross_attn.in_proj_bias', 'model.transformer_module.decoder.layers.6.cross_attn.in_proj_weight', 'model.transformer_module.decoder.layers.6.cross_attn.out_proj.bias', 'model.transformer_module.decoder.layers.6.cross_attn.out_proj.weight', 'model.transformer_module.decoder.layers.6.cross_attn_layer_norm.bias', 'model.transformer_module.decoder.layers.6.cross_attn_layer_norm.weight', 'model.transformer_module.decoder.layers.6.fc1.bias', 'model.transformer_module.decoder.layers.6.fc1.weight', 'model.transformer_module.decoder.layers.6.fc2.bias', 'model.transformer_module.decoder.layers.6.fc2.weight', 'model.transformer_module.decoder.layers.6.final_layer_norm.bias', 'model.transformer_module.decoder.layers.6.final_layer_norm.weight', 'model.transformer_module.decoder.layers.6.self_attn.k_proj.bias', 'model.transformer_module.decoder.layers.6.self_attn.k_proj.weight', 'model.transformer_module.decoder.layers.6.self_attn.out_proj.bias', 'model.transformer_module.decoder.layers.6.self_attn.out_proj.weight', 'model.transformer_module.decoder.layers.6.self_attn.q_proj.bias', 'model.transformer_module.decoder.layers.6.self_attn.q_proj.weight', 'model.transformer_module.decoder.layers.6.self_attn.v_proj.bias', 'model.transformer_module.decoder.layers.6.self_attn.v_proj.weight', 'model.transformer_module.decoder.layers.6.self_attn_layer_norm.bias', 'model.transformer_module.decoder.layers.6.self_attn_layer_norm.weight', 'model.transformer_module.decoder.layers.7.cross_attn.in_proj_bias', 'model.transformer_module.decoder.layers.7.cross_attn.in_proj_weight', 'model.transformer_module.decoder.layers.7.cross_attn.out_proj.bias', 'model.transformer_module.decoder.layers.7.cross_attn.out_proj.weight', 'model.transformer_module.decoder.layers.7.cross_attn_layer_norm.bias', 'model.transformer_module.decoder.layers.7.cross_attn_layer_norm.weight', 'model.transformer_module.decoder.layers.7.fc1.bias', 'model.transformer_module.decoder.layers.7.fc1.weight', 'model.transformer_module.decoder.layers.7.fc2.bias', 'model.transformer_module.decoder.layers.7.fc2.weight', 'model.transformer_module.decoder.layers.7.final_layer_norm.bias', 'model.transformer_module.decoder.layers.7.final_layer_norm.weight', 'model.transformer_module.decoder.layers.7.self_attn.k_proj.bias', 'model.transformer_module.decoder.layers.7.self_attn.k_proj.weight', 'model.transformer_module.decoder.layers.7.self_attn.out_proj.bias', 'model.transformer_module.decoder.layers.7.self_attn.out_proj.weight', 'model.transformer_module.decoder.layers.7.self_attn.q_proj.bias', 'model.transformer_module.decoder.layers.7.self_attn.q_proj.weight', 'model.transformer_module.decoder.layers.7.self_attn.v_proj.bias', 'model.transformer_module.decoder.layers.7.self_attn.v_proj.weight', 'model.transformer_module.decoder.layers.7.self_attn_layer_norm.bias', 'model.transformer_module.decoder.layers.7.self_attn_layer_norm.weight', 'model.transformer_module.decoder.layers.8.cross_attn.in_proj_bias', 'model.transformer_module.decoder.layers.8.cross_attn.in_proj_weight', 'model.transformer_module.decoder.layers.8.cross_attn.out_proj.bias', 'model.transformer_module.decoder.layers.8.cross_attn.out_proj.weight', 'model.transformer_module.decoder.layers.8.cross_attn_layer_norm.bias', 'model.transformer_module.decoder.layers.8.cross_attn_layer_norm.weight', 'model.transformer_module.decoder.layers.8.fc1.bias', 'model.transformer_module.decoder.layers.8.fc1.weight', 'model.transformer_module.decoder.layers.8.fc2.bias', 'model.transformer_module.decoder.layers.8.fc2.weight', 'model.transformer_module.decoder.layers.8.final_layer_norm.bias', 'model.transformer_module.decoder.layers.8.final_layer_norm.weight', 'model.transformer_module.decoder.layers.8.self_attn.k_proj.bias', 'model.transformer_module.decoder.layers.8.self_attn.k_proj.weight', 'model.transformer_module.decoder.layers.8.self_attn.out_proj.bias', 'model.transformer_module.decoder.layers.8.self_attn.out_proj.weight', 'model.transformer_module.decoder.layers.8.self_attn.q_proj.bias', 'model.transformer_module.decoder.layers.8.self_attn.q_proj.weight', 'model.transformer_module.decoder.layers.8.self_attn.v_proj.bias', 'model.transformer_module.decoder.layers.8.self_attn.v_proj.weight', 'model.transformer_module.decoder.layers.8.self_attn_layer_norm.bias', 'model.transformer_module.decoder.layers.8.self_attn_layer_norm.weight']
@@ -2018,7 +2023,7 @@ You should probably TRAIN this model on a down-stream task to be able to use it 
 <div id="ad4c579b" class="cell" data-execution_count="49">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>show_split_results(evaluate_split(cfg<span class="op">=</span>cfg, split<span class="op">=</span><span class="st">"test"</span>), StreetHazards.CLASSES)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>show_split_results(evaluate_split(cfg<span class="op">=</span>cfg, split<span class="op">=</span><span class="st">"test"</span>), StreetHazards.CLASSES)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <div class="ansi-escaped-output">
@@ -2061,7 +2066,7 @@ You should probably TRAIN this model on a down-stream task to be able to use it 
 <div id="174817ea" class="cell" data-execution_count="50">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>interactive_inference_visualizer(cfg<span class="op">=</span>cfg, split<span class="op">=</span><span class="st">"test"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>interactive_inference_visualizer(cfg<span class="op">=</span>cfg, split<span class="op">=</span><span class="st">"test"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Static Preview (Index 1025) for split 'test':</code></pre>
@@ -2086,22 +2091,22 @@ Interactive Explorer:</code></pre>
 <div id="64bcdc45" class="cell" data-execution_count="43">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>cfg, _ <span class="op">=</span> build_config(</span>
-<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>    [</span>
-<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/base.yaml"</span>,</span>
-<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/transforms/ablation_result.yaml"</span>,</span>
-<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/decoders/fpn_no_aspp.yaml"</span>,</span>
-<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/losses/open/ptl_dice_objectosphere.yaml"</span>,</span>
-<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>    ],</span>
-<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a>    overrides<span class="op">=</span>{</span>
-<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dataset_config"</span>: {<span class="st">"add_anomalies"</span>: <span class="va">False</span>},</span>
-<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"model_cfg"</span>: {<span class="st">"model"</span>: {<span class="st">"params"</span>: {<span class="st">"alpha"</span>: <span class="fl">1.0</span>}}},</span>
-<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"paths"</span>: {</span>
-<span id="cb59-12"><a href="#cb59-12" aria-hidden="true" tabindex="-1"></a>            <span class="op">**</span>NOTEBOOK_PATHS,</span>
-<span id="cb59-13"><a href="#cb59-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"checkpoint"</span>: <span class="st">"../checkpoints/ptl_dice_objectosphere_20251208_222812_val-OoDAUPR_epoch_0.7698.pth"</span>,</span>
-<span id="cb59-14"><a href="#cb59-14" aria-hidden="true" tabindex="-1"></a>        },</span>
-<span id="cb59-15"><a href="#cb59-15" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb59-16"><a href="#cb59-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>cfg, _ <span class="op">=</span> build_config(</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>    [</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/base.yaml"</span>,</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/transforms/ablation_result.yaml"</span>,</span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/decoders/fpn_no_aspp.yaml"</span>,</span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"../configs/losses/open/ptl_dice_objectosphere.yaml"</span>,</span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a>    overrides<span class="op">=</span>{</span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dataset_config"</span>: {<span class="st">"add_anomalies"</span>: <span class="va">False</span>},</span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"model_cfg"</span>: {<span class="st">"model"</span>: {<span class="st">"params"</span>: {<span class="st">"alpha"</span>: <span class="fl">1.0</span>}}},</span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"paths"</span>: {</span>
+<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a>            <span class="op">**</span>NOTEBOOK_PATHS,</span>
+<span id="cb57-13"><a href="#cb57-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"checkpoint"</span>: <span class="st">"../checkpoints/ptl_dice_objectosphere_20251208_222812_val-OoDAUPR_epoch_0.7698.pth"</span>,</span>
+<span id="cb57-14"><a href="#cb57-14" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb57-15"><a href="#cb57-15" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb57-16"><a href="#cb57-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.</code></pre>
@@ -2110,7 +2115,7 @@ Interactive Explorer:</code></pre>
 <div id="b038d2a7" class="cell" data-execution_count="44">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>show_split_results(evaluate_split(cfg<span class="op">=</span>cfg, split<span class="op">=</span><span class="st">"test"</span>), StreetHazards.CLASSES)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>show_split_results(evaluate_split(cfg<span class="op">=</span>cfg, split<span class="op">=</span><span class="st">"test"</span>), StreetHazards.CLASSES)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <div class="ansi-escaped-output">
@@ -2153,7 +2158,7 @@ Interactive Explorer:</code></pre>
 <div id="8cf47331" class="cell" data-execution_count="46">
 <details class="code-fold">
 <summary>Show/Hide Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>interactive_inference_visualizer(cfg<span class="op">=</span>cfg, split<span class="op">=</span><span class="st">"test"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>interactive_inference_visualizer(cfg<span class="op">=</span>cfg, split<span class="op">=</span><span class="st">"test"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Static Preview (Index 1025) for split 'test':</code></pre>
@@ -2177,7 +2182,7 @@ Interactive Explorer:</code></pre>
 </div>
 </section>
 <section id="discussion" class="level3" data-number="7.3">
-<h3 data-number="7.3" class="anchored" data-anchor-id="discussion"><span class="header-section-number">7.3</span> 7.2 Discussion</h3>
+<h3 data-number="7.3" class="anchored" data-anchor-id="discussion"><span class="header-section-number">7.3</span> Discussion</h3>
 <p>The proposed approach for open-set semantic segmentation significantly outperforms the Mask2Former + RbA baseline in terms of AUPR for anomaly detection, while remaining competitive in closed-set segmentation as measured by mIoU (Note Mask2Former has a much larger parameter count, ~30M vs ~7M).</p>
 <table class="caption-top table">
 <colgroup>
@@ -2209,7 +2214,7 @@ Interactive Explorer:</code></pre>
 </section>
 </section>
 <section id="references" class="level2" data-number="8">
-<h2 data-number="8" class="anchored" data-anchor-id="references"><span class="header-section-number">8</span> 7. References</h2>
+<h2 data-number="8" class="anchored" data-anchor-id="references"><span class="header-section-number">8</span> References</h2>
 <ul>
 <li><strong>Loss Functions in the Era of Semantic Segmentation: A Survey and Outlook</strong>
 <ul>
@@ -2682,5 +2687,5 @@ Interactive Explorer:</code></pre>
 
 
 
-<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>
