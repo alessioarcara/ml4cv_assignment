@@ -24,3 +24,14 @@ class MetricModality(StrEnum):
     FULL = "full"  # Returns the full history list
     SINGLE = "single"  # Returns a single scalar value (min/max/last)
     MEDIA = "media"  # Downloads and returns the local file path
+
+
+class SplitType(StrEnum):
+    TRAINING = "training"
+    VALIDATION = "validation"
+    TEST = "test"
+
+
+class DatasetType(StrEnum):
+    CITYSCAPES = "cityscapes"
+    STREETHAZARDS = "streethazards"

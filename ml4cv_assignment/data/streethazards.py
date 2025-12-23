@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Dict, Optional, Tuple, Union
 
 import albumentations as A
 import numpy as np
@@ -8,8 +8,10 @@ from pytorch_ood.augment import InsertCOCO
 from torch import Tensor
 from torch.utils.data import Dataset
 
-from ml4cv_assignment.config.dataset_config import StreetHazardsDatasetConfig
 from ml4cv_assignment.data.data_utils import TorchSerializedList
+
+if TYPE_CHECKING:
+    from ml4cv_assignment.config.dataset_config import StreetHazardsDatasetConfig
 
 
 class StreetHazards(Dataset):
@@ -32,7 +34,7 @@ class StreetHazards(Dataset):
 
     def __init__(
         self,
-        config: StreetHazardsDatasetConfig,
+        config: "StreetHazardsDatasetConfig",
         root_dir: Path,
         coco_dir: Path,
         subset: str = "training",

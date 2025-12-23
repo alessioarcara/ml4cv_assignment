@@ -66,11 +66,14 @@ EXPERIMENTS=(
   #"configs/base.yaml configs/transforms/full.yaml configs/proto_segnet.yaml configs/ood_proto_segnet.yaml configs/anomaly_identification_criterias/cac_score.yaml"
   #"configs/base.yaml configs/transforms/full.yaml configs/proto_segnet.yaml configs/ood_proto_segnet.yaml configs/anomaly_identification_criterias/dist_score.yaml"
   #"configs/base.yaml configs/transforms/full.yaml configs/proto_segnet.yaml configs/ood_proto_segnet.yaml configs/anomaly_identification_criterias/cac_score_not_norm.yaml"
-  "configs/base.yaml configs/transforms/full.yaml configs/proto_segnet.yaml configs/ood_proto_segnet.yaml configs/anomaly_identification_criterias/cac_score_running_centers.yaml"
+  #"configs/base.yaml configs/transforms/full.yaml configs/proto_segnet.yaml configs/ood_proto_segnet.yaml configs/anomaly_identification_criterias/cac_score_running_centers.yaml"
 
   # Mask2Former RbA
   #"configs/transforms/ablation_result.yaml configs/mask2former.yaml"
   #"configs/transforms/ablation_result.yaml configs/mask2former.yaml configs/ood_mask2former.yaml"
+
+  # Cityscapes Closed-Set
+  "configs/base.yaml configs/transforms/ablation_result.yaml configs/decoders/fpn_no_aspp.yaml configs/losses/closed/ptl_focal_dice.yaml configs/dataset/cityscapes.yaml"
 )
 
 echo "Found ${#EXPERIMENTS[@]} experiments to run."

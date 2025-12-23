@@ -19,3 +19,6 @@ class PathsConfig(BaseModel):
     coco_data_dir: DirectoryPath = Field(
         ..., description="Directory containing the COCO dataset"
     )
+    cityscapes_root_dir: DirectoryPath = Field(
+        ..., description="Directory containing the Cityscapes dataset"
+    )
