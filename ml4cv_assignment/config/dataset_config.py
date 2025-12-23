@@ -21,6 +21,10 @@ class BaseDatasetConfig(BaseModel, ABC):
         ge=0.0,
         le=1.0,
     )
+    unknown_mask_value: int = Field(
+        ...,
+        description="Mask value to use for unknown regions when adding anomalies",
+    )
 
     @abstractmethod
     def create_dataset(
@@ -80,7 +84,9 @@ class CityscapesDatasetConfig(BaseDatasetConfig):
             raise ValueError(f"Invalid subset '{subset}' for Cityscapes dataset")
 
         return CityscapesDataset(
+            config=self,
             root=paths.cityscapes_root_dir,
+            coco_dir=paths.coco_data_dir,
             split=cityscapes_split,
             mode="fine",
             target_type="semantic",

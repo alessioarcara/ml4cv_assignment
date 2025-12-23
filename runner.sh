@@ -72,8 +72,9 @@ EXPERIMENTS=(
   #"configs/transforms/ablation_result.yaml configs/mask2former.yaml"
   #"configs/transforms/ablation_result.yaml configs/mask2former.yaml configs/ood_mask2former.yaml"
 
-  # Cityscapes Closed-Set
-  "configs/base.yaml configs/transforms/ablation_result.yaml configs/decoders/fpn_no_aspp.yaml configs/losses/closed/ptl_focal_dice.yaml configs/dataset/cityscapes.yaml"
+  # Cityscapes
+  #"configs/base.yaml configs/transforms/ablation_result.yaml configs/decoders/fpn_no_aspp.yaml configs/losses/closed/ptl_focal_dice.yaml configs/dataset/cityscapes.yaml"
+  "configs/base.yaml configs/transforms/ablation_result.yaml configs/decoders/fpn_no_aspp.yaml configs/losses/closed/ptl_focal_dice.yaml configs/dataset/cityscapes.yaml configs/dataset/cityscapes_open.yaml"
 )
 
 echo "Found ${#EXPERIMENTS[@]} experiments to run."

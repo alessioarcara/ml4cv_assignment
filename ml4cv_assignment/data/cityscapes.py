@@ -1,14 +1,23 @@
 from pathlib import Path
-from typing import Callable, Optional, Union
+from typing import TYPE_CHECKING, Callable, Optional, Tuple, Union
 
 import numpy as np
+import torch
+from torch import Tensor
 from torchvision.datasets import Cityscapes
 
+from ml4cv_assignment.data.dataset_mixins import AnomalyAugmentationMixin
 
-class CityscapesDataset(Cityscapes):
+if TYPE_CHECKING:
+    from ml4cv_assignment.config.dataset_config import CityscapesDatasetConfig
+
+
+class CityscapesDataset(Cityscapes, AnomalyAugmentationMixin):
     def __init__(
         self,
+        config: "CityscapesDatasetConfig",
         root: Union[str, Path],
+        coco_dir: Path,
         split: str = "train",
         mode: str = "fine",
         target_type: Union[list[str], str] = "instance",
@@ -31,17 +40,21 @@ class CityscapesDataset(Cityscapes):
             if cls.id >= 0:  # ignore classes with id -1
                 self.id_to_train_id[cls.id] = cls.train_id
 
-    def __getitem__(self, index):
-        image, mask = super().__getitem__(index)
+        self.setup_coco(config, coco_dir=coco_dir, exclude_classes=None)
 
-        img_np = np.array(image)
-        mask_np = np.array(mask)
+    def __getitem__(
+        self, idx: int, apply_transforms: bool = True
+    ) -> Union[Tuple[np.ndarray, np.ndarray], Tuple[Tensor, Tensor]]:
+        img, mask = super().__getitem__(idx)
+
+        img_np, mask_np = self.apply_augmentations(
+            img, mask, self.albu_transforms, apply_transforms
+        )
 
         mask_np = self.id_to_train_id[mask_np]
 
-        if self.albu_transforms is not None:
-            augmented = self.albu_transforms(image=img_np, mask=mask_np)
-            img_np, mask_np = augmented["image"], augmented["mask"]
+        if isinstance(img_np, torch.Tensor):
+            mask_np = torch.from_numpy(mask_np).long()
 
         return img_np, mask_np
 

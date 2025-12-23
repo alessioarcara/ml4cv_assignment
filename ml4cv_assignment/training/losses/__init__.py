@@ -6,6 +6,7 @@ from ml4cv_assignment.training.losses.prototypical_global_local_triplet_loss imp
     PrototypicalGlobalLocalTripletLoss,
 )
 from ml4cv_assignment.training.losses.rejected_by_all_loss import RejectedByAllLoss
+from ml4cv_assignment.training.losses.unknown_aware_loss import UnknownAwareLoss
 from ml4cv_assignment.training.losses.weighted_loss import WeightedLoss
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "PrototypicalGlobalLocalTripletLoss",
     "DMLLoss",
     "OoDBCELoss",
+    "UnknownAwareLoss",
 ]

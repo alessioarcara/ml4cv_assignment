@@ -4,17 +4,17 @@ from typing import TYPE_CHECKING, Dict, Optional, Tuple, Union
 import albumentations as A
 import numpy as np
 from PIL import Image
-from pytorch_ood.augment import InsertCOCO
 from torch import Tensor
 from torch.utils.data import Dataset
 
 from ml4cv_assignment.data.data_utils import TorchSerializedList
+from ml4cv_assignment.data.dataset_mixins import AnomalyAugmentationMixin
 
 if TYPE_CHECKING:
     from ml4cv_assignment.config.dataset_config import StreetHazardsDatasetConfig
 
 
-class StreetHazards(Dataset):
+class StreetHazards(Dataset, AnomalyAugmentationMixin):
     CLASSES = [
         "unlabeled",  # 0
         "building",  # 1
@@ -57,16 +57,11 @@ class StreetHazards(Dataset):
             )
 
         self.mask_shift = config.mask_shift
-        self.coco_transform = (
-            InsertCOCO(
-                coco_dir=str(coco_dir),
-                exclude_classes="Streethazards",
-                p=config.prob_insert,
-                n=config.num_objects_to_insert,
-                ood_mask_value=14,
-            )
-            if config.add_anomalies
-            else None
+
+        self.setup_coco(
+            config=config,
+            coco_dir=coco_dir,
+            exclude_classes="StreetHazards",
         )
 
     def __len__(self) -> int:
@@ -78,18 +73,8 @@ class StreetHazards(Dataset):
         img = Image.open(self.imgs[idx]).convert("RGB")
         mask = Image.open(self.masks[idx]).convert("L")
 
-        if self.coco_transform is not None:
-            img, mask = self.coco_transform(img, mask)
-
-        img_np = np.array(img)
-        mask_np = np.array(mask)
-
-        if apply_transforms and self.transforms is not None:
-            augmented = self.transforms(image=img_np, mask=mask_np)
-            img_np, mask_np = augmented["image"], augmented["mask"]
-
-        assert img_np is not None and mask_np is not None, (
-            "Image or mask is None after transformations"
+        img_np, mask_np = self.apply_augmentations(
+            img, mask, self.transforms, apply_transforms
         )
 
         mask_np = mask_np - int(self.mask_shift)

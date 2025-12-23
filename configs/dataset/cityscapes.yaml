@@ -29,7 +29,7 @@ model_cfg:
     fam_blocks: "fusion_blocks"
 
 training:
-  wandb_base_run_name: "cityscapes_closed_ptl"
+  wandb_base_run_name: "cityscapes_closed"
   batch_size: 8
 
   train_transforms:
