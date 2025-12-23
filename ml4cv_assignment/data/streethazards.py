@@ -73,13 +73,15 @@ class StreetHazards(Dataset, AnomalyAugmentationMixin):
         img = Image.open(self.imgs[idx]).convert("RGB")
         mask = Image.open(self.masks[idx]).convert("L")
 
-        img_np, mask_np = self.apply_augmentations(
-            img, mask, self.transforms, apply_transforms
+        mask_np = np.array(mask)
+
+        img_aug, mask_aug = self.apply_augmentations(
+            img, mask_np, self.transforms, apply_transforms
         )
 
-        mask_np = mask_np - int(self.mask_shift)
+        mask_aug = mask_aug - int(self.mask_shift)
 
-        return img_np, mask_np
+        return img_aug, mask_aug
 
     @property
     def num_classes(self) -> int:

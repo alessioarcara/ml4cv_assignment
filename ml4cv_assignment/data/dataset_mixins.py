@@ -14,8 +14,13 @@ class AnomalyAugmentationMixin:
         self,
         config: "BaseDatasetConfig",
         coco_dir: Union[Path, str],
-        exclude_classes: list[str] | str | None = None,
+        exclude_classes: Optional[list[str] | str] = None,
     ):
+        # HACK: If exclude_classes is None or empty, InsertCOCO internally filters out everything.
+        # We provide a non-existent class to force it to include all images.
+        if not exclude_classes:
+            exclude_classes = ["__fake_class_to_bypass_bug__"]
+
         self.coco_transform = (
             InsertCOCO(
                 coco_dir=str(coco_dir),
@@ -31,17 +36,18 @@ class AnomalyAugmentationMixin:
     def apply_augmentations(
         self,
         img: Image.Image,
-        mask: Image.Image,
+        mask_np: np.ndarray,
         transforms: Optional[Callable],
         apply_transforms: bool,
     ) -> Tuple[np.ndarray, np.ndarray]:
-        # 1. Apply COCO Anomaly Insertion (PIL -> PIL)
+        # 1. Apply COCO Anomaly Insertion
         if hasattr(self, "coco_transform") and self.coco_transform is not None:
-            img, mask = self.coco_transform(img, mask)
+            img, mask_tensor = self.coco_transform(img, mask_np)
+            # InsertCOCO returns mask as a Tensor; convert back to NumPy (uint8)
+            mask_np = mask_tensor.cpu().numpy().astype(np.uint8)
 
-        # 2. Convert to NumPy
+        # 2. Convert to NumPy (Needed for Albumentations)
         img_np = np.array(img)
-        mask_np = np.array(mask)
 
         # 3. Apply Albumentations (NumPy -> NumPy)
         if apply_transforms and transforms is not None:

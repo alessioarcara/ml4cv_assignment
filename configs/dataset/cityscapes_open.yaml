@@ -1,7 +1,7 @@
 dataset_config:
   add_anomalies: true
   prob_insert: 1.0
-  unknown_mask_value: 34
+  unknown_mask_value: 19 
 
 model_cfg:
   model:
@@ -17,7 +17,7 @@ model_cfg:
               params:
                 average: "macro"
                 ignore_index: 255
-            unknown_label: 34
+            unknown_label: 19
         - type: UnknownAwareLoss
           params:
             loss:
@@ -28,11 +28,11 @@ model_cfg:
                 magnitude: 10
                 num_classes: 19
                 ignore_index: 255
-            unknown_label: 34
+            unknown_label: 19
         - type: ObjectosphereLoss
           params:
             xi: 5.0
-            unknown_label: 34
+            unknown_label: 19
             ignore_index: 255
 training:
   wandb_base_run_name: "cityscapes_open"
@@ -63,7 +63,7 @@ training:
         ignore_index: 255 
     - type: AUPR
       params:
-        unknown_label: 34
+        unknown_label: 19
 
   callbacks:
     - type: EarlyStoppingCallback
