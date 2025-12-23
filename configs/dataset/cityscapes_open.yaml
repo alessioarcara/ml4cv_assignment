@@ -1,7 +1,7 @@
 dataset_config:
   add_anomalies: true
   prob_insert: 1.0
-  unknown_mask_value: 19
+  unknown_mask_value: 34
 
 model_cfg:
   model:
@@ -9,7 +9,6 @@ model_cfg:
       encoder_lr: 1e-5
       decoder_lr: 1e-4
       alpha: 1.0
-    params:
       losses:
         - type: UnknownAwareLoss
           params:
@@ -18,7 +17,7 @@ model_cfg:
               params:
                 average: "macro"
                 ignore_index: 255
-            unknown_label: 19
+            unknown_label: 34
         - type: UnknownAwareLoss
           params:
             loss:
@@ -29,11 +28,11 @@ model_cfg:
                 magnitude: 10
                 num_classes: 19
                 ignore_index: 255
-            unknown_label: 19
+            unknown_label: 34
         - type: ObjectosphereLoss
           params:
             xi: 5.0
-            unknown_label: 19
+            unknown_label: 34
             ignore_index: 255
 training:
   wandb_base_run_name: "cityscapes_open"
@@ -64,7 +63,30 @@ training:
         ignore_index: 255 
     - type: AUPR
       params:
-        unknown_label: 19
+        unknown_label: 34
+
+  callbacks:
+    - type: EarlyStoppingCallback
+      params:
+        patience: 10
+        minimize: false
+        history_key: val/OoDAUPR_epoch
+    - type: ModelSavingCallback
+      params:
+        out_dir: checkpoints  
+        minimize: false
+        history_key: val/OoDAUPR_epoch
+    - type: VisualizeSegmentationResultsCallback
+      params:
+        num_samples: 8
+        dataset_type: cityscapes
+    - type: ModelSummaryCallback
+      params: {}
+    - type: PixelEmbeddingsCallback
+      params:
+        anchors_magnitude: 10
+        min_num_pixels: 1000
+        dataset_type: cityscapes
 
 paths:
   checkpoint: checkpoints/cityscapes_closed_20251223_175807_val-mIoU_epoch_0.6693.pth

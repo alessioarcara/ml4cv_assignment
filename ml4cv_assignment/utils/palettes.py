@@ -2,20 +2,20 @@ import numpy as np
 
 STREETHAZARD_COLORS = np.array(
     [
-        [0, 0, 0],  # unlabeled: 0,
-        [70, 70, 70],  # building: 1,
-        [190, 153, 153],  # fence: 2,
-        [250, 170, 160],  # other: 3,
-        [220, 20, 60],  # pedestrian: 4,
-        [153, 153, 153],  # pole: 5,
-        [157, 234, 50],  # road line: 6,
-        [128, 64, 128],  # road: 7,
-        [244, 35, 232],  # sidewalk: 8,
-        [107, 142, 35],  # vegetation: 9,
-        [0, 0, 142],  # car: 10,
-        [102, 102, 156],  # wall: 11,
-        [220, 220, 0],  # traffic sign: 12,
-        [60, 250, 240],  # anomaly:cityscapes 13,
+        [0, 0, 0],  # 0: unlabeled,
+        [70, 70, 70],  # 1: building,
+        [190, 153, 153],  # 2: fence,
+        [250, 170, 160],  # 3: other,
+        [220, 20, 60],  # 4: pedestrian,
+        [153, 153, 153],  # 5: pole,
+        [157, 234, 50],  # 6: road line,
+        [128, 64, 128],  # 7: road,
+        [244, 35, 232],  # 8: sidewalk,
+        [107, 142, 35],  # 9: vegetation,
+        [0, 0, 142],  # 10: car,
+        [102, 102, 156],  # 11: wall,
+        [220, 220, 0],  # 12: traffic sign,
+        [60, 250, 240],  # 13: anomaly,
     ]
 )
 
@@ -41,5 +41,6 @@ CITYSCAPES_COLORS = np.array(
         [0, 80, 100],  # 16: train
         [0, 0, 230],  # 17: motorcycle
         [119, 11, 32],  # 18: bicycle
+        [60, 250, 240],  # 19: anomaly
     ]
 )

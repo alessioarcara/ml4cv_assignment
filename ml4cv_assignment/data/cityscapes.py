@@ -36,9 +36,15 @@ class CityscapesDataset(Cityscapes, AnomalyAugmentationMixin):
 
         # lookup table to map original IDs to training IDs
         self.id_to_train_id = np.full((256,), 255, dtype=np.uint8)
+
         for cls in self.classes:
             if cls.id >= 0:  # ignore classes with id -1
                 self.id_to_train_id[cls.id] = cls.train_id
+
+        # Include anomaly class in mapping otherwise it would be overwritten
+        if config.add_anomalies:
+            anomaly_id = config.unknown_mask_value
+            self.id_to_train_id[anomaly_id] = anomaly_id
 
         self.setup_coco(config, coco_dir=coco_dir, exclude_classes=None)
 
@@ -51,10 +57,12 @@ class CityscapesDataset(Cityscapes, AnomalyAugmentationMixin):
             img, mask, self.albu_transforms, apply_transforms
         )
 
-        mask_np = self.id_to_train_id[mask_np]
-
-        if isinstance(img_np, torch.Tensor):
+        # Map original IDs to training IDs
+        if isinstance(mask_np, Tensor):
+            mask_np = self.id_to_train_id[mask_np]
             mask_np = torch.from_numpy(mask_np).long()
+        else:
+            mask_np = self.id_to_train_id[mask_np]
 
         return img_np, mask_np
 
@@ -64,4 +72,5 @@ class CityscapesDataset(Cityscapes, AnomalyAugmentationMixin):
         for c in cls.classes:
             if c.train_id not in [255, -1]:
                 id2label[c.train_id] = c.name
+        id2label[34] = "anomaly"
         return id2label
