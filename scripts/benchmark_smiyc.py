@@ -1,5 +1,6 @@
 import argparse
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -14,14 +15,48 @@ from loguru import logger
 from tqdm import tqdm
 
 
+def ensure_benchmark_code():
+    current_file_path = Path(__file__).resolve()
+    project_root = current_file_path.parent.parent
+    external_dir = project_root / "external"
+    target_path = external_dir / "road-anomaly-benchmark"
+
+    REPO_URL = "https://github.com/SegmentMeIfYouCan/road-anomaly-benchmark.git"
+
+    if target_path.exists() and (target_path.iterdir()):
+        return
+
+    logger.warning(
+        f"'road-anomaly-benchmark' not found in '{external_dir}'. Cloning from {REPO_URL}..."
+    )
+
+    try:
+        external_dir.mkdir(parents=True, exist_ok=True)
+
+        if target_path.exists():
+            target_path.rmdir()
+
+        subprocess.run(
+            ["git", "clone", REPO_URL, str(target_path)],
+            check=True,
+            stdout=subprocess.DEVNULL,
+        )
+        logger.success("'road-anomaly-benchmark' cloned successfully.")
+    except Exception as e:
+        logger.error(f"Failed to clone 'road-anomaly-benchmark': {e}")
+        logger.error("Please manually clone it: git clone {REPO_URL} {target_path}")
+        sys.exit(1)
+
+
 def setup_environment():
+    ensure_benchmark_code()
     current_file_path = Path(__file__).resolve()
     project_root = current_file_path.parent.parent
     external_repo_path = project_root / "external" / "road-anomaly-benchmark"
     sys.path.append(str(project_root))
     sys.path.append(str(external_repo_path))
-    DATASET_ROOT = "/home/aarcara/ml4cv_assignment/datasets"
-    os.environ["DATASETS_DIR"] = DATASET_ROOT
+    DATASET_ROOT = project_root / "datasets"
+    os.environ["DIR_DATASETS"] = str(DATASET_ROOT)
 
 
 setup_environment()
@@ -159,7 +194,9 @@ def main(args: argparse.Namespace):
         print("\n--- Final Evaluation Metrics ---")
         print(metrics)
     except Exception:
-        logger.error("Error calculating metrics")
+        logger.warning(
+            "Could not compute metrics. No annotations available for this dataset."
+        )
 
 
 if __name__ == "__main__":

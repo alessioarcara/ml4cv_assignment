@@ -6,7 +6,7 @@
 
 from pathlib import Path
 
-import gdown
+import gdown  # type: ignore
 from loguru import logger
 
 CHECKPOINTS_DIR = Path("checkpoints")
@@ -17,6 +17,7 @@ files = {
     "ood_baseline_proto_segnet_20251213_052614_val-OoDAUPR_epoch_0.7577.pth": "15fM3p8VJRrLllwiO7Fu7f-O7N1LuGaqR",
     "ptl_dice_objectosphere_20251208_222812_val-OoDAUPR_epoch_0.7698.pth": "1WaaYNKvnsZiBZ98xj5zM-Nawzo78xDGH",
     "ood_mask2former_20251214_121509_val-OoDAUPR_epoch_0.6609.pth": "16Js6iKtZAV30Mj56064mOYSVloMTtAOp",
+    "cityscapes_open_20251224_135733_val-OoDAUPR_epoch_0.7993.pth": "1PD0exlLyXCLoDQhAznQthKZCLEaUSHlg",
 }
 
 
