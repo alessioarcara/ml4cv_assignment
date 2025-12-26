@@ -1,0 +1,19 @@
+project:
+  type: website
+  output-dir: docs
+  resources:
+    - "assets/"
+
+website:
+  title: "Machine Learning for Computer Vision Assignment"
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    smooth-scroll: true
+
+    code-fold: true
+    code-summary: "Show/Hide Code"

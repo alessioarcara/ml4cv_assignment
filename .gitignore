@@ -227,3 +227,9 @@ datasets
 wandb
 saved
 checkpoints
+
+# Quarto
+/_site/
+.quarto/
+**/*.quarto/
+**/*.quarto_ipynb
