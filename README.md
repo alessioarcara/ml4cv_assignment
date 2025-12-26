@@ -146,7 +146,7 @@ uv run python scripts/eval.py \
 To benchmark the model on the RoadAnomaly dataset, use the `benchmark_smiyc.py` script:
 
 ```bash
-uv run python scripts/benchmark_smiyc.py \
+uv run --extra smiyc python scripts/benchmark_smiyc.py \
     --dataset AnomalyTrack-all
 ```
 
