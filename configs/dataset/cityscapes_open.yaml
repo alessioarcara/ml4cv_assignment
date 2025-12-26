@@ -8,7 +8,7 @@ model_cfg:
     params:
       encoder_lr: 1e-5
       decoder_lr: 1e-4
-      alpha: 1.0
+      alpha: 0.5
       losses:
         - type: UnknownAwareLoss
           params:
@@ -36,6 +36,7 @@ model_cfg:
             ignore_index: 255
 training:
   wandb_base_run_name: "cityscapes_open"
+  batch_size: 4
   force_eval_mode: true
 
   train_transforms:
