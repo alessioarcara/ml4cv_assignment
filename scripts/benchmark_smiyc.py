@@ -27,7 +27,9 @@ def ensure_benchmark_code():
         return
 
     logger.warning(
-        f"'road-anomaly-benchmark' not found in '{external_dir}'. Cloning from {REPO_URL}..."
+        "'road-anomaly-benchmark' not found in '{}'. Cloning from {}...",
+        external_dir,
+        REPO_URL,
     )
 
     try:
@@ -43,8 +45,8 @@ def ensure_benchmark_code():
         )
         logger.success("'road-anomaly-benchmark' cloned successfully.")
     except Exception as e:
-        logger.error(f"Failed to clone 'road-anomaly-benchmark': {e}")
-        logger.error("Please manually clone it: git clone {REPO_URL} {target_path}")
+        logger.error("Failed to clone 'road-anomaly-benchmark': {}", e)
+        logger.error("Please manually clone it: git clone {} {}", REPO_URL, target_path)
         sys.exit(1)
 
 
@@ -70,7 +72,9 @@ except ImportError:
     sys.exit(1)
 
 # --- Config ---
-CHECKPOINT_PATH = "/home/aarcara/ml4cv_assignment/checkpoints/cityscapes_open_20251224_135733_val-OoDAUPR_epoch_0.7993.pth"
+CHECKPOINT_PATH = (
+    "checkpoints/cityscapes_open_20251224_135733_val-OoDAUPR_epoch_0.7993.pth"
+)
 CONFIG_FILES = [
     "configs/base.yaml",
     "configs/transforms/ablation_result.yaml",
@@ -182,7 +186,7 @@ def main(args: argparse.Namespace):
         dataset_name=args.dataset,
     )
 
-    logger.info(f"Starting benchmark on {args.dataset} dataset...")
+    logger.info("Starting benchmark on {} dataset...", args.dataset)
     for frame in tqdm(ev.get_frames(), desc="Processing", unit="frame"):
         anomaly_map = method.predict(frame.image)
         ev.save_output(frame, anomaly_map)
