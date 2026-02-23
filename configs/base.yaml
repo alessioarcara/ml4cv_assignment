@@ -4,6 +4,7 @@ dataset_config:
   type: streethazards
   add_anomalies: false 
   mask_shift: true
+  unknown_mask_value: 13
 
 model_cfg:
   use_preprocessor: false 

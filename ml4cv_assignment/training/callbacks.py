@@ -12,9 +12,11 @@ from torch import Tensor
 from torchinfo import summary
 
 import wandb
+from ml4cv_assignment.data.cityscapes import CityscapesDataset
 from ml4cv_assignment.data.streethazards import StreetHazards
-from ml4cv_assignment.utils.typings import Stage
-from ml4cv_assignment.utils.visualize import COLORS, apply_colormap, color
+from ml4cv_assignment.utils.palettes import CITYSCAPES_COLORS, STREETHAZARD_COLORS
+from ml4cv_assignment.utils.typings import DatasetType, Stage
+from ml4cv_assignment.utils.visualize import apply_colormap, color
 
 if TYPE_CHECKING:
     from ml4cv_assignment.training.trainer import Trainer
@@ -129,9 +131,16 @@ class VisualizeSegmentationResultsCallback(Callback):
     Log a side-by-side comparison of true vs predicted segmentation masks.
     """
 
-    def __init__(self, num_samples: int) -> None:
+    def __init__(
+        self, num_samples: int, dataset_type: DatasetType = DatasetType.STREETHAZARDS
+    ) -> None:
         self.num_samples = num_samples
         self.eval_step = 0
+
+        if dataset_type == DatasetType.STREETHAZARDS:
+            self.palette = STREETHAZARD_COLORS
+        elif dataset_type == DatasetType.CITYSCAPES:
+            self.palette = CITYSCAPES_COLORS
 
     def on_train_start(self, trainer: "Trainer") -> None:
         self.table = wandb.Table(columns=["step", "image"], log_mode="INCREMENTAL")
@@ -165,8 +174,8 @@ class VisualizeSegmentationResultsCallback(Callback):
             ood_scores,
         ):
             img_np = trainer.denormalize(img)
-            true_colored = color(gt_mask.cpu().numpy(), COLORS)
-            pred_colored = color(pred_mask.cpu().numpy(), COLORS)
+            true_colored = color(gt_mask.cpu().numpy(), self.palette)
+            pred_colored = color(pred_mask.cpu().numpy(), self.palette)
 
             images_to_concat = [img_np, true_colored, pred_colored]
 
@@ -187,10 +196,19 @@ class PixelEmbeddingsCallback(Callback):
     Log PCA visualization of pixels embeddings for the first image in a batch.
     """
 
-    def __init__(self, anchors_magnitude: float, min_num_pixels: int) -> None:
+    def __init__(
+        self,
+        anchors_magnitude: float,
+        min_num_pixels: int,
+        dataset_type: DatasetType = DatasetType.STREETHAZARDS,
+    ) -> None:
         self.anchors_magnitude = anchors_magnitude
         self.min_num_pixels = min_num_pixels
-        self.id_to_label_map = StreetHazards.id_to_label_map()
+
+        if dataset_type == DatasetType.STREETHAZARDS:
+            self.id_to_label_map = StreetHazards.id_to_label_map()
+        else:
+            self.id_to_label_map = CityscapesDataset.id_to_label_map()
 
     def on_eval_end(self, trainer: "Trainer") -> None:
         val_loader = trainer.get_loader(Stage.VAL)

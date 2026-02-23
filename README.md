@@ -46,16 +46,44 @@ pip install -e .
 
 ### 3. **Dataset setup:**
 
-The dataset must be downloaded manually from the links provided above and extracted into the `datasets/` folder. Create the folder if it does not exist. The resulting structure should look like this:
+The dataset must be downloaded manually from the links provided above and extracted into the `datasets/` folder. Create the folder if it does not exist. 
+
+#### A. Street Hazards (Primary)
+
+1. Download:
+    * [Training and validation sets download link](https://people.eecs.berkeley.edu/~hendrycks/streethazards_train.tar)
+    * [Test set download link](https://people.eecs.berkeley.edu/~hendrycks/streethazards_test.tar)
+
+2. Extract the contents into the `datasets/train/` and `datasets/test/` folders respectively.
+
+#### B. Road Anomaly Benchmark (Optional/Benchmarking)
+
+Required only if you intend to run the `benchmark_smiyc` benchmark script.
+
+1. Download the **RoadAnomaly21** from the [SegmentMentMeIfYouCan website](https://segmentmeifyoucan.com/datasets).
+2. Extract the contents into the `datasets/dataset_AnomalyTrack/` folder.
+
+#### C. Cityscapes (Optional/Pre-training)
+
+Used for closed-set and open-set trainings (with OutlierExposure) before RoadAnomaly evaluation.
+
+1. Register from the [official website](https://www.cityscapes-dataset.com/downloads/) to dowload the Cityscapes dataset.
+2. Download the following packages:
+   * `leftImg8bit_trainvaltest.zip` (Images)
+   * `gtFine_trainvaltest.zip` (Annotations)
+3. Extract the contents into the `datasets/cityscapes/` folder.
+
+The resulting structure should look like this:
 
 ```plain
-├── datasets/
-│   ├── test/           # Extracted from streethazards_test.tar
-│   └── train/          # Extracted from streethazards_train.tar
+datasets/
+├── test/                   # Street Hazards (Test)
+├── train/                  # Street Hazards (Train)
+├── RoadAnomaly/            # Road Anomaly Benchmark
+└── cityscapes/             # Cityscapes
+    ├── gtFine/
+    └── leftImg8bit/
 ```
-
-* [Training and validation sets download link](https://people.eecs.berkeley.edu/~hendrycks/streethazards_train.tar)
-* [Test set download link](https://people.eecs.berkeley.edu/~hendrycks/streethazards_test.tar)
 
 ### 4. **Download weights (optional):**
 
@@ -65,6 +93,7 @@ All pre-trained models are available for download in the table below. Once downl
 | :--- | :---: |
 | **ProtoSegNet (Baseline)** | [weights](https://drive.google.com/file/d/15fM3p8VJRrLllwiO7Fu7f-O7N1LuGaqR/view?usp=share_link) |
 | **ProtoSegNet (Optimized)** | [weights](https://drive.google.com/file/d/1WaaYNKvnsZiBZ98xj5zM-Nawzo78xDGH/view?usp=share_link) |
+| **ProtoSegNet (Cityscapes)** | [weights](https://drive.google.com/file/d/1PD0exlLyXCLoDQhAznQthKZCLEaUSHlg/view?usp=share_link) |
 | **Mask2Former + RbA** | [weights](https://drive.google.com/file/d/16Js6iKtZAV30Mj56064mOYSVloMTtAOp/view?usp=share_link) |
 
 Alternatively, you can use the provided script to download all checkpoints automatically:
@@ -112,6 +141,17 @@ uv run python scripts/eval.py \
 * `--split`: The dataset split to evaluate on (test or val). Defaults to test.
 * `--checkpoint_path`: (Optional) Path to a specific .pth model file. If not provided, the script will look for the default checkpoint defined in your config.
 
+### Benchmarking on RoadAnomaly (SegmentMeIfYouCan)
+
+To benchmark the model on the RoadAnomaly dataset, use the `benchmark_smiyc.py` script:
+
+```bash
+uv run --extra smiyc python scripts/benchmark_smiyc.py \
+    --dataset AnomalyTrack-all
+```
+
+**Note**: This script requires the `RoadAnomaly` dataset to be correctly placed in `datasets/dataset_AnomalyTrack/` as described in the Dataset setup section.
+
 ## Project Structure
 
 ```plain
@@ -123,7 +163,11 @@ ml4cv_assignment/
 │   └── ...
 ├── datasets/           # Dataset directory
 │   ├── test/           # Extracted from streethazards_test.tar
-│   └── train/          # Extracted from streethazards_train.tar
+│   ├── train/          # Extracted from streethazards_train.tar
+│   ├── dataset_AnomalyTrack/  # Road Anomaly Benchmark
+│   └── cityscapes/     # Cityscapes dataset
+├── external/           # Submodules
+│   └── road-anomaly-benchmark/
 ├── ml4cv_assignment/   # Main package
 │   ├── config/         # Pydantic schemas and configuration logic
 │   ├── data/           # Dataset, augmentations and collation

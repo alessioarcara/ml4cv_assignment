@@ -1,23 +1,23 @@
 from functools import partial
-from pathlib import Path
 from typing import Annotated, Callable, Optional, Union
 
 import albumentations as A
-import torch
-from loguru import logger
 from pydantic import BaseModel, Field
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
 from transformers import Mask2FormerImageProcessor
 
-from ml4cv_assignment.config.dataset_config import StreetHazardsDatasetConfig
+from ml4cv_assignment.config.dataset_config import (
+    CityscapesDatasetConfig,
+    StreetHazardsDatasetConfig,
+)
 from ml4cv_assignment.config.model_config import ModelConfig
 from ml4cv_assignment.config.paths_config import PathsConfig
 from ml4cv_assignment.config.trainer_config import TrainerConfig
 from ml4cv_assignment.data.collate import collate_fn
 from ml4cv_assignment.data.data_utils import MultiEpochsDataLoader
-from ml4cv_assignment.data.streethazards import StreetHazards
 from ml4cv_assignment.models.base_model import BaseModel as MyModel
-from ml4cv_assignment.utils.checkpoint import remap_state_dict_keys
+from ml4cv_assignment.utils.checkpoint import load_checkpoint
+from ml4cv_assignment.utils.typings import SplitType
 
 
 class Config(BaseModel):
@@ -25,46 +25,41 @@ class Config(BaseModel):
     training: TrainerConfig
     paths: PathsConfig
     dataset_config: Annotated[
-        Union[StreetHazardsDatasetConfig], Field(discriminator="type")
+        Union[StreetHazardsDatasetConfig, CityscapesDatasetConfig],
+        Field(discriminator="type"),
     ]
     model_cfg: ModelConfig
 
     def dataset(
         self,
-        root_dir: Path,
+        subset: SplitType,
         transforms: Optional[A.Compose] = None,
-        subset: str = "training",
-    ) -> "StreetHazards":
-        return StreetHazards(
-            config=self.dataset_config,
-            root_dir=root_dir,
-            coco_dir=self.paths.coco_data_dir,
-            transforms=transforms,
+    ) -> Dataset:
+        return self.dataset_config.create_dataset(
+            paths=self.paths,
             subset=subset,
+            transforms=transforms,
         )
 
     @property
-    def train_dataset(self) -> "StreetHazards":
+    def train_dataset(self) -> Dataset:
         return self.dataset(
-            root_dir=self.paths.street_hazards_train_dir,
+            subset=SplitType.TRAINING,
             transforms=self.training.train_transforms,
-            subset="training",
         )
 
     @property
-    def val_dataset(self) -> "StreetHazards":
+    def val_dataset(self) -> Dataset:
         return self.dataset(
-            root_dir=self.paths.street_hazards_train_dir,
+            subset=SplitType.VALIDATION,
             transforms=self.training.val_transforms,
-            subset="validation",
         )
 
     @property
-    def test_dataset(self) -> "StreetHazards":
+    def test_dataset(self) -> Dataset:
         return self.dataset(
-            root_dir=self.paths.street_hazards_test_dir,
+            subset=SplitType.TEST,
             transforms=self.training.val_transforms,
-            subset="test",
         )
 
     @property
@@ -108,19 +103,6 @@ class Config(BaseModel):
         model = self.model_cfg.model
 
         if self.paths.checkpoint:
-            ckpt = torch.load(self.paths.checkpoint, map_location="cpu")
-
-            state_dict = remap_state_dict_keys(ckpt, self.model_cfg.ckpt_remap)
-
-            missing_keys, unexpected_keys = model.load_state_dict(
-                state_dict, strict=False
-            )
-
-            if len(missing_keys) > 0:
-                logger.warning(f"Missing keys: {missing_keys}")
-            if len(unexpected_keys) > 0:
-                logger.warning(f"Unexpected keys: {unexpected_keys}")
-
-            logger.info("✅ Checkpoint loaded successfully")
+            load_checkpoint(model, self.paths.checkpoint, self.model_cfg.ckpt_remap)
 
         return model
